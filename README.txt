@@ -7,8 +7,17 @@ Contact: Philippe Coval <rzr(a)gna.org
 
 ### TODO ###
 
-Port to FireFoxOS
+* TODO [#A] : nicer UI/UX
+* TODO [#B] : map sources selection
+* TODO [#B] : convert la,lo to wgs (ie google url to wgs)
+* TODO [#B] : bookmarks
+* TODO [#C] : share position (mail, im, social)
+* TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome
+* TODO [#C] : load navicore input bookmarks
+* TODO [#C] : 3D globe and trace curves
 
+
+### NOTES ###
 
 Select maps source ie :
 

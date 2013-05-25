@@ -22,49 +22,49 @@ mapo
 <body>
     <div data-role="page" >
         <div data-role="header" data-position="fixed" >
-            <h1>Single-Page Application </h1>
+            <h1>Mapo : GPS tracker and WGS84 converter</h1>
         </div><!-- /header -->
 
         <div data-role="content" >
 
 
-<p id="locationInfo"></p>
-
 
 <form>
-<input type="text" id="wgs"
-value="http://rzr.online.fr/q/geo/0,0# mapo : wgs84"
-/>
 
-
-hintText: "Latitude N+/S-"
+Latitude N+/S- :
 
 <input  type="text" id="la" value="26.357865"
 onChange="set(la.value, lo.value);"
 >
 
-hintText: "Longitude W+/E-"
+
+Longitude W+/E-" :
 
 <input  type="text" id="lo" value="127.783782"
-onChange="set(la.value, lo.value);"
+  onChange="set(la.value, lo.value);"
 />
 
 
+<input type="text" id="wgs"
+  value="http://rzr.online.fr/q/geo/0,0# mapo : wgs84"
+/>
 
-</select>
+
 
 <input type="text" id="wgs" 
  value="wgs84 ( degree, minutes, seconds)"
 />
 
-<input type="button" onClick="oneShotFunc()">
+
+<input type="button" onClick="oneShotFunc()" value="Track from GPS" />
 
 </form>
 
+<p id="locationInfo"></p>
 
 
 <iframe width=100% height=600 id="webView"
-src="http://rzr.online.fr/geo/26.357865,127.783782">
+  src="http://rzr.online.fr/geo/26.357865,127.783782">
 </iframe>
 
         </div><!-- /content -->

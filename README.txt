@@ -7,6 +7,9 @@ Contact: Philippe Coval <rzr(a)gna.org
 
 ### TODO ###
 
+Port to FireFoxOS
+
+
 Select maps source ie :
 
 <select>

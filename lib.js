@@ -85,6 +85,7 @@ var base="http://rzr.online.fr/geo/";
 
 function set(la, lo)
 {
+	// base = selected url
     if (  document.getElementById("la").value != la ) {
 	document.getElementById("la").value = la;
     } 
@@ -97,7 +98,9 @@ function set(la, lo)
     document.getElementById("wgs").value = text;
 
     var url =  base + la + "," + lo;
-    document.getElementById("webView").src = url;
+    // base.replace( "{lo}" , lo );
+    document.getElementById("webViewMini").src = url;
+    document.getElementById("webViewMaxi").src = url;
 }
 
 

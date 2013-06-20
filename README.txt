@@ -8,7 +8,7 @@ Contact: Philippe Coval <rzr(a)gna.org
 ### TODO ###
 
 * TODO [#A] : nicer UI/UX
-* TODO [#B] : map sources selection
+* TODO [#B] : map sources selection (mapstraction)
 * TODO [#B] : convert la,lo to wgs (ie google url to wgs)
 * TODO [#B] : bookmarks
 * TODO [#C] : share position (mail, im, social)

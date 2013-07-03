@@ -140,4 +140,22 @@ function decimalToCoord( $lo , $la )
 
 $coord = decimalToCoord( $la , $lo );
 
+
+	
+<!--					<input type="radio" name="provider" id="wikimapia" onclick="refresh()"
+						value="http://www.wikimapia.org/#y=${lat}&x=${lon}&z=13&l=2&m=a&v=2"/>
+					<label for="wikimapia">Wikimapia</label>
+
+					<input type="radio" name="provider" id="rzr" onclick="refresh()"
+						value="http://rzr.online.fr/geo/${lat},${lon}"/> 
+					<label for="rzr">Rzr</label>
+
+					<input type="radio" name="provider" id="bing" onclick="refresh()"
+						value="http://www.bing.com/maps/embed/?v=2&amp;cp=${lat}~${lon}&amp;lvl=5&amp;dir=0&amp;sty=r&amp;form=LMLTEW&amp;emid=bf64cbe7-ff5a-4400-4fdc-cf8e5e8e01e0"/> 
+					<label for="bing">Bing</label>
+							
+					<input type="radio" name="provider" id="flasheart" onclick="refresh()"
+						value="http://www.flashearth.com/?&z=12.1&r=0&src=2&lat=${lat}&lon=${lon}"/> 
+					<label for="flasheart">Flashearth</label>
+ -->	
 -->

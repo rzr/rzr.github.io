@@ -8,138 +8,161 @@
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="An application" />
 
-<title>Mapo</title>
+<title>MAPO</title>
 
 <link rel="stylesheet" href="./css/jquery.mobile-1.2.0.css" />
 <link rel="stylesheet" href="./css/Mapo.css" />
+<link rel="stylesheet" href="./css/style.css" />
 
+<script type="text/javascript"
+	src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript"
+	src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
 <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="./js/jquery.mobile-1.2.0.js"></script>
 <script type="text/javascript" src="./js/main.js"></script>
 <script type="text/javascript" src="./lib.js"></script>
-
 </head>
 
-<body onload="refresh()">
+<body>
 
-<!-- Page 1 : My position -->
+	<!-- Page 1 : My position -->
 	<div data-role="page" id="position">
-	
-		<div data-role="header" data-position="fixed">
-			<h1>MAPO</h1>
-			<button id="exit" data-inline="true">Exit</button>
+		<div data-role="header" data-id="myheader" data-position="fixed">
+						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
+						<h1 class="ui-title">MAPO</h1>
+						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#position" class="ui-btn-active">Position</a></li>
-					<li><a href="#place">Map</a></li>
-					<li><a href="#options">Options</a></li>
+					<li><a href="#position" class="ui-btn-active ui-state-persist">Position</a></li>
+					<li><a href="#map">Map</a></li>
+					<li><a href="#settings">Settings</a></li>
 				</ul>
-			</div> <!-- /navbar -->
-		</div> <!-- /header -->
+			</div>
+			<!-- /navbar -->
+		</div>
+		<!-- /header -->
 
 		<div data-role="content">
-
 			<form>
-				Latitude N+/S- : <input type="text" id="lat" value="26.357865" onChange="set(lat.value, lon.value);">
-				Longitude W+/E-" : <input type="text" id="lon" value="127.783782" onChange="set(lat.value, lon.value);" />
-				<input type="button" onclick="getLocation()" value="Track from GPS"/>
+				<label for=lat>Latitude N+/S- :</label>
+				<input type="text" id="lat" value="26.357865" onChange="set(lat.value, lon.value);"/>
+				<label for=lon>Longitude W+/E- :</label>
+				<input type="text" id="lon" value="127.783782" onChange="set(lat.value, lon.value);"/>
+				<p>
+					<input type="button" onclick="getLocation()" value="Your position from GPS" />
+				<p>
 			</form>
-			
+
 			<p id="location"></p>
-			
-			<iframe class="map" width="100%" height="100%" src=""></iframe>
-		
-		</div> <!-- /content -->
-
-
-		<div data-role="footer" data-position="fixed">
-			http://gitorious.org/mapo
-		</div> <!-- /footer -->
-	</div> <!-- /page #position-->
-
-<!-- Page 2 : Search a place -->
-
-	<div data-role="page" id="place">
-
-		<div data-role="header" data-position="fixed">
-		
-			<h1>MAPO</h1>
-			<button id="exit" data-inline="true">Exit</button>
-			
-			<div data-role="navbar">
-				<ul>
-					<li><a href="#position">Position</a></li>
-					<li><a href="#place" class="ui-btn-active">Map</a></li>
-					<li><a href="#options">Options</a></li>
-				</ul>
-			</div> <!-- /navbar -->
-		</div> <!-- /header -->
-
-		<div data-role="content">
-		<p>
-			<iframe width=100% height=100% id="webViewMaxi" class="map"
-				src="hello"> </iframe>
-		</p>
-		</div> <!-- /content -->
-
-
-		<div data-role="footer" data-position="fixed">
-			&copy; 2013 Eurogiciel. All rights reserved.
-		</div> <!-- /footer -->
-	</div> <!-- /page #place-->
-
-<!-- Page 3 : Options -->
-	<div data-role="page" id="options">
-
-		<div data-role="header" data-position="fixed">
-			<h1>MAPO</h1>
-			<button id="exit" data-inline="true">Exit</button>
-			
-			<div data-role="navbar">
-				<ul>
-					<li><a href="#position">Position</a></li>
-					<li><a href="#place">Map</a></li>
-					<li><a href="#options" class="ui-btn-active">Options</a></li>
-				</ul>
-			</div> <!-- /navbar -->
-		</div> <!-- /header -->
-
-		<div data-role="content">
 
 			<form>
-				<input type="text" id="link"/> 
-				<input type="text" id="wgs" value="wgs84 ( degree, minutes, seconds)" />
+				<label for="link">Link :</label>
+				<input type="text" id="link" />
+				<label for="wgs">wgs84 ( degree, minutes, seconds) :</label>
+				<input type="text" id="wgs" value="wgs84 ( degree, minutes, seconds)"/>
+			</form>
+		</div>
+		<!-- /content -->
 
+
+		<div data-role="footer" data-id="myfooter" data-position="fixed">
+			<p>Open Source Project : http://gitorious.org/mapo</p>
+		</div>
+		<!-- /footer -->
+	</div>
+	<!-- /page #position-->
+
+	<!-- Page 2 : Search a place -->
+
+	<div data-role="page" id="map">
+		<div data-role="header" data-id="myheader" data-position="fixed">
+						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
+						<h1 class="ui-title">MAPO</h1>
+						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#position">Position</a></li>
+					<li><a href="#map" class="ui-btn-active ui-state-persist">Map</a></li>
+					<li><a href="#settings">Settings</a></li>
+				</ul>
+			</div>
+			<!-- /navbar -->
+		</div>
+		<!-- /header -->
+
+		<div data-role="content">
+
+			<div id="myMap"></div>
+
+		</div>
+		<!-- /content -->
+
+
+		<div data-role="footer" data-id="myfooter" data-position="fixed">
+			<p>Open Source Project : http://gitorious.org/mapo</p>
+		</div>
+		<!-- /footer -->
+	</div>
+	<!-- /page #place-->
+
+	<!-- Page 3 : Options -->
+	<div data-role="page" id="settings">
+
+		<div data-role="header" data-id="myheader" data-position="fixed">
+						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
+						<h1 class="ui-title">MAPO</h1>
+						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#position">Position</a></li>
+					<li><a href="#map">Map</a></li>
+					<li><a href="#settings" class="ui-btn-active ui-state-persist">Settings</a></li>
+				</ul>
+			</div>
+			<!-- /navbar -->
+		</div>
+		<!-- /header -->
+
+		<div data-role="content">
+		
+			<form>
 				<fieldset data-role="controlgroup">
-	
-				<legend>Please choose a web mapping service :</legend>
 
-					<input type="radio" name="mapChoice" id="mapChoice1" onclick="refresh()"
-						value="http://www.wikimapia.org/#y=${lat}&x=${lon}&z=13&l=2&m=a&v=2" checked="checked"/>
-					<label for="mapChoice1">Wikimapia</label>
+					<legend>Please choose a web mapping service :</legend>
 
-					<input type="radio" name="mapChoice" id="mapChoice2" onclick="refresh()"
-						value="http://rzr.online.fr/geo/${lat},${lon}"/> 
-					<label for="mapChoice2">Rzr</label>
+					<input type="radio" name="provider" id="openstreetmap" onclick="refresh()"
+						value="http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}"
+						checked="checked"/>
+					<label for="openstreetmap">OpenStreetMap</label>
 
-					<input type="radio" name="mapChoice" id="mapChoice3" onclick="refresh()"
-						value="http://www.bing.com/maps/embed/?v=2&amp;cp=${lat}~${lon}&amp;lvl=5&amp;dir=0&amp;sty=r&amp;form=LMLTEW&amp;emid=bf64cbe7-ff5a-4400-4fdc-cf8e5e8e01e0"/> 
-					<label for="mapChoice3">Bing</label>
-							
-					<input type="radio" name="mapChoice" id="mapChoice4" onclick="refresh()"
-						value="http://www.flashearth.com/?&z=12.1&r=0&src=2&lat=${lat}&lon=${lon}"/> 
-					<label for="mapChoice4">Flashearth</label>
-				
+					<input type="radio" name="provider" id="googlemaps" onclick="refresh()"
+						value="http://maps.google.com/maps?&z=10&ll=${lat},${lon}"/>
+						<label for="googlemaps">Google Maps</label>
 				</fieldset>
 			</form>
+			
+			<table>
+				<tr>
+					<td><label for="switchOnline">Online/Offline :</label></td>
+					<td>
+						<select name="switchOnline" id="switchOnline" data-role="slider" onchange="switchOnline()">
+							<option value="offline">Offline</option>
+							<option value="online">Online</option>
+						</select>
+					</td>
+				<tr>
+			</table>
+		</div>
+		<!-- /content -->
 
-		</div> <!-- /content -->
 
-
-		<div data-role="footer" data-position="fixed">
-			&copy; 2013 Eurogiciel. All rights reserved.
-		</div> <!-- /footer -->
-	</div> <!-- /page #options-->
+		<div data-role="footer" data-id="myfooter" data-position="fixed">
+			<p>Open Source Project : http://gitorious.org/mapo</p>
+		</div>
+		<!-- /footer -->
+	</div>
+	<!-- /page #options-->
 
 
 </body>

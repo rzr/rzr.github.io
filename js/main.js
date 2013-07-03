@@ -1,16 +1,9 @@
-//Initialize function
 var init = function () {
     // TODO:: Do your initialization job
-	
-	// Button exit
-	$("#exit").click(exit());
-	
-	// Map initialization by default
-	
+	refresh();
+		
 	// End of initialization
     console.log("init() called");
 };
 
-$(function(){
-	init();
-});
+window.onload = init;

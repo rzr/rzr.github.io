@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <meta charset="utf-8" />
@@ -28,10 +27,12 @@
 
 	<!-- Page 1 : My position -->
 	<div data-role="page" id="position">
-		<div data-role="header" data-id="myheader" data-position="fixed">
-						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
-						<h1 class="ui-title">MAPO</h1>
-						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
+		<div data-role="header" data-id="myHeader" data-position="fixed">
+			<a href="#position" data-role="button" id="home" class="ui-btn-left"
+				data-icon="home">Home</a>
+			<h1 class="ui-title">MAPO</h1>
+			<a data-role="button" id="exit" class="ui-btn-right"
+				data-icon="delete" onclick="exit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position" class="ui-btn-active ui-state-persist">Position</a></li>
@@ -45,30 +46,26 @@
 
 		<div data-role="content">
 			<form>
-				<label for=lat>Latitude N+/S- :</label>
-				<input type="text" id="lat" value="26.357865" onChange="set(lat.value, lon.value);"/>
-				<label for=lon>Longitude W+/E- :</label>
-				<input type="text" id="lon" value="127.783782" onChange="set(lat.value, lon.value);"/>
+				<label for=lat>Latitude N+/S- :</label> <input type="text" id="lat"
+					value="26.357865" onChange="set(lat.value, lon.value);" /> <label
+					for=lon>Longitude W+/E- :</label> <input type="text" id="lon"
+					value="127.783782" onChange="set(lat.value, lon.value);" />
 				<p>
-					<input type="button" onclick="getLocation()" value="Your position from GPS" />
+					<input type="button" onclick="getLocation()"
+						value="Your position from GPS" />
 				<p>
-			</form>
-
-			<p id="location"></p>
-
-			<form>
-				<label for="link">Link :</label>
-				<input type="text" id="link" />
-				<label for="wgs">wgs84 ( degree, minutes, seconds) :</label>
-				<input type="text" id="wgs" value="wgs84 ( degree, minutes, seconds)"/>
+					<label for="OSMLink">OpenStreetMap Link :</label> <input
+						type="text" id="OSMLink" /> <label for="GMLink">Google
+						Maps Link :</label> <input type="text" id="GMLink" /> <label for="wgs">wgs84
+						( degree, minutes, seconds) :</label> <input type="text" id="wgs"
+						value="wgs84 ( degree, minutes, seconds)" />
 			</form>
 		</div>
 		<!-- /content -->
 
 
-		<div data-role="footer" data-id="myfooter" data-position="fixed">
-			<p>Open Source Project : http://gitorious.org/mapo</p>
-		</div>
+		<div data-role="footer" data-id="myFooter" data-position="fixed">
+			Open Source Project : http://gitorious.org/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #position-->
@@ -76,10 +73,12 @@
 	<!-- Page 2 : Search a place -->
 
 	<div data-role="page" id="map">
-		<div data-role="header" data-id="myheader" data-position="fixed">
-						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
-						<h1 class="ui-title">MAPO</h1>
-						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
+		<div data-role="header" data-id="myHeader" data-position="fixed">
+			<a href="#position" data-role="button" id="home" class="ui-btn-left"
+				data-icon="home">Home</a>
+			<h1 class="ui-title">MAPO</h1>
+			<a data-role="button" id="exit" class="ui-btn-right"
+				data-icon="delete" onclick="exit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position">Position</a></li>
@@ -99,9 +98,8 @@
 		<!-- /content -->
 
 
-		<div data-role="footer" data-id="myfooter" data-position="fixed">
-			<p>Open Source Project : http://gitorious.org/mapo</p>
-		</div>
+		<div data-role="footer" data-id="myFooter" data-position="fixed">
+			Open Source Project : http://gitorious.org/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #place-->
@@ -109,10 +107,12 @@
 	<!-- Page 3 : Options -->
 	<div data-role="page" id="settings">
 
-		<div data-role="header" data-id="myheader" data-position="fixed">
-						<a href="#position" data-role="button" id="home" class="ui-btn-left" data-icon="home">Home</a>
-						<h1 class="ui-title">MAPO</h1>
-						<a data-role="button" id="exit" class="ui-btn-right" data-icon="delete" onclick="exit()">Exit</a>
+		<div data-role="header" data-id="myHeader" data-position="fixed">
+			<a href="#position" data-role="button" id="home" class="ui-btn-left"
+				data-icon="home">Home</a>
+			<h1 class="ui-title">MAPO</h1>
+			<a data-role="button" id="exit" class="ui-btn-right"
+				data-icon="delete" onclick="exit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position">Position</a></li>
@@ -125,7 +125,7 @@
 		<!-- /header -->
 
 		<div data-role="content">
-		
+			<!-- 
 			<form>
 				<fieldset data-role="controlgroup">
 
@@ -133,33 +133,33 @@
 
 					<input type="radio" name="provider" id="openstreetmap" onclick="refresh()"
 						value="http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}"
-						checked="checked"/>
+						/>
 					<label for="openstreetmap">OpenStreetMap</label>
 
 					<input type="radio" name="provider" id="googlemaps" onclick="refresh()"
-						value="http://maps.google.com/maps?&z=10&ll=${lat},${lon}"/>
+						value="http://maps.google.com/maps?&z=10&ll=${lat},${lon}"
+						checked="checked"/>
 						<label for="googlemaps">Google Maps</label>
+						
 				</fieldset>
 			</form>
-			
+			 -->
 			<table>
 				<tr>
-					<td><label for="switchOnline">Online/Offline :</label></td>
-					<td>
-						<select name="switchOnline" id="switchOnline" data-role="slider" onchange="switchOnline()">
+					<td><label for="switchOnline">Online/Offline Option :</label></td>
+					<td><select name="switchOnline" id="switchOnline"
+						data-role="slider" onchange="switchOnline()">
 							<option value="offline">Offline</option>
 							<option value="online">Online</option>
-						</select>
-					</td>
+					</select></td>
 				<tr>
 			</table>
 		</div>
 		<!-- /content -->
 
 
-		<div data-role="footer" data-id="myfooter" data-position="fixed">
-			<p>Open Source Project : http://gitorious.org/mapo</p>
-		</div>
+		<div data-role="footer" data-id="myFooter" data-position="fixed">
+			Open Source Project : http://gitorious.org/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #options-->

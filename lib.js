@@ -1,6 +1,11 @@
-var zoom = 3;
+
+var map;
+var zoom = 7;
 var isOnline = false;
 
+/*
+ * WGS Manager
+ */
 function toStringWgs84(lat, lon) {
 	var latitude = lat;
 	var longitude = lon;
@@ -21,7 +26,7 @@ function toStringWgs84(lat, lon) {
 		s = parseInt("" + s, 10);
 		text += "" + d + "d" + m + "m" + s + "s";
 	}
-	//text += "\n";
+	// text += "\n";
 	{
 		if (latitude > 0) {
 			text += "N";
@@ -61,7 +66,7 @@ function toStringText(lat, lon) {
 		s = parseInt("" + s, 10);
 		text = d + " ° " + text + " D " + m + " m " + s + " s ";
 	}
-	//text += "\n";
+	// text += "\n";
 	{
 		if (latitude > 0) {
 			text += "N";
@@ -81,11 +86,37 @@ function toStringText(lat, lon) {
 	return text;
 }
 
-function getUrl() {
-	var url = $("input[name='provider']:checked").attr('value');
+function setWGS(lat, lon) {
+	var text = "wgs84:" + toStringWgs84(lat, lon);
+	var text = toStringText(lat, lon);
+	document.getElementById("wgs").value = text;
+}
+
+/*
+ * Link Manager
+ */
+function getOSMLink(lat, lon) {
+	var url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+	url = url.replace("${lon}", lon);
+	url = url.replace("${lat}", lat);
 	return url;
 }
 
+function getGMLink(lat, lon) {
+	var url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
+	url = url.replace("${lon}", lon);
+	url = url.replace("${lat}", lat);
+	return url;
+}
+
+function updateLinks(lat, lon) {
+	$('#OSMLink').val(getOSMLink(lat, lon));
+	$('#GMLink').val(getGMLink(lat, lon));
+}
+
+/*
+ * Map Manager
+ */
 function getMapSize() {
 	var viewHeight = $(window).height();
 	var viewWidth = $(window).width();
@@ -99,86 +130,84 @@ function getMapSize() {
 	return [ contentWidth, contentHeight ];
 }
 
-function setGoogleMaps(lat, lon) {
+function setMapSize() {
+	var mapSize = getMapSize();
+	$('#myMap').css("width", mapSize[0]);
+	$('#myMap').css("height", mapSize[1]);
+}
+
+function chargeMap(lat, lon) {
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
-		layers : [ new OpenLayers.Layer.Google("Google Streets", // the default
-		{
-			numZoomLevels : 20
-		}), new OpenLayers.Layer.Google("Google Physical", {
-			type : google.maps.MapTypeId.TERRAIN
-		}), new OpenLayers.Layer.Google("Google Hybrid", {
-			type : google.maps.MapTypeId.HYBRID,
-			numZoomLevels : 20
-		}), new OpenLayers.Layer.Google("Google Satellite", {
-			type : google.maps.MapTypeId.SATELLITE,
-			numZoomLevels : 22
-		}) ],
+		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
+				new OpenLayers.Layer.Google("Google Streets", {
+					numZoomLevels : 20
+				}), new OpenLayers.Layer.Google("Google Physical", {
+					type : google.maps.MapTypeId.TERRAIN
+				}), new OpenLayers.Layer.Google("Google Hybrid", {
+					type : google.maps.MapTypeId.HYBRID,
+					numZoomLevels : 20
+				}), new OpenLayers.Layer.Google("Google Satellite", {
+					type : google.maps.MapTypeId.SATELLITE,
+					numZoomLevels : 22
+				}) ],
 		center : new OpenLayers.LonLat(lon, lat)
-		// Google.v3 uses web mercator as projection, so we have to
-		// transform our coordinates
+
 		.transform('EPSG:4326', 'EPSG:3857'),
-		zoom : 5
+		zoom : 7
 	});
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 }
 
-function setOpenLayers(lat, lon) {
-	var map = new OpenLayers.Map("myMap"); // Add a map object
-	map.addLayer(new OpenLayers.Layer.OSM()); // Add the default layer OSM
-	var mapProjection = map.getProjectionObject();
-	var sphereProjection = new OpenLayers.Projection("EPSG:4326");
-	var coord = new OpenLayers.LonLat(lon, lat); // longitude/latitude coordinates
-	coord.transform(sphereProjection, mapProjection);
-	map.setCenter(coord, zoom);
-}
-
-function set(lat, lon) {
-	var provider = $('input[type=radio][name=provider]:checked').attr('id');
-	var url = getUrl();
+/*
+ * Latitude/Lontitude Manager
+ */
+function setLat(lat) {
 	if (document.getElementById("lat").value != lat) {
 		document.getElementById("lat").value = lat;
 	}
+}
+
+function setLon(lon) {
 	if (document.getElementById("lon").value != lon) {
 		document.getElementById("lon").value = lon;
 	}
-
-	var text = "wgs84:" + toStringWgs84(lat, lon);
-	text = toStringText(lat, lon);
-	document.getElementById("wgs").value = text;
-
-	url = url.replace("${lon}", lon);
-	url = url.replace("${lat}", lat);
-	document.getElementById("link").value = url;
-
-	$('#myMap').empty();
-
-	if (isOnline) {
-
-		var mapSize = getMapSize();
-		$('#myMap').css("width", mapSize[0]);
-		$('#myMap').css("height", mapSize[1]);
-
-		switch (provider) {
-		case 'googlemaps':
-			setGoogleMaps(lat, lon);
-			break;
-		case 'openstreetmap':
-			setOpenLayers(lat, lon);
-			break;
-		}
-	} else {
-		$('#myMap').html(
-			"<p align='center'>Please connect your application online<br/>" +
-			"if you want to charge the map</p>");
-	}
-
 }
 
+/*
+ * General Manager
+ */
+function set(lat, lon) {
+	setLat(lat);
+	setLon(lon);
+	setWGS(lat, lon);
+	updateLinks(lat, lon);
+
+	$('#myMap').empty();
+	if (isOnline) {
+		setMapSize();
+		chargeMap(lat, lon);
+	} else {
+		$('#myMap').html(
+				"<p align='center'>Please connect your application online in the settings"
+						+ " if you want to charge the map</p>");
+	}
+}
+
+function refresh() {
+	if (isOnline && !navigator.onLine) {
+		$('#switchOnline').val('offline').slider('refresh');
+		isOnline = false;
+		alert("Connection lost");
+	}
+	set(document.getElementById("lat").value,
+			document.getElementById("lon").value);
+}
+
+/*
+ * Location Manager
+ */
 function showLocation(position) {
-//	document.getElementById("location").innerHTML = "<p>Latitude : "
-//			+ position.coords.latitude + "<br>" + "Longitude : "
-//			+ position.coords.longitude + "</p>";
 	set(position.coords.latitude, position.coords.longitude);
 }
 
@@ -208,7 +237,7 @@ function getLocation() {
 			maximumAge : 600000
 		});
 	} else {
-		document.getElementById("location").innerHTML=
+		document.getElementById("location").innerHTML = 
 			"Geolocation is not supported by this browser.";
 	}
 }
@@ -217,25 +246,25 @@ function watchLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.watchPosition(showLocation, errorLocation);
 	} else {
-		document.getElementById("location").innerHTML=
-			"Geolocation is not supported.";
+		document.getElementById("location").innerHTML = "Geolocation is not supported.";
 	}
 }
 
-function refresh() {
-	$('#myMap').empty();
-	set(document.getElementById("lat").value,
-			document.getElementById("lon").value);
-}
-
+/*
+ * Connection Manager
+ */
 function switchOnline() {
-	if (isOnline) {
-		isOnline = false;
-		refresh();
+	if (!isOnline) {
+		if (navigator.onLine) {
+			isOnline = true;
+		} else {
+			$('#switchOnline').val('offline').slider('refresh');
+			alert("Can not connect");
+		}
 	} else {
-		isOnline = true;
-		refresh();
+		isOnline = false;
 	}
+	refresh();
 }
 
 function exit() {

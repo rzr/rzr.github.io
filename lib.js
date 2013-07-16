@@ -1,7 +1,9 @@
 
 var map;
-var zoom = 7;
 var isOnline = false;
+var recording = false;
+var recordingFrequency;
+var energySaving = false;
 
 /*
  * WGS Manager
@@ -124,10 +126,9 @@ function getMapSize() {
 	var footer = $("div[data-role='footer']:visible:visible");
 	var navbar = $("div[data-role='navbar']:visible:visible");
 	var content = $("div[data-role='content']:visible:visible");
-	var contentHeight = viewHeight - header.outerHeight()
-			- navbar.outerHeight() - footer.outerHeight();
-	var contentWidth = viewWidth - 30;
-	return [ contentWidth, contentHeight ];
+	var contentHeight = viewHeight-header.outerHeight()-navbar.outerHeight()-footer.outerHeight();
+	var contentWidth = viewWidth-30;
+	return [contentWidth, contentHeight];
 }
 
 function setMapSize() {
@@ -182,7 +183,7 @@ function set(lat, lon) {
 	setLon(lon);
 	setWGS(lat, lon);
 	updateLinks(lat, lon);
-
+	
 	$('#myMap').empty();
 	if (isOnline) {
 		setMapSize();
@@ -232,9 +233,7 @@ function errorLocation(error) {
 function getLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(showLocation, errorLocation, {
-			enableHighAccuracy : true,
-			timeout : 10000,
-			maximumAge : 600000
+			enableHighAccuracy : !energySaving,
 		});
 	} else {
 		document.getElementById("location").innerHTML = 
@@ -242,16 +241,152 @@ function getLocation() {
 	}
 }
 
-function watchLocation() {
+
+/*
+ * Recording manager
+ */
+
+var docDir;
+var doc;
+var file;
+
+function onRecordError(e) {
+	var msg = '';
+	switch (e.code) {
+	case FileError.QUOTA_EXCEEDED_ERR:
+		msg = 'QUOTA_EXCEEDED_ERR';
+		break;
+	case FileError.NOT_FOUND_ERR:
+		msg = 'NOT_FOUND_ERR';
+		break;
+	case FileError.SECURITY_ERR:
+		msg = 'SECURITY_ERR';
+		break;
+	case FileError.INVALID_MODIFICATION_ERR:
+		msg = 'INVALID_MODIFICATION_ERR';
+		break;
+	case FileError.INVALID_STATE_ERR:
+		msg = 'INVALID_STATE_ERR';
+		break;
+	default:
+		msg = 'Unknown Error';
+	break;
+	};
+	console.log('Error: ' + msg);
+}
+
+function resolveFile(){
+	try {
+		file = docDir.resolve(doc);
+	} catch (exc) {
+		console.log('Could not resolve file: ' + exc.message);
+		// Stop in case of any errors
+		return;
+	}
+}
+
+function writeToStream(fileStream) {
+	try {
+		var dateRecord = new Date();
+		var lat = $("#lat").val();
+		var lon = $("#lon").val();
+		fileStream.write(dateRecord+" lat: "+lat+" lon: "+lon+"\r");
+		alert(dateRecord+" lat: "+lat+" lon: "+lon);
+		fileStream.close();
+	} catch (exc) {
+		console.log('Could not write to file: ' + exc.message);
+	}
+}
+
+function writeRecord(){
+	try {
+		file.openStream(
+				// open for appending
+				'a',
+				// success callback - add textarea's contents
+				writeToStream,
+				// error callback
+				onRecordError
+		);
+	} catch (exc) {
+		console.log('Could not write to file: ' + exc.message);
+	}
+}
+
+function readFromStream(fileStream) {
+	try {
+		console.log('File size: ' + file.fileSize);
+		var contents = fileStream.read(fileStream.bytesAvailable);
+		fileStream.close();
+		console.log('file contents:' + contents);
+	} catch (exc) {
+		console.log('Could not read from file: ' + exc.message);
+	}
+}
+
+function readRecord(){
+	try {
+		file.openStream(
+				// open for reading
+				'r',
+				// success callback - add textarea's contents
+				readFromStream,
+				// error callback
+				onRecordError
+		);
+	} catch (exc) {
+		console.log('Could not write to file: ' + exc.message);
+	}
+}
+
+function onResolveSuccess(dir) {
+	docDir = dir;
+	var dateFile = new Date();
+	doc = 'MAPO_course_'+dateFile+".txt";
+	doc = doc.replace(/ /g, "-");
+	docDir.createFile(doc);
+	alert("File created : "+doc);
+	
+}
+
+function onResolveError(e) {
+	console.log('message: ' + e.message);
+}
+
+function recordLocation(position){
+	if(recording){
+		set(position.coords.latitude, position.coords.longitude);
+		resolveFile();
+		writeRecord();
+		readRecord();
+	}
+}
+
+function getPosition() {
+	navigator.geolocation.getCurrentPosition(recordLocation, errorLocation,
+			{enableHighAccuracy : !energySaving});
+}
+
+function record() {
 	if (navigator.geolocation) {
-		navigator.geolocation.watchPosition(showLocation, errorLocation);
+		if(!recording){
+			recording = true;
+			setFrequency();
+			tizen.filesystem.resolve('documents', onResolveSuccess, onResolveError, 'rw');
+			var intervalID = setInterval(getPosition, recordingFrequency);
+		}
+		else {
+			recording = false;
+			clearInterval(intervalID);
+		}
 	} else {
 		document.getElementById("location").innerHTML = "Geolocation is not supported.";
 	}
 }
 
+
 /*
- * Connection Manager
+ * Settings Manager
  */
 function switchOnline() {
 	if (!isOnline) {
@@ -265,6 +400,19 @@ function switchOnline() {
 		isOnline = false;
 	}
 	refresh();
+}
+
+function switchEnergy() {
+	if(!energySaving){
+		energySaving = true;
+	}
+	else {
+		energySaving = false;
+	}
+}
+
+function setFrequency(){
+	recordingFrequency = $('#sliderFrequency').val()*1000; // From seconds to millisecond
 }
 
 function exit() {

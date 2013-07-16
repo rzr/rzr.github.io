@@ -1,5 +1,10 @@
 td
 {
     text-align : center;
+    width : 50%;
 }
 
+#location
+{
+	text-align: center;
+}

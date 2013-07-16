@@ -4,6 +4,9 @@
     <tizen:application id="xqV5JPggpX.mapo" package="xqV5JPggpX" required_version="2.1"/>
     <content src="index.html"/>
     <feature name="http://tizen.org/api/application.read"/>
+    <feature name="http://tizen.org/api/filesystem"/>
     <icon src="icon.png"/>
     <name>mapo</name>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
 </widget>

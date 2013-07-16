@@ -46,19 +46,42 @@
 
 		<div data-role="content">
 			<form>
-				<label for=lat>Latitude N+/S- :</label> <input type="text" id="lat"
-					value="26.357865" onChange="set(lat.value, lon.value);" /> <label
-					for=lon>Longitude W+/E- :</label> <input type="text" id="lon"
-					value="127.783782" onChange="set(lat.value, lon.value);" />
-				<p>
-					<input type="button" onclick="getLocation()"
-						value="Your position from GPS" />
-				<p>
-					<label for="OSMLink">OpenStreetMap Link :</label> <input
-						type="text" id="OSMLink" /> <label for="GMLink">Google
-						Maps Link :</label> <input type="text" id="GMLink" /> <label for="wgs">wgs84
-						( degree, minutes, seconds) :</label> <input type="text" id="wgs"
-						value="wgs84 ( degree, minutes, seconds)" />
+				<table>
+					<tr>
+						<td><label for=lat>Latitude N+/S-:</label></td>
+						<td><input type="text" id="lat" value="26.357865" onChange="set(lat.value, lon.value);" /></td> 
+					</tr>
+					<tr>
+						<td><label for=lon>Longitude W+/E-:</label></td>
+						<td><input type="text" id="lon" value="127.783782" onChange="set(lat.value, lon.value);" /></td>
+					</tr>
+					<tr>
+						<td><label for="OSMLink">OpenStreetMap Link:</label></td>
+						<td><input type="text" id="OSMLink" /></td>
+					</tr>
+					<tr>
+						<td><label for="GMLink">Google Maps Link:</label></td>
+						<td><input type="text" id="GMLink" /></td>
+					</tr>
+					<tr>
+						<td><label for="wgs">wgs84 (degree,minutes,seconds):</label></td>
+						<td><input type="text" id="wgs" value="wgs84 ( degree, minutes, seconds)" /></td>
+					</tr>
+					<tr>
+						<td>
+							<label for="switchRecord">Record your course:</label>
+						</td>
+						<td>
+							<select name="switchRecord" id="switchRecord" data-role="slider" onchange="record()">
+								<option value="stop">Stop</option>
+								<option value="start">Start</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+				<input type="button" onclick="getLocation()" value="Get your position"/>
+				<p id="location"></p>
+				
 			</form>
 		</div>
 		<!-- /content -->
@@ -125,35 +148,35 @@
 		<!-- /header -->
 
 		<div data-role="content">
-			<!-- 
-			<form>
-				<fieldset data-role="controlgroup">
-
-					<legend>Please choose a web mapping service :</legend>
-
-					<input type="radio" name="provider" id="openstreetmap" onclick="refresh()"
-						value="http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}"
-						/>
-					<label for="openstreetmap">OpenStreetMap</label>
-
-					<input type="radio" name="provider" id="googlemaps" onclick="refresh()"
-						value="http://maps.google.com/maps?&z=10&ll=${lat},${lon}"
-						checked="checked"/>
-						<label for="googlemaps">Google Maps</label>
-						
-				</fieldset>
-			</form>
-			 -->
 			<table>
 				<tr>
-					<td><label for="switchOnline">Online/Offline Option :</label></td>
-					<td><select name="switchOnline" id="switchOnline"
-						data-role="slider" onchange="switchOnline()">
+					<td><label for="switchOnline">Connection:</label></td>
+					<td>
+						<select name="switchOnline" id="switchOnline"
+							data-role="slider" onchange="switchOnline()">
 							<option value="offline">Offline</option>
 							<option value="online">Online</option>
-					</select></td>
+						</select>
+					</td>
 				<tr>
+				<tr>
+					<td><label for="switchEnergy">Energy saving:</label></td>
+					<td>
+						<select name="switchEnergy" id="switchEnergy"
+							data-role="slider" onchange="switchEnergy()">
+							<option value="off">Off</option>
+							<option value="on">On</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+				</tr>
+				
 			</table>
+				<label for="sliderFrequency">Recording frequency (seconds):</label>
+				<input type="range" name="sliderFrequency" id="sliderFrequency" value="10" min="1" max="100" onchange="setFrequency()"/>
+
 		</div>
 		<!-- /content -->
 

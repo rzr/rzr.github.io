@@ -18,6 +18,13 @@ Contact: Philippe Coval <rzr(a)gna.org
 * TODO [#C] : 3D globe and trace curves
 
 
+### BUG ###
+
+* BUG [#A] : Frequency of records very irregular
+* BUG [#B] : No record during standby
+* BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases
+
+
 ### NOTES ###
 
 Select maps source ie :

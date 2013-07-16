@@ -4,6 +4,10 @@ URL: https://gitorious.org/mapo/mapo
 Licence: GPL-2.0+
 Contact: Philippe Coval <rzr(a)gna.org
 
+Mapo is a geolocation application for the Tizen OS, developped with HTML5/CSS3 an jQuery.
+
+http://gitorious.org/mapo
+
 
 ### TODO ###
 

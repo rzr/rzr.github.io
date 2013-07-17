@@ -291,7 +291,6 @@ function writeToStream(fileStream) {
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
 		fileStream.write(dateRecord+" lat: "+lat+" lon: "+lon+"\r");
-		alert(dateRecord+" lat: "+lat+" lon: "+lon);
 		fileStream.close();
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
@@ -345,8 +344,7 @@ function onResolveSuccess(dir) {
 	doc = 'MAPO_course_'+dateFile+".txt";
 	doc = doc.replace(/ /g, "-");
 	docDir.createFile(doc);
-	alert("File created : "+doc);
-	
+	alert("Course recording in the file : "+doc);
 }
 
 function onResolveError(e) {
@@ -378,6 +376,7 @@ function record() {
 		else {
 			recording = false;
 			clearInterval(intervalID);
+			alert("Course recorded in the file : "+doc);
 		}
 	} else {
 		document.getElementById("location").innerHTML = "Geolocation is not supported.";

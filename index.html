@@ -195,9 +195,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 				
 			</table>
-				<label for="sliderFrequency">Recording frequency (seconds):</label>
-				<input type="range" name="sliderFrequency" id="sliderFrequency" value="10" min="1" max="100" onchange="setFrequency()"/>
-
+			<label for="sliderFrequency">Recording frequency (seconds):</label>
+			<input type="range" name="sliderFrequency" id="sliderFrequency" value="10" min="1" max="100" onchange="setFrequency()"/>
+			
+			<input type="button" value="Send by Email" onclick="sendEmail()"/>
 		</div>
 		<!-- /content -->
 

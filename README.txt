@@ -24,12 +24,16 @@ http://gitorious.org/mapo
 
 ### BUG ###
 
-* BUG [#A] : Frequency of records very irregular
+* BUG [#A] : Change of frequency not applied
 * BUG [#B] : No record during standby
 * BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases
 
 
 ### NOTES ###
+
+Tizen Geolocation issue :
+https://developer.tizen.org/forums/native-application-development/device-gps-testing
+
 
 Select maps source ie :
 

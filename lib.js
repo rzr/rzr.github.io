@@ -407,6 +407,7 @@ function record() {
 /*
  * Settings Manager
  */
+
 function switchOnline() {
 	if (!isOnline) {
 		if (navigator.onLine) {

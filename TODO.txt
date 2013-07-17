@@ -1,0 +1,19 @@
+
+### TODO ###
+
+* TODO [#A] : test on device
+* TODO [#A] : nicer UI/UX
+* TODO [#B] : map sources selection
+* TODO [#B] : convert la,lo to wgs (ie google url to wgs)
+* TODO [#B] : bookmarks
+* TODO [#C] : share position (mail, im, social)
+* TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome
+* TODO [#C] : load navicore input bookmarks
+* TODO [#C] : 3D globe and trace curves
+
+
+### BUG ###
+
+* BUG [#A] : Change of frequency not applied
+* BUG [#B] : No record during standby
+* BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases

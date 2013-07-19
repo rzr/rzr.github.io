@@ -361,8 +361,10 @@ function readRecord(){
 function onResolveSuccess(dir) {
 	docDir = dir;
 	var dateFile = new Date();
-	doc = 'MAPO_course_'+dateFile+".txt";
+	doc = 'MAPO_'+dateFile+".txt";
 	doc = doc.replace(/ /g, "-");
+	doc = doc.replace(/:/g, "-");
+	doc = doc.replace("-GMT+0900-(KST)", "");
 	docDir.createFile(doc);
 	alert("Course recording in the file : "+doc);
 }
@@ -402,6 +404,11 @@ function record() {
 		document.getElementById("location").innerHTML = "Geolocation is not supported.";
 	}
 }
+
+
+/*
+ * Bluetooth manager
+ */
 
 
 /*

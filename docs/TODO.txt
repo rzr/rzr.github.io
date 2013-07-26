@@ -1,7 +1,8 @@
 
 ### TODO ###
 
-* TODO [#A] : test on device
+* TODO [#A] : Use JQuery with OpenLayers on the map
+* TODO [#A] : Keep the information on the local storage
 * TODO [#A] : nicer UI/UX
 * TODO [#B] : map sources selection
 * TODO [#B] : convert la,lo to wgs (ie google url to wgs)
@@ -10,6 +11,8 @@
 * TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome
 * TODO [#C] : load navicore input bookmarks
 * TODO [#C] : 3D globe and trace curves
+
+https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming%2Fhtml%2Fguide%2Fapp_guide%2Fapplication_service.htm
 
 
 ### BUG ###

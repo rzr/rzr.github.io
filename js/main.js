@@ -21,9 +21,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var init = function () {
     // TODO:: Do your initialization job
+	swipePage();
 	refresh();
 	// End of initialization
     console.log("init() called");
 };
 
+//var initEmail = function() {
+//	
+//	// caller
+//
+//	mailInit();
+//	sendEmail("This is a test message.", "mapo.tizen@laposte.net");
+//
+//}
+
 window.onload = init;
+//$(document).ready(initEmail);

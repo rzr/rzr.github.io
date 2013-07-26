@@ -124,16 +124,16 @@ function getOSMLink(lat, lon) {
 	return url;
 }
 
-function getGMLink(lat, lon) {
-	var url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
-	url = url.replace("${lon}", lon);
-	url = url.replace("${lat}", lat);
-	return url;
-}
+//function getGMLink(lat, lon) {
+//	var url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
+//	url = url.replace("${lon}", lon);
+//	url = url.replace("${lat}", lat);
+//	return url;
+//}
 
 function updateLinks(lat, lon) {
-	$('#OSMLink').val(getOSMLink(lat, lon));
-	$('#GMLink').val(getGMLink(lat, lon));
+	//$('#OSMLink').val(getOSMLink(lat, lon));
+	$('#OSMLink').attr('href', getOSMLink(lat, lon));
 }
 
 /*
@@ -407,10 +407,206 @@ function record() {
 
 
 /*
- * Bluetooth manager
+ * Email Manager
  */
 
+function goToOSM(){
+	if(isOnline){
+		var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/view", 
+				getOSMLink($("#lat").val(), $("#lon").val()), null);
+		var appControlReplyCallback =
+		{
+			onsuccess: function(data)
+			{
+				for (var i = 0; i < data.length; i++)
+				{
+					console.log("#" + i + " key:" + data[i].key);
+					for (var j = 0; j < data[i].value.length; j++)
+					{
+						console.log("   value#" + j + ":"+data[i].value[j]);
+					}
+				}
+			},
+			onfailure: function()
+			{
+				console.log('The launch application control failed');
+			}
+		}
+		tizen.application.launchAppControl(appControl, null, function() 
+				{console.log("launch application control succeed"); }, 
+				function(e) {console.log("launch application control failed. reason: " + e.message); }, 
+				appControlReplyCallback );
+	}
+	else {
+		alert("Please connect your application online in the settings"
+						+ " if you want to open a browser")
+	}
+}
 
+
+function sendEmail(){
+	if (isOnline){
+		var message = "This is the position I want to show you from Mapo:\nLatitute="+
+		$("#lat").val()+"\nLongitude = "+$("#lon").val()+
+		"\nIf you prefer in WGS 84, here it is: "+$('#wgs').val()+
+		"\nYou can see this position on OpenStreetMap: "+$('#OSMLink').val()+"\nOr on Google Maps: "+$('#GMLink').val()+
+		"\nConnect you on Mapo for more details about this application!";
+	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/send", // compose or send
+			"mailto:",
+			null,
+			null,
+			[ 
+			  new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/subject",["Mapo"]),
+			  new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text", [message]),
+			  new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/to", ["mapo.tizen@gmail.com"]) //TODO tizen.mapo@spamgourmet.com
+			  //new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/path", ["Phone/Images/image16.jpg"])
+			]
+	);
+
+	tizen.application.launchAppControl(appControl, null,
+			function(){console.log("launch service succeeded");},
+			function(e){console.log("launch service failed. Reason: " + e.name);});
+	}
+	else {
+		alert("Please connect your application online in the settings"
+						+ " if you want to send an email")
+	}
+}
+
+function sendBluetooth(){
+//	 var appControl = new tizen.ApplicationControl(
+//		     "http://tizen.org/appcontrol/operation/pick",
+//		     null,
+//		     "image/jpeg",
+//		     null);
+//
+//		 var appControlReplyCallback = {
+//		     // callee sent a reply
+//		     onsuccess: function(data) {
+//		         for (var i = 0; i < data.length; i++) {
+//		             if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
+//		                 console.log('Selected image is ' + data[i].value[0]);
+//		             }
+//		         }
+//		     },
+//		     // callee returned failure
+//		     onfailure: function() {
+//		         console.log('The launch application control failed');
+//		     }
+//		 }
+//
+//		 tizen.application.launchAppControl(
+//		     appControl,
+//		     null,
+//		     function() {console.log("launch application control succeed"); },
+//		     function(e) {console.log("launch application control failed. reason: " + e.message); },
+//		     appControlReplyCallback );
+	
+//	tizen.application.launch("tizen.bluetooth", 
+//			function(){console.log("launch service succeeded");},
+//			function(e){console.log("launch service failed. Reason: " + e.name);});
+	
+//	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/bluetooth/pick", "Phone/Images/image16.jpg");
+//	tizen.application.launchAppControl(appControl, null,
+//			function(){console.log("launch service succeeded");},
+//			function(e){console.log("launch service failed. Reason: " + e.name);});
+}
+
+//function sendMessage(){
+//	var message = "This is the position I want to show you from Mapo:\nLatitute="+
+//		$("#lat").val()+"\nLongitude = "+$("#lon").val()+
+//		"\nIf you prefer in WGS 84, here it is: "+$('#wgs').val()+
+//		"\nYou can see this position on OpenStreetMap: "+$('#OSMLink').val()+"\nOr on Google Maps: "+$('#GMLink').val()+
+//		"\nConnect you on Mapo for more details about this application!";
+//	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/compose",
+//			tizen.smsmessages,
+//			null,
+//			null,
+//			[
+//			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text", ["lol"])
+//			]
+//			);
+//	tizen.application.launchAppControl(appControl, null,
+//			function(){console.log("launch service succeeded");},
+//			function(e){console.log("launch service failed. Reason: " + e.name);});
+//}
+
+//function sendEmail (){
+//	//Define the success callback.
+//	var messageSentCallback = function(recipients) {
+//		console.log("Email sent successfully to " + recipients.length + " recipients.");
+//		for (var i = 0; i < recipients.length; i++){
+//			console.log("The Email has been sent to " + recipients[i]);
+//		}
+//		alert("Email sent successfully");
+//	}
+//	
+//	// Define the error callback.
+//	function errorCallback(err) {
+//		console.log(err.name + " error: " + err.message);
+//	}
+//	
+//	function serviceListCB(services) {
+//		if (services.length > 0) {
+//			var msg = new tizen.Message("messaging.email", {
+//				body: "Tizen first mail message.",
+//				to: ["mapo.tizen@laposte.net"],
+//				subject: "Mapo",
+//				hasAttachment: true,
+//				attachments: [new tizen.MessageAttachment("Downloads/text.txt")]
+//			});
+//			console.log("msg = " + msg.body);
+//			services[0].sendMessage(msg, messageSentCallback, errorCallback);
+//		}
+//	}
+//	tizen.messaging.getMessageServices("messaging.email", serviceListCB, errorCallback);
+//}
+
+//[Constructor(MessageServiceTag type, optional MessageInit? messageInitDict)]
+//interface Message {
+//
+//  readonly attribute MessageId? id;
+//
+//  readonly attribute MessageConvId? conversationId;
+//
+//  readonly attribute MessageFolderId? folderId;
+//
+//  readonly attribute MessageServiceTag type;
+//
+//  readonly attribute Date? timestamp;
+//
+//  readonly attribute DOMString? from;
+//
+//  attribute DOMString[] to;
+//
+//  attribute DOMString[] cc;
+//
+//  attribute DOMString[] bcc;
+//
+//  attribute MessageBody body;
+//
+//  attribute boolean isRead;
+//
+//  readonly attribute boolean hasAttachment;
+//
+//  attribute boolean isHighPriority;
+//
+//  attribute DOMString subject;
+//
+//  readonly attribute MessageId? inResponseTo;
+//
+//  readonly attribute DOMString messageStatus;
+//
+//  attribute MessageAttachment[] attachments;
+//};
+
+
+//var msg = new tizen.Message("messaging.email", {plainBody: "I will arrive in 10 minutes.",
+//	to: ["raghu.kona@hotmail.com", "naga.kona@outlook.com"]});
+//msg.attachments = [new tizen.MessageAttachment("images/myimage.png", "image/png"),
+//                   new tizen.MessageAttachment("docs/mydoc.pdf", "text/pdf")];
+
+	
 /*
  * Settings Manager
  */
@@ -440,6 +636,29 @@ function switchEnergy() {
 
 function setFrequency(){
 	recordingFrequency = $('#sliderFrequency').val()*1000; // From seconds to millisecond
+}
+
+function swipePage(){
+	$('div.ui-page').live("swipeleft", function(){
+		var nextpage = $(this).next('div[data-role="page"]');
+		// swipe using id of next page if exists
+		if (nextpage.length > 0) {
+			$.mobile.changePage(nextpage, {
+		        transition: "slide",
+		        reverse: false
+		    });
+		}
+	});
+	$('div.ui-page').live("swiperight", function(){
+		var prevpage = $(this).prev('div[data-role="page"]');
+		// swipe using id of next page if exists
+		if (prevpage.length > 0) {
+			$.mobile.changePage(prevpage, {
+		        transition: "slide",
+		        reverse: true
+		    });
+		}
+	});
 }
 
 function exit() {

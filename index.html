@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
-				data-icon="delete" onclick="exit()">Exit</a>
+				data-icon="delete" onclick="quit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position" class="ui-btn-active ui-state-persist">Position</a></li>
@@ -123,7 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
-				data-icon="delete" onclick="exit()">Exit</a>
+				data-icon="delete" onclick="quit();">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position">Position</a></li>
@@ -157,7 +157,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
-				data-icon="delete" onclick="exit()">Exit</a>
+				data-icon="delete" onclick="quit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position">Position</a></li>
@@ -196,21 +196,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 				
 			</table>
-			<label for="sliderFrequency">Recording frequency (seconds):</label>
-			<input type="range" name="sliderFrequency" id="sliderFrequency" value="10" min="1" max="100" onchange="setFrequency()"/>
+			<label for="sliderTimeout">Recording timeout (seconds):</label>
+			<input type="range" name="sliderTimeout" id="sliderTimeout" value="10" min="1" max="100"/> <!-- onchange="setTimeout()" -->
 			
 			<a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
 			<div id="popup" data-role="popup" data-style="center_title_1btn">
 				<div class="ui-popup-title">
 					<h3>Share With</h3>
 				</div>
-				<!-- Code here to show all the available options, like bluetooth, SMS, Email, Skype etc... -->
 				<input type="button" class="ui-popup-content" onclick="sendEmail()" value="Email"/>
 				<!-- <input type="button" class="ui-popup-content" onclick="sendMessage()" value="Message"/>
 				<input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/>
 				<input type="button" class="ui-popup-content" onclick="share()" value="Share"/>
 				<input type="button" class="ui-popup-content" onclick="view()" value="View"/> -->
 			</div>
+			<!-- /popup -->
+			
+			<input type="button" onclick="createContact()" value="Create a contact"/>
+			<input type="button" onclick="test()" value="Store"/>
 			
 		</div>
 		<!-- /content -->

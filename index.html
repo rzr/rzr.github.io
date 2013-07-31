@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <meta charset="utf-8" />
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="description" content="An application" />
+<meta name="description" content="An application based on geolocation" />
 
 <title>Mapo</title>
 
@@ -49,8 +49,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Page 1 : My position -->
 	<div data-role="page" id="position" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" id="home" class="ui-btn-left"
-				data-icon="home">Home</a>
+			<a href="#position" data-role="button" 
+				id="home" class="ui-btn-left" data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -64,36 +64,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-
+		
 		<div data-role="content">
 			<form>
 				<table>
 					<tr>
 						<td><label for=lat>Latitude N+/S-:</label></td>
-						<td><input type="text" id="lat" value="26.357865" onChange="set(lat.value, lon.value);" /></td> 
+						<td><input type="text" id="lat" value="26.357865"
+							onChange="set(lat.value, lon.value);" /></td> 
 					</tr>
 					<tr>
 						<td><label for=lon>Longitude W+/E-:</label></td>
-						<td><input type="text" id="lon" value="127.783782" onChange="set(lat.value, lon.value);" /></td>
+						<td><input type="text" id="lon" value="127.783782"
+							onChange="set(lat.value, lon.value);" /></td>
 					</tr>
-					<!-- <tr>
-						<td><label for="OSMLink">OpenStreetMap Link:</label></td>
-						<td><input type="text" id="OSMLink" /></td>
-					</tr>
-					<tr>
-						<td><label for="GMLink">Google Maps Link:</label></td>
-						<td><a id="OSMLink" href="">OpenStreetMap Link</a></td>
-					</tr> -->
 					<tr>
 						<td><label for="wgs">wgs84 (degree,minutes,seconds):</label></td>
-						<td><input type="text" id="wgs" value="wgs84 ( degree, minutes, seconds)" /></td>
+						<td><input type="text" id="wgs" 
+							value="wgs84 ( degree, minutes, seconds)" /></td>
 					</tr>
 					<tr>
 						<td>
 							<label for="switchRecord">Record your course:</label>
 						</td>
 						<td>
-							<select name="switchRecord" id="switchRecord" data-role="slider" onchange="record()">
+							<select name="switchRecord" id="switchRecord" 
+								data-role="slider" onchange="record()">
 								<option value="stop">Stop</option>
 								<option value="start">Start</option>
 							</select>
@@ -106,23 +102,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</form>
 		</div>
 		<!-- /content -->
-
-
+		
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Open Source Project : http://gitorious.org/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #position-->
-
+	
+	
 	<!-- Page 2 : Search a place -->
-
 	<div data-role="page" id="map" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" id="home" class="ui-btn-left"
-				data-icon="home">Home</a>
+			<a href="#position" data-role="button" 
+				id="home" class="ui-btn-left" data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
-				data-icon="delete" onclick="quit();">Exit</a>
+				data-icon="delete" onclick="quit()">Exit</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#position">Position</a></li>
@@ -133,27 +128,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-
+		
 		<div data-role="content">
-
 			<div id="myMap"></div>
-
 		</div>
 		<!-- /content -->
-
-
+		
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Open Source Project : http://gitorious.org/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #place-->
-
-	<!-- Page 3 : Options -->
-	<div data-role="page" id="settings" class="ui-page">
-
+	
+	
+	<!-- Page 3 : Settings -->
+	<div data-role="page" id="Settings" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" id="home" class="ui-btn-left"
-				data-icon="home">Home</a>
+			<a href="#position" data-role="button" 
+				id="home" class="ui-btn-left" data-icon="home">Home</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -190,33 +182,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 						</select>
 					</td>
 				</tr>
-				<tr>
-					<td></td>
-				</tr>
-				
 			</table>
 			<label for="selectorTimeout">Recording timeout (seconds):</label>
-			<input type="range" name="selectorTimeout" id="selectorTimeout" value="10" min="1" max="100"/>
-			
-			<div id=selectorTimeout></div>
+			<input type="range" name="selectorTimeout" id="selectorTimeout"
+				value="10" min="1" max="100"/>
 			<a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
 			<div id="popup" data-role="popup" data-style="center_title_1btn">
-				<div class="ui-popup-title">
-					<h3>Share With</h3>
-				</div>
+				<div class="ui-popup-title"><h3>Share With</h3></div>
 				<input type="button" class="ui-popup-content" onclick="sendEmail()" value="Email"/>
 				<!-- <input type="button" class="ui-popup-content" onclick="sendMessage()" value="Message"/>
-				<input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/>
-				<input type="button" class="ui-popup-content" onclick="share()" value="Share"/>
-				<input type="button" class="ui-popup-content" onclick="view()" value="View"/> -->
+				<input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/> -->
 			</div>
 			<!-- /popup -->
-			
 			<input type="button" onclick="createContact()" value="Create a contact"/>
-			
 		</div>
 		<!-- /content -->
-
+		
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Open Source Project : http://gitorious.org/mapo
 		</div>

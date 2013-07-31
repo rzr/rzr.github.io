@@ -21,14 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var map;
 var isOnline = false;
-var recording = false;
-// var timeout;
-var energySaving = false;
 
-
-function log(message)
-{
-if ( !false ) { console.log("# " + message); }
+function log(message) {
+	if ( !false ) { console.log("# " + message); }
 }
 
 /*
@@ -271,7 +266,8 @@ function showLocation(position) {
 }
 
 function errorLocation(error) {
-	var errorInfo = document.getElementById("location");
+	$('#switchRecord').val('stop').slider('refresh');
+	var errorInfo = document.getElementById("locationInfo");
 	switch (error.code) {
 	case error.PERMISSION_DENIED:
 		errorInfo.innerHTML = "User denied the request for Geolocation.";
@@ -291,10 +287,10 @@ function errorLocation(error) {
 function getLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(showLocation, errorLocation, {
-			enableHighAccuracy : !energySaving,
+			enableHighAccuracy : $('#switchEnergy').val()=='off'
 		});
 	} else {
-		document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+		document.getElementById("locationInfo").innerHTML = "Geolocation is not supported by this browser.";
 	}
 }
 
@@ -307,6 +303,8 @@ var doc;
 var file;
 
 function onRecordError(e) {
+	$('#switchRecord').val(stop).slider('refresh');
+	alert("fuck");
 	var msg = '';
 	switch (e.code) {
 	case FileError.QUOTA_EXCEEDED_ERR:
@@ -409,7 +407,7 @@ function onResolveError(e) {
 }
 
 function recordLocation(position) {
-	if (recording) {
+	if ($('#switchRecord').val() == "start") {
 		set(position.coords.latitude, position.coords.longitude);
 		resolveFile();
 		writeRecord();
@@ -419,26 +417,25 @@ function recordLocation(position) {
 
 function getPosition() {
 	navigator.geolocation.getCurrentPosition(recordLocation, errorLocation, {
-		enableHighAccuracy : !energySaving
+		enableHighAccuracy : $('#switchEnergy').val()=='off'
 	});
 }
 
 function record() {
 	if (navigator.geolocation) {
-		if (!recording) {
-			recording = true;
-			// setTimeout();
+		if ($('#switchRecord').val() == "start") {
 			tizen.filesystem.resolve('documents', onResolveSuccess,
 					onResolveError, 'rw');
+			getPosition();
 			var intervalID = setInterval(getPosition, $('#selectorTimeout').val()*1000);
 			// alert($('#selectorTimeout').val());
 		} else {
-			recording = false;
 			clearInterval(intervalID);
 			alert("Course recorded in the file : " + doc);
 		}
 	} else {
-		document.getElementById("location").innerHTML = "Geolocation is not supported.";
+		$('#switchRecord').val('stop').slider('refresh');
+		document.getElementById("locationInfo").innerHTML = "Geolocation is not supported.";
 	}
 }
 
@@ -640,16 +637,6 @@ function switchOnline() {
 	}
 	refresh();
 }
-
-function switchEnergy() {
-	if (!energySaving) {
-		energySaving = true;
-	} else {
-		energySaving = false;
-	}
-	refresh();
-}
-
 
 function swipePage() {
 	$('div.ui-page').live("swipeleft", function() {

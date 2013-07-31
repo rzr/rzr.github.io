@@ -101,9 +101,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</tr>
 				</table>
 				<input type="button" onclick="getLocation()" value="Get your position"/>
-				<p id="location"></p>
 				<input type="button" onclick="goToOSM()" value="Go to OpenStreetMap.org"/>
-				
+				<p id="locationInfo"></p>
 			</form>
 		</div>
 		<!-- /content -->
@@ -185,7 +184,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<td><label for="switchEnergy">Energy saving:</label></td>
 					<td>
 						<select name="switchEnergy" id="switchEnergy"
-							data-role="slider" onchange="switchEnergy()">
+							data-role="slider">
 							<option value="off">Off</option>
 							<option value="on">On</option>
 						</select>
@@ -199,7 +198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<label for="selectorTimeout">Recording timeout (seconds):</label>
 			<input type="range" name="selectorTimeout" id="selectorTimeout" value="10" min="1" max="100"/>
 			
-			 <div id=selectorTimeout></div>
+			<div id=selectorTimeout></div>
 			<a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
 			<div id="popup" data-role="popup" data-style="center_title_1btn">
 				<div class="ui-popup-title">

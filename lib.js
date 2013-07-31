@@ -19,16 +19,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
 
+
+/*
+ * Application Global variables
+ */
+
 var map;
 var isOnline = false;
 
+/*
+ * Schedule
+ */
+
 function log(message) {
-	if ( !false ) { console.log("# " + message); }
+	if (!false) console.log("# " + message);
 }
+
 
 /*
  * WGS Manager
  */
+
 function toStringWgs84(lat, lon) {
 	var latitude = lat;
 	var longitude = lon;
@@ -115,11 +126,14 @@ function setWGS(lat, lon) {
 	document.getElementById("wgs").value = text;
 }
 
+
 /*
  * Link Manager
  */
+
 function getOSMLink(lat, lon) {
-	var url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+	var url = 
+		"http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
 	url = url.replace("${lon}", lon);
 	url = url.replace("${lat}", lat);
 	return url;
@@ -144,9 +158,9 @@ function goToOSM() {
 			}
 		}
 		tizen.application.launchAppControl(appControl, null, function() {
-			console.log("launch application control succeed");
+			console.log("launch internet application control succeed");
 		}, function(e) {
-			console.log("launch application control failed. reason: "
+			console.log("launch internet application control failed. reason: "
 					+ e.message);
 		}, appControlReplyCallback);
 	} else {
@@ -155,21 +169,15 @@ function goToOSM() {
 	}
 }
 
-// function getGMLink(lat, lon) {
-// var url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
-// url = url.replace("${lon}", lon);
-// url = url.replace("${lat}", lat);
-// return url;
-// }
-
 function updateLinks(lat, lon) {
-	// $('#OSMLink').val(getOSMLink(lat, lon));
 	$('#OSMLink').attr('href', getOSMLink(lat, lon));
 }
+
 
 /*
  * Map Manager
  */
+
 function getMapSize() {
 	var viewHeight = $(window).height();
 	var viewWidth = $(window).width();
@@ -193,24 +201,21 @@ function chargeMap(lat, lon) {
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
 		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
-				new OpenLayers.Layer.Google("Google Streets", {
-					numZoomLevels : 20
-				}), new OpenLayers.Layer.Google("Google Physical", {
-					type : google.maps.MapTypeId.TERRAIN
-				}), new OpenLayers.Layer.Google("Google Hybrid", {
-					type : google.maps.MapTypeId.HYBRID,
-					numZoomLevels : 20
-				}), new OpenLayers.Layer.Google("Google Satellite", {
-					type : google.maps.MapTypeId.SATELLITE,
-					numZoomLevels : 22
-				}) ],
-		center : new OpenLayers.LonLat(lon, lat)
-
-		.transform('EPSG:4326', 'EPSG:3857'),
+		           new OpenLayers.Layer.Google("Google Streets",
+		        		   {numZoomLevels : 20}),
+		           new OpenLayers.Layer.Google("Google Physical",
+		        		   {type : google.maps.MapTypeId.TERRAIN}),
+		           new OpenLayers.Layer.Google("Google Hybrid",
+		        		   {type : google.maps.MapTypeId.HYBRID,numZoomLevels : 20}),
+		           new OpenLayers.Layer.Google("Google Satellite",
+		        		   {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22})
+				 ],
+		center : new OpenLayers.LonLat(lon, lat).transform('EPSG:4326', 'EPSG:3857'),
 		zoom : 7
 	});
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 }
+
 
 /*
  * Latitude/Lontitude Manager
@@ -236,15 +241,15 @@ function set(lat, lon) {
 	setLon(lon);
 	setWGS(lat, lon);
 	updateLinks(lat, lon);
-	
 	$('#myMap').empty();
 	if (isOnline) {
 		setMapSize();
 		chargeMap(lat, lon);
 	} else {
 		$('#myMap').html(
-				"<p align='center'>Please connect your application online in the settings"
-						+ " if you want to charge the map</p>");
+				"<p align='center'>" +
+				"Please connect your application online in the settings" +
+				" if you want to charge the map</p>");
 	}
 }
 
@@ -254,9 +259,9 @@ function refresh() {
 		isOnline = false;
 		alert("Connection lost");
 	}
-	set(document.getElementById("lat").value,
-			document.getElementById("lon").value);
+	set(document.getElementById("lat").value,document.getElementById("lon").value);
 }
+
 
 /*
  * Location Manager
@@ -266,7 +271,6 @@ function showLocation(position) {
 }
 
 function errorLocation(error) {
-	$('#switchRecord').val('stop').slider('refresh');
 	var errorInfo = document.getElementById("locationInfo");
 	switch (error.code) {
 	case error.PERMISSION_DENIED:
@@ -286,13 +290,14 @@ function errorLocation(error) {
 
 function getLocation() {
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(showLocation, errorLocation, {
-			enableHighAccuracy : $('#switchEnergy').val()=='off'
-		});
+		navigator.geolocation.getCurrentPosition(showLocation, errorLocation,
+				{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 	} else {
-		document.getElementById("locationInfo").innerHTML = "Geolocation is not supported by this browser.";
+		document.getElementById("locationInfo").innerHTML = 
+			"Geolocation is not supported by this browser.";
 	}
 }
+
 
 /*
  * Recording manager
@@ -302,9 +307,32 @@ var docDir;
 var doc;
 var file;
 
+function onResolveSuccess(dir) {
+	docDir = dir;
+	var dateFile = new Date();
+	doc = 'MAPO_' + dateFile + ".txt";
+	doc = doc.replace(/ /g, "-");
+	doc = doc.replace(/:/g, "-");
+	doc = doc.replace("-GMT+0900-(KST)", "");
+	docDir.createFile(doc);
+	$('#locationInfo').html("Course recording in the file : " + doc);
+}
+
+function onResolveError(e) {
+	console.log('message: ' + e.message);
+}
+
+function resolveFile() {
+	try {
+		file = docDir.resolve(doc);
+	} catch (exc) {
+		console.log('Could not resolve file: ' + exc.message);
+		// Stop in case of any errors
+		return;
+	}
+}
+
 function onRecordError(e) {
-	$('#switchRecord').val(stop).slider('refresh');
-	alert("fuck");
 	var msg = '';
 	switch (e.code) {
 	case FileError.QUOTA_EXCEEDED_ERR:
@@ -326,18 +354,7 @@ function onRecordError(e) {
 		msg = 'Unknown Error';
 		break;
 	}
-	;
 	console.log('Error: ' + msg);
-}
-
-function resolveFile() {
-	try {
-		file = docDir.resolve(doc);
-	} catch (exc) {
-		console.log('Could not resolve file: ' + exc.message);
-		// Stop in case of any errors
-		return;
-	}
 }
 
 function writeToStream(fileStream) {
@@ -345,7 +362,7 @@ function writeToStream(fileStream) {
 		var dateRecord = new Date();
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
-		fileStream.write(dateRecord + " lat: " + lat + " lon: " + lon + "\r");
+		fileStream.write(dateRecord + ";lat:" + lat + ";lon:" + lon + "\r");
 		fileStream.close();
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
@@ -391,21 +408,6 @@ function readRecord() {
 	}
 }
 
-function onResolveSuccess(dir) {
-	docDir = dir;
-	var dateFile = new Date();
-	doc = 'MAPO_' + dateFile + ".txt";
-	doc = doc.replace(/ /g, "-");
-	doc = doc.replace(/:/g, "-");
-	doc = doc.replace("-GMT+0900-(KST)", "");
-	docDir.createFile(doc);
-	alert("Course recording in the file : " + doc);
-}
-
-function onResolveError(e) {
-	console.log('message: ' + e.message);
-}
-
 function recordLocation(position) {
 	if ($('#switchRecord').val() == "start") {
 		set(position.coords.latitude, position.coords.longitude);
@@ -415,10 +417,28 @@ function recordLocation(position) {
 	}
 }
 
+function errorPosition(error) {
+	$('#switchRecord').val('stop').slider('refresh');
+	var errorInfo = document.getElementById("locationInfo");
+	switch (error.code) {
+	case error.PERMISSION_DENIED:
+		errorInfo.innerHTML = "User denied the request for Geolocation.";
+		break;
+	case error.POSITION_UNAVAILABLE:
+		errorInfo.innerHTML = "Location information is unavailable.";
+		break;
+	case error.TIMEOUT:
+		errorInfo.innerHTML = "The request to get user location timed out.";
+		break;
+	case error.UNKNOWN_ERROR:
+		errorInfo.innerHTML = "An unknown error occurred.";
+		break;
+	}
+}
+
 function getPosition() {
-	navigator.geolocation.getCurrentPosition(recordLocation, errorLocation, {
-		enableHighAccuracy : $('#switchEnergy').val()=='off'
-	});
+	navigator.geolocation.getCurrentPosition(recordLocation, errorPosition,
+			{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 }
 
 function record() {
@@ -427,46 +447,49 @@ function record() {
 			tizen.filesystem.resolve('documents', onResolveSuccess,
 					onResolveError, 'rw');
 			getPosition();
-			var intervalID = setInterval(getPosition, $('#selectorTimeout').val()*1000);
+			var intervalID = setInterval(getPosition, $('#selectorTimeout')
+					.val() * 1000);
 			// alert($('#selectorTimeout').val());
 		} else {
 			clearInterval(intervalID);
-			alert("Course recorded in the file : " + doc);
+			$('#locationInfo').html("Course recorded in the file : " + doc);
 		}
 	} else {
-		$('#switchRecord').val('stop').slider('refresh');
-		document.getElementById("locationInfo").innerHTML = "Geolocation is not supported.";
+		document.getElementById("locationInfo").innerHTML = 
+			"Geolocation is not supported.";
 	}
 }
+
 
 /*
  * Contact Manager
  */
+
 function createContact() {
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/social/add",
 			null,
-			"vnd.tizen.item.type/vnd.tizen.contact", // Or null for the
-														// emulator
+			"vnd.tizen.item.type/vnd.tizen.contact", // null for the emulator
 			null,
 			[
-					new tizen.ApplicationControlData(
-							"http://tizen.org/appcontrol/data/social/item_type",
-							[ "contact" ]),
-					new tizen.ApplicationControlData(
-							"http://tizen.org/appcontrol/data/social/email",
-							[ "mapo.tizen+"
-									+ toStringWgs84($('#lat').val(), $('#lon')
-											.val()) + "@gmail.com" ]),
-					new tizen.ApplicationControlData(
-							"http://tizen.org/appcontrol/data/social/url",
-							[ getOSMLink($("#lat").val(), $("#lon").val()) ]) ]);
-	tizen.application.launchAppControl(appControl, null, function() {
-		console.log("launch service succeeded");
-	}, function(e) {
-		console.log("launch service failed. Reason: " + e.name);
-	});
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/item_type",
+					 [ "contact" ]),
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/email",
+					 [ "mapo.tizen+"+
+					   toStringWgs84(
+							   $('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/url",
+					 [ getOSMLink($("#lat").val(), $("#lon").val()) ])
+			]);
+	tizen.application.launchAppControl(appControl, null, 
+			function() {console.log("launch service succeeded");},
+			function(e) {console.log(
+					"launch service failed. Reason: " +e.name);});
 }
+
 
 /*
  * Email Manager
@@ -474,43 +497,36 @@ function createContact() {
 
 function sendEmail() {
 	if (isOnline) {
-		var message = "This is the position I want to show you from Mapo:\nLatitute="
-				+ $("#lat").val()
-				+ "\nLongitude = "
-				+ $("#lon").val()
-				+ "\nIf you prefer in WGS 84, here it is: "
-				+ $('#wgs').val()
-				+ "\nYou can see this position on OpenStreetMap: "
-				+ $('#OSMLink').val()
-				+ "\nOr on Google Maps: "
-				+ $('#GMLink').val()
-				+ "\nConnect you on Mapo for more details about this application!";
+		var message =
+			"This is the position I want to show you from Mapo:" +
+			"\nLatitute="+$("#lat").val()+
+			"\nLongitude = "+$("#lon").val()+
+			"\nIf you prefer in WGS 84, here it is: "+$('#wgs').val()+
+			"\nYou can see this position on OpenStreetMap: "+$('#OSMLink').val()+
+			"\nConnect you on Mapo for more details!";
 		var appControl = new tizen.ApplicationControl(
-				"http://tizen.org/appcontrol/operation/send",
-				// compose or send
-				"mailto:", null, null, [
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/subject",
-								[ "Mapo" ]),
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/text",
-								[ message ]),
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/to",
-								[ "mapo.tizen@gmail.com" ]) // ,
+				"http://tizen.org/appcontrol/operation/send", // compose or send
+				"mailto:", null, null, 
+				[
+				 new tizen.ApplicationControlData(
+						 "http://tizen.org/appcontrol/data/subject", [ "Mapo" ]),
+				 new tizen.ApplicationControlData(
+						 "http://tizen.org/appcontrol/data/text", [ message ]),
+				 new tizen.ApplicationControlData(
+						 "http://tizen.org/appcontrol/data/to", 
+						 [ "mapo.tizen@gmail.com" ])
 				// TODO tizen.mapo@spamgourmet.com
-				// new
-				// tizen.ApplicationControlData("http://tizen.org/appcontrol/data/path",
-				// ["images/image1.jpg"])
+// new tizen.ApplicationControlData(
+//	"http://tizen.org/appcontrol/data/path",
+// ["images/image1.jpg"])
 				]);
-		tizen.application.launchAppControl(appControl, null, function() {
-			console.log("launch service succeeded");
-		}, function(e) {
-			console.log("launch service failed. Reason: " + e.name);
-		});
+		tizen.application.launchAppControl(appControl, null,
+				function() {console.log("launch service succeeded");}, 
+				function(e) {
+					console.log("launch service failed. Reason: " + e.name);});
 	} else {
 		alert("Please connect your application online in the settings"
-				+ " if you want to send an email")
+				+ " if you want to send an email");
 	}
 }
 
@@ -583,22 +599,23 @@ function sendEmail() {
 /*
  * Storage Manager
  */
+
 function store() {
 	localStorage.setItem('lat', $('#lat').val());
 	localStorage.setItem('lon', $('#lon').val());
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
-	
-	for (var i = 0; i < localStorage.length; i++){
-	    log(i+localStorage.getItem(localStorage.key(i)));
+
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i + localStorage.getItem(localStorage.key(i)));
 	}
-	
+
 }
 
 function init() {
-	for (var i = 0; i < localStorage.length; i++){
-	    log(i+localStorage.getItem(localStorage.key(i)));
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i + localStorage.getItem(localStorage.key(i)));
 	}
 	if (localStorage.getItem('lat') != null) {
 		$('#lat').val(localStorage.getItem('lat'));
@@ -606,14 +623,14 @@ function init() {
 	if (localStorage.getItem('lon') != null) {
 		$('#lon').val(localStorage.getItem('lon'));
 	}
-	if (localStorage.getItem('connection') != null) {
+	if (localStorage.getItem('connection') == 'online') {
 		$('#switchOnline').val(localStorage.getItem('connection'));
 	}
 	if (localStorage.getItem('energySaving') != null) {
 		$('#switchEnergy').val(localStorage.getItem('energySaving'));
 	}
 	if (localStorage.getItem('timeout') != null) {
-		$('#selectorTimeout').attr('value',localStorage.getItem('timeout'));
+		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
 	}
 	refresh();
 }
@@ -639,31 +656,26 @@ function switchOnline() {
 }
 
 function swipePage() {
-	$('div.ui-page').live("swipeleft", function() {
-		var nextpage = $(this).next('div[data-role="page"]');
-		// swipe using id of next page if exists
-		if (nextpage.length > 0) {
-			$.mobile.changePage(nextpage, {
-				transition : "slide",
-				reverse : false
-			});
-		}
-	});
-	$('div.ui-page').live("swiperight", function() {
-		var prevpage = $(this).prev('div[data-role="page"]');
-		// swipe using id of next page if exists
-		if (prevpage.length > 0) {
-			$.mobile.changePage(prevpage, {
-				transition : "slide",
-				reverse : true
-			});
-		}
-	});
+	$('div.ui-page').live("swipeleft",
+			function() {
+				var nextpage = $(this).next('div[data-role="page"]');
+				// swipe using id of next page if exists
+				if (nextpage.length > 0) {
+					$.mobile.changePage(nextpage,
+							{transition : "slide", reverse : false});
+	}});
+	$('div.ui-page').live("swiperight", 
+			function() {
+				var prevpage = $(this).prev('div[data-role="page"]');
+				// swipe using id of next page if exists
+				if (prevpage.length > 0) {
+					$.mobile.changePage(prevpage,
+							{transition : "slide", reverse : true});
+	}});
 }
 
 function quit() {
 	store();
-	setTimeout(function() {
-		tizen.application.getCurrentApplication().exit();
-	}, 2000);
+	setTimeout(
+			function() {tizen.application.getCurrentApplication().exit();}, 2000);
 }

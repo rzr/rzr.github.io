@@ -21,11 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var initializer = function () {
     // TODO:: Do your initialization job
-	swipePage();
 	init();
+	swipePage();
 	// End of initialization
     console.log("init() called");
 };
-
 
 window.onload = initializer;

@@ -196,9 +196,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 				
 			</table>
-			<label for="sliderTimeout">Recording timeout (seconds):</label>
-			<input type="range" name="sliderTimeout" id="sliderTimeout" value="10" min="1" max="100"/> <!-- onchange="setTimeout()" -->
+			<label for="selectorTimeout">Recording timeout (seconds):</label>
+			<input type="range" name="selectorTimeout" id="selectorTimeout" value="10" min="1" max="100"/>
 			
+			 <div id=selectorTimeout></div>
 			<a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
 			<div id="popup" data-role="popup" data-style="center_title_1btn">
 				<div class="ui-popup-title">
@@ -213,7 +214,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /popup -->
 			
 			<input type="button" onclick="createContact()" value="Create a contact"/>
-			<input type="button" onclick="test()" value="Store"/>
 			
 		</div>
 		<!-- /content -->

@@ -430,8 +430,8 @@ function record() {
 			// setTimeout();
 			tizen.filesystem.resolve('documents', onResolveSuccess,
 					onResolveError, 'rw');
-			var intervalID = setInterval(getPosition, $('#sliderTimeout').val());
-			// alert($('#sliderTimeout').val());
+			var intervalID = setInterval(getPosition, $('#selectorTimeout').val()*1000);
+			// alert($('#selectorTimeout').val());
 		} else {
 			recording = false;
 			clearInterval(intervalID);
@@ -591,18 +591,13 @@ function store() {
 	localStorage.setItem('lon', $('#lon').val());
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
-	localStorage.setItem('timeout', $('#sliderTimeout').val());
+	localStorage.setItem('timeout', $('#selectorTimeout').val());
 	
 	for (var i = 0; i < localStorage.length; i++){
 	    log(i+localStorage.getItem(localStorage.key(i)));
 	}
 	
 }
-
-
-/*
- * Settings Manager
- */
 
 function init() {
 	for (var i = 0; i < localStorage.length; i++){
@@ -621,18 +616,23 @@ function init() {
 		$('#switchEnergy').val(localStorage.getItem('energySaving'));
 	}
 	if (localStorage.getItem('timeout') != null) {
-		$('#sliderTimeout').val(localStorage.getItem('timeout'));
-		//alert("init to : "+localStorage.getItem('timeout'));
+		$('#selectorTimeout').attr('value',localStorage.getItem('timeout'));
 	}
 	refresh();
 }
+
+
+/*
+ * Settings Manager
+ */
 
 function switchOnline() {
 	if (!isOnline) {
 		if (navigator.onLine) {
 			isOnline = true;
 		} else {
-			$('#switchOnline').val('offline').slider('refresh');
+			$('#switchOnline').val('offline');
+			$('#switchOnline').slider('refresh');
 			alert("Can not connect");
 		}
 	} else {

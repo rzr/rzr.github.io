@@ -67,39 +67,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		
 		<div data-role="content">
 			<form>
-				<table>
-					<tr>
-						<td><label for=lat>Latitude N+/S-:</label></td>
-						<td><input type="text" id="lat" value="26.357865"
-							onChange="set(lat.value, lon.value);" /></td> 
-					</tr>
-					<tr>
-						<td><label for=lon>Longitude W+/E-:</label></td>
-						<td><input type="text" id="lon" value="127.783782"
-							onChange="set(lat.value, lon.value);" /></td>
-					</tr>
-					<tr>
-						<td><label for="wgs">wgs84 (degree,minutes,seconds):</label></td>
-						<td><input type="text" id="wgs" 
-							value="wgs84 ( degree, minutes, seconds)" /></td>
-					</tr>
-					<tr>
-						<td>
-							<label for="switchRecord">Record your course:</label>
-						</td>
-						<td>
-							<select name="switchRecord" id="switchRecord" 
-								data-role="slider" onchange="record()">
-								<option value="stop">Stop</option>
-								<option value="start">Start</option>
-							</select>
-						</td>
-					</tr>
-				</table>
-				<input type="button" onclick="getLocation()" value="Get your position"/>
-				<input type="button" onclick="goToOSM()" value="Go to OpenStreetMap.org"/>
-				<p id="locationInfo"></p>
+					<label for=lat>Latitude N+/S-:</label>
+					<input type="text" id="lat" value="26.357865"
+						onChange="changeLat();"/>
+					<label for=lon>Longitude W+/E-:</label>
+					<input type="text" id="lon" value="127.783782"
+						onChange="changeLon();"/>
+					<label for="dms">DMS (degree,minutes,seconds):</label>
+					<input type="text" id="dms" onChange="changeDMS();"/>
 			</form>
+			<table>
+				<tr>
+					<td><label for="switchRecord">Record your course:</label></td>
+					<td>
+						<select name="switchRecord" id="switchRecord" 
+							data-role="slider" onchange="record()">
+							<option value="stop">Stop</option>
+							<option value="start">Start</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><input type="button" onclick="getLocation()" value="Get position"/></td>
+					<td><input type="button" onclick="goToOSM()" value="OpenStreetMap"/></td>
+				</tr>
+			</table>
+			<p id="locationInfo"></p>
 		</div>
 		<!-- /content -->
 		

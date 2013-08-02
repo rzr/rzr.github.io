@@ -37,97 +37,6 @@ function log(message) {
 
 
 /*
- * WGS Manager
- */
-
-function toStringWgs84(lat, lon) {
-	var latitude = lat;
-	var longitude = lon;
-	var text = "";
-	{
-		if (longitude > 0) {
-			text += "E";
-		} else {
-			text += "W";
-			longitude = -longitude;
-		}
-		var u = longitude;
-		var d = parseInt("" + u, 10);
-		var s = (u - d) * 60 * 60;
-		var m = (s / 60.);
-		m = parseInt("" + m, 10);
-		s = (s - 60 * m);
-		s = parseInt("" + s, 10);
-		text += "" + d + "d" + m + "m" + s + "s";
-	}
-	// text += "\n";
-	{
-		if (latitude > 0) {
-			text += "N";
-		} else {
-			latitude = -latitude;
-			text += "S";
-		}
-		var u = latitude;
-		var d = parseInt("" + u, 10);
-		var s = (u - d) * 60 * 60;
-		var m = (s / 60.);
-		m = parseInt("" + m, 10);
-		s = (s - 60 * m);
-		s = parseInt("" + s, 10);
-		text += "" + d + "d" + m + "m" + s + "s";
-	}
-	return text;
-}
-
-function toStringText(lat, lon) {
-	var latitude = lat;
-	var longitude = lon;
-	var text = "";
-	{
-		if (longitude > 0) {
-			text += "E";
-		} else {
-			text += "W";
-			longitude = -longitude;
-		}
-		var u = longitude;
-		var d = parseInt("" + u, 10);
-		var s = (u - d) * 60 * 60;
-		var m = (s / 60.);
-		m = parseInt("" + m, 10);
-		s = (s - 60 * m);
-		s = parseInt("" + s, 10);
-		text = d + " ° " + text + " D " + m + " m " + s + " s ";
-	}
-	// text += "\n";
-	{
-		if (latitude > 0) {
-			text += "N";
-		} else {
-			latitude = -latitude;
-			text += "S";
-		}
-		var u = latitude;
-		var d = parseInt("" + u, 10);
-		var s = (u - d) * 60 * 60;
-		var m = (s / 60.);
-		m = parseInt("" + m, 10);
-		s = (s - 60 * m);
-		s = parseInt("" + s, 10);
-		text = d + " ° " + text + " D " + m + " m " + s + " s ";
-	}
-	return text;
-}
-
-function setWGS(lat, lon) {
-	var text = "wgs84:" + toStringWgs84(lat, lon);
-	var text = toStringText(lat, lon);
-	document.getElementById("wgs").value = text;
-}
-
-
-/*
  * Link Manager
  */
 
@@ -218,16 +127,140 @@ function chargeMap(lat, lon) {
 
 
 /*
- * Latitude/Lontitude Manager
+ * Transformation Manager
+ */
+
+function fromLatLonToDMS(lat, lon) {
+	var latitude = lat;
+	var longitude = lon;
+	var text="";
+	var NS="";
+	if (latitude >= 0) {
+		NS += "N";
+	} else {
+		latitude = -latitude;
+		NS += "S";
+	}
+	var d = parseInt(latitude);
+	var m = parseInt((latitude - d) * 60);
+	var s = parseInt((latitude-d)*60*60 - 60*m);
+	text += NS+" "+d+"° "+m+"' "+s+"\"  ";
+
+	var EW="";
+	if (longitude >= 0) {
+		EW += "E";
+	} else {
+		EW += "W";
+		longitude = -longitude;
+	}
+	var d = parseInt(longitude);
+	var m = parseInt((longitude - d) * 60);
+	var s = parseInt((longitude-d)*60*60 - 60*m);
+	text += EW+" "+d+"° "+m+"' "+s+"\"";
+	// text = NS+" "+d+"° "+m+"' "+s+"\"  "+EW+" "+d+"° "+m+"' "+s+"\"";
+	return text;
+}
+
+function setDMS(lat, lon) {
+	$('#dms').val(fromLatLonToDMS(lat, lon));
+}
+
+function fromDMSToLatLon(dms){
+	var re = 
+		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
+	if (re.test(dms)) {
+		var lat = parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60);
+		if(RegExp.$1=='S'){
+			lat=-lat;
+		}
+		var lon = parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60);
+		if(RegExp.$5=='W'){
+			lon=-lon;
+		}
+		return [ lat, lon ];
+	} else {
+		alert("Coordinate DMS invalid : "+$('#dms').val());
+		
+		//$('#locationInfo').html("Coordinate DMS invalid : "+$('#dms').val());
+		return;
+	}
+}
+
+function setLatLon(dms){
+	var coordinates = fromDMSToLatLon(dms);
+	setLat(coordinates[0]);
+	setLon(coordinates[1]);
+}
+
+function validateDMS(dms){
+	var re = 
+		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
+	if (re.test(dms)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function validateLatOrLon(latOrLon){
+	if(/[0-9.-]+$/.test(latOrLon)){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function changeLat(){
+	var lat = $('#lat').val();
+	//lat = lat.toFixed(6);
+	var lon = $('#lon').val();
+	//lon = lon.toFixed(6);
+	if(validateLatOrLon(lat)){
+		setDMS(lat, lon);
+		storeData();
+	} else {
+		alert("Latitude coordinate invalid : "+lat);
+		initData();
+	}
+}
+
+function changeLon(){
+	var lat = $('#lat').val();//.toFixed(6);
+	var lon = $('#lon').val();//.toFixed(6);
+	if(validateLatOrLon(lon)){
+		setDMS(lat, lon);
+		storeData();
+	} else {
+		alert("Lontitude coordinate invalid : "+lon);
+		initData();
+	}
+}
+
+function changeDMS(){
+	var dms = $('#dms').val();
+	if(validateDMS(dms)){
+		setLatLon(dms)
+		storeData();
+	} else {
+		alert("DMS coordinate invalid : "+dms);
+		initData();
+	}
+}
+
+
+/*
+ * Coordinates Manager
  */
 function setLat(lat) {
 	if (document.getElementById("lat").value != lat) {
+		//lat = lat.toFixed(6);
 		document.getElementById("lat").value = lat;
 	}
 }
 
 function setLon(lon) {
 	if (document.getElementById("lon").value != lon) {
+		//lon = lon.toFixed(6);
 		document.getElementById("lon").value = lon;
 	}
 }
@@ -236,10 +269,13 @@ function setLon(lon) {
 /*
  * General Manager
  */
-function set(lat, lon) {
+
+function set() {
+	var lat = $('#lat').val();
+	var lon = $('#lon').val();
 	setLat(lat);
 	setLon(lon);
-	setWGS(lat, lon);
+	setDMS(lat, lon);
 	updateLinks(lat, lon);
 	$('#myMap').empty();
 	if (isOnline) {
@@ -259,7 +295,7 @@ function refresh() {
 		isOnline = false;
 		alert("Connection lost");
 	}
-	set(document.getElementById("lat").value,document.getElementById("lon").value);
+	set();
 }
 
 
@@ -267,7 +303,7 @@ function refresh() {
  * Location Manager
  */
 function showLocation(position) {
-	set(position.coords.latitude, position.coords.longitude);
+	set();
 }
 
 function errorLocation(error) {
@@ -410,7 +446,7 @@ function readRecord() {
 
 function recordLocation(position) {
 	if ($('#switchRecord').val() == "start") {
-		set(position.coords.latitude, position.coords.longitude);
+		set();
 		resolveFile();
 		writeRecord();
 		readRecord();
@@ -600,29 +636,32 @@ function sendEmail() {
  * Storage Manager
  */
 
-function store() {
+function storeData(){
 	localStorage.setItem('lat', $('#lat').val());
 	localStorage.setItem('lon', $('#lon').val());
+	localStorage.setItem('dms', $('#dms').val());
+}
+
+function storeSettings() {
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
-
-	for ( var i = 0; i < localStorage.length; i++) {
-		log(i + localStorage.getItem(localStorage.key(i)));
-	}
-
 }
 
-function init() {
-	for ( var i = 0; i < localStorage.length; i++) {
-		log(i + localStorage.getItem(localStorage.key(i)));
-	}
+function initData(){
 	if (localStorage.getItem('lat') != null) {
 		$('#lat').val(localStorage.getItem('lat'));
 	}
 	if (localStorage.getItem('lon') != null) {
 		$('#lon').val(localStorage.getItem('lon'));
 	}
+	if (localStorage.getItem('dms') != null) {
+		$('#dms').val(localStorage.getItem('dms'));
+	}
+	storeData();
+}
+
+function initSettings() {
 	if (localStorage.getItem('connection') == 'online') {
 		$('#switchOnline').val(localStorage.getItem('connection'));
 	}
@@ -632,7 +671,23 @@ function init() {
 	if (localStorage.getItem('timeout') != null) {
 		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
 	}
+	storeSettings();
+}
+
+function init(){
+	initData();
+	initSettings();
 	refresh();
+}
+
+function quit() {
+	storeData();
+	storeSettings();
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
+	}
+	setTimeout(
+		function() {tizen.application.getCurrentApplication().exit();}, 2000);
 }
 
 
@@ -672,10 +727,4 @@ function swipePage() {
 					$.mobile.changePage(prevpage,
 							{transition : "slide", reverse : true});
 	}});
-}
-
-function quit() {
-	store();
-	setTimeout(
-			function() {tizen.application.getCurrentApplication().exit();}, 2000);
 }

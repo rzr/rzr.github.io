@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var initializer = function () {
-    // TODO:: Do your initialization job
+    // Initialization job
 	init();
 	swipePage();
 	// End of initialization

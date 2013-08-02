@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<form>
 					<label for=lat>Latitude N+/S-:</label>
 					<input type="text" id="lat" value="26.357865"
-						onChange="changeLat();"/>
+						onChange="changeLat(lat.value);"/>
 					<label for=lon>Longitude W+/E-:</label>
 					<input type="text" id="lon" value="127.783782"
 						onChange="changeLon();"/>
@@ -89,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 				<tr>
 					<td><input type="button" onclick="getLocation()" value="Get position"/></td>
-					<td><input type="button" onclick="goToOSM()" value="OpenStreetMap"/></td>
+					<td><input type="button" id="OSMLink" onclick="goToOSM()" value="OpenStreetMap"/></td>
 				</tr>
 			</table>
 			<p id="locationInfo"></p>
@@ -135,7 +135,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	
 	<!-- Page 3 : Settings -->
-	<div data-role="page" id="Settings" class="ui-page">
+	<div data-role="page" id="settings" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
 			<a href="#position" data-role="button" 
 				id="home" class="ui-btn-left" data-icon="home">Home</a>

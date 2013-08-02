@@ -23,24 +23,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * Application Global variables
  */
-
+// The map of the application
 var map;
+// The boolean which provide the connection state of the application
 var isOnline = false;
 
-/*
- * Schedule
- */
 
-function log(message) {
-	if (!false) console.log("# " + message);
-}
+/*
+ * Recording Global Variable
+ */
+// Directory where the recording document is placed
+var docDir;
+// Name of the recording document
+var doc;
+// The file where the records are placed
+var file;
 
 
 /*
  * Link Manager
  */
 
-function getOSMLink(lat, lon) {
+/**
+ * Get the OpenStreetMap link with the corresponding latitude and longitude
+ * @returns url
+ */
+function getOSMLink() {
+	var lat = $("#lat").val();
+	var lon = $("#lon").val();
 	var url = 
 		"http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
 	url = url.replace("${lon}", lon);
@@ -48,11 +58,14 @@ function getOSMLink(lat, lon) {
 	return url;
 }
 
+/**
+ * Use the Internet Application Control to go to OSM link with the browser
+ */
 function goToOSM() {
 	if (isOnline) {
 		var appControl = new tizen.ApplicationControl(
-				"http://tizen.org/appcontrol/operation/view", getOSMLink($(
-						"#lat").val(), $("#lon").val()), null);
+				"http://tizen.org/appcontrol/operation/view", 
+				getOSMLink(), null);
 		var appControlReplyCallback = {
 			onsuccess : function(data) {
 				for ( var i = 0; i < data.length; i++) {
@@ -78,8 +91,11 @@ function goToOSM() {
 	}
 }
 
-function updateLinks(lat, lon) {
-	$('#OSMLink').attr('href', getOSMLink(lat, lon));
+/**
+ * update links
+ */
+function updateLinks() {
+	$('#OSMLink').attr('href', getOSMLink());
 }
 
 
@@ -87,6 +103,10 @@ function updateLinks(lat, lon) {
  * Map Manager
  */
 
+/**
+ * get the size of the map (width, height) according to the dimension of the screen
+ * @returns [ width, height ]
+ */
 function getMapSize() {
 	var viewHeight = $(window).height();
 	var viewWidth = $(window).width();
@@ -100,13 +120,21 @@ function getMapSize() {
 	return [ contentWidth, contentHeight ];
 }
 
+/**
+ * Modify the dimension of the map according to getMapSize()
+ */
 function setMapSize() {
 	var mapSize = getMapSize();
 	$('#myMap').css("width", mapSize[0]);
 	$('#myMap').css("height", mapSize[1]);
 }
 
-function chargeMap(lat, lon) {
+/**
+ * Charge the OpenLayers map with different OpenStreetMap and Google maps' layers
+ */
+function chargeMap() {
+	var lat = $("#lat").val();
+	var lon = $("#lon").val();
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
 		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
@@ -127,13 +155,19 @@ function chargeMap(lat, lon) {
 
 
 /*
- * Transformation Manager
+ * Coordinates transformation Manager
  */
 
+/**
+ * Transform the latitude/longitude into DMS coordinate
+ * @param lat : latitude
+ * @param lon : longitude
+ * @returns dms : DMS coordinate
+ */
 function fromLatLonToDMS(lat, lon) {
 	var latitude = lat;
 	var longitude = lon;
-	var text="";
+	var dms="";
 	var NS="";
 	if (latitude >= 0) {
 		NS += "N";
@@ -144,7 +178,7 @@ function fromLatLonToDMS(lat, lon) {
 	var d = parseInt(latitude);
 	var m = parseInt((latitude - d) * 60);
 	var s = parseInt((latitude-d)*60*60 - 60*m);
-	text += NS+" "+d+"° "+m+"' "+s+"\"  ";
+	dms += NS+" "+d+"° "+m+"' "+s+"\"  ";
 
 	var EW="";
 	if (longitude >= 0) {
@@ -156,42 +190,79 @@ function fromLatLonToDMS(lat, lon) {
 	var d = parseInt(longitude);
 	var m = parseInt((longitude - d) * 60);
 	var s = parseInt((longitude-d)*60*60 - 60*m);
-	text += EW+" "+d+"° "+m+"' "+s+"\"";
+	dms += EW+" "+d+"° "+m+"' "+s+"\"";
 	// text = NS+" "+d+"° "+m+"' "+s+"\"  "+EW+" "+d+"° "+m+"' "+s+"\"";
-	return text;
+	return dms;
 }
 
-function setDMS(lat, lon) {
-	$('#dms').val(fromLatLonToDMS(lat, lon));
-}
-
+/**
+* Transform the DMS into latitude/longitude coordinates
+* @param dms : DMS coordinate
+* @returns [ lat, lon ] : latitude and longitude coordinates
+*/
 function fromDMSToLatLon(dms){
 	var re = 
 		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
-	if (re.test(dms)) {
-		var lat = parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60);
-		if(RegExp.$1=='S'){
-			lat=-lat;
-		}
-		var lon = parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60);
-		if(RegExp.$5=='W'){
-			lon=-lon;
-		}
-		return [ lat, lon ];
-	} else {
-		alert("Coordinate DMS invalid : "+$('#dms').val());
-		
-		//$('#locationInfo').html("Coordinate DMS invalid : "+$('#dms').val());
-		return;
+	var lat = parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60);
+	if(RegExp.$1=='S'){
+		lat=-lat;
+	}
+	var lon = parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60);
+	if(RegExp.$5=='W'){
+		lon=-lon;
+	}
+	return [ lat, lon ];
+}
+
+
+/*
+ * Coordinates Manager
+ */
+
+/**
+ * Modify the latitude value
+ * @param lat : new latitude value
+ */
+function setLat(lat) {
+	if (document.getElementById("lat").value != lat) {
+		lat = lat.toFixed(6);
+		document.getElementById("lat").value = lat;
 	}
 }
 
-function setLatLon(dms){
-	var coordinates = fromDMSToLatLon(dms);
+/**
+ * Modify the longitude value
+ * @param lon : new longitude value
+ */
+function setLon(lon) {
+	if (document.getElementById("lon").value != lon) {
+		lon = lon.toFixed(6);
+		document.getElementById("lon").value = lon;
+	}
+}
+
+/**
+ * Modify the DMS value using the transformation's function fromLatLonToDMS
+ */
+function setDMS() {
+	$('#dms').val(fromLatLonToDMS($("#lat").val(), $("#lon").val()));
+}
+
+/**
+ * Modify the latitude and longitude values using the transformation's function fromDMSToLatLon
+ */
+function setLatLon(){
+	var coordinates = fromDMSToLatLon($('#dms').val());
+	log(coordinates[0]);
 	setLat(coordinates[0]);
 	setLon(coordinates[1]);
 }
 
+/**
+ * Validate or not the DMS coordinate according to the form of the regular expression
+ * @param dms : DMS coordinates
+ * @returns Validation
+ */
 function validateDMS(dms){
 	var re = 
 		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
@@ -202,6 +273,11 @@ function validateDMS(dms){
 	}
 }
 
+/**
+ * Validate or not the latitudes and longitudes coordinates according to the form of the regular expression
+ * @param latOrLon
+ * @returns Validation
+ */
 function validateLatOrLon(latOrLon){
 	if(/[0-9.-]+$/.test(latOrLon)){
 		return true;
@@ -210,13 +286,16 @@ function validateLatOrLon(latOrLon){
 	}
 }
 
+/**
+ * Function called when the latitude value changes
+ * Calculate the new DMS coordinate
+ */
 function changeLat(){
-	var lat = $('#lat').val();
-	//lat = lat.toFixed(6);
-	var lon = $('#lon').val();
-	//lon = lon.toFixed(6);
+	var lat = parseFloat($('#lat').val()).toFixed(6);
+	var lon = parseFloat($('#lon').val()).toFixed(6);
+	$('#lat').val(lat);
 	if(validateLatOrLon(lat)){
-		setDMS(lat, lon);
+		setDMS();
 		storeData();
 	} else {
 		alert("Latitude coordinate invalid : "+lat);
@@ -224,11 +303,16 @@ function changeLat(){
 	}
 }
 
+/**
+ * Function called when the longitude value changes
+ * Calculate the new DMS coordinate
+ */
 function changeLon(){
-	var lat = $('#lat').val();//.toFixed(6);
-	var lon = $('#lon').val();//.toFixed(6);
+	var lat = parseFloat($('#lat').val()).toFixed(6);
+	var lon = parseFloat($('#lon').val()).toFixed(6);
+	$('#lon').val(lon);
 	if(validateLatOrLon(lon)){
-		setDMS(lat, lon);
+		setDMS();
 		storeData();
 	} else {
 		alert("Lontitude coordinate invalid : "+lon);
@@ -236,10 +320,14 @@ function changeLon(){
 	}
 }
 
+/**
+ * Function called when the DMS value changes
+ * Calculate the new latitude and longitude coordinates
+ */
 function changeDMS(){
 	var dms = $('#dms').val();
 	if(validateDMS(dms)){
-		setLatLon(dms)
+		setLatLon(dms);
 		storeData();
 	} else {
 		alert("DMS coordinate invalid : "+dms);
@@ -249,63 +337,22 @@ function changeDMS(){
 
 
 /*
- * Coordinates Manager
- */
-function setLat(lat) {
-	if (document.getElementById("lat").value != lat) {
-		//lat = lat.toFixed(6);
-		document.getElementById("lat").value = lat;
-	}
-}
-
-function setLon(lon) {
-	if (document.getElementById("lon").value != lon) {
-		//lon = lon.toFixed(6);
-		document.getElementById("lon").value = lon;
-	}
-}
-
-
-/*
- * General Manager
- */
-
-function set() {
-	var lat = $('#lat').val();
-	var lon = $('#lon').val();
-	setLat(lat);
-	setLon(lon);
-	setDMS(lat, lon);
-	updateLinks(lat, lon);
-	$('#myMap').empty();
-	if (isOnline) {
-		setMapSize();
-		chargeMap(lat, lon);
-	} else {
-		$('#myMap').html(
-				"<p align='center'>" +
-				"Please connect your application online in the settings" +
-				" if you want to charge the map</p>");
-	}
-}
-
-function refresh() {
-	if (isOnline && !navigator.onLine) {
-		$('#switchOnline').val('offline').slider('refresh');
-		isOnline = false;
-		alert("Connection lost");
-	}
-	set();
-}
-
-
-/*
  * Location Manager
  */
+
+/**
+ * Function called when the getCurrentPosition succeded
+ * Refresh the application
+ */
 function showLocation(position) {
-	set();
+	refresh();
 }
 
+/**
+ * Function called when the getCurrentPosition failed
+ * Show the error
+ * @param error
+ */
 function errorLocation(error) {
 	var errorInfo = document.getElementById("locationInfo");
 	switch (error.code) {
@@ -324,6 +371,9 @@ function errorLocation(error) {
 	}
 }
 
+/**
+ * Get the current position according to the GPS' device
+ */
 function getLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(showLocation, errorLocation,
@@ -339,10 +389,11 @@ function getLocation() {
  * Recording manager
  */
 
-var docDir;
-var doc;
-var file;
-
+/**
+ * Function called when the file resolution succeded
+ * Create the recording file in the corresponding directory
+ * @param dir : directory where the file is placed
+ */
 function onResolveSuccess(dir) {
 	docDir = dir;
 	var dateFile = new Date();
@@ -354,10 +405,18 @@ function onResolveSuccess(dir) {
 	$('#locationInfo').html("Course recording in the file : " + doc);
 }
 
+/**
+ * Function called when the file resolution failed
+ * Show the error
+ * @param e : error
+ */
 function onResolveError(e) {
 	console.log('message: ' + e.message);
 }
 
+/**
+ * Resolve the file
+ */
 function resolveFile() {
 	try {
 		file = docDir.resolve(doc);
@@ -368,6 +427,11 @@ function resolveFile() {
 	}
 }
 
+/**
+ * Function called when the record failed, writing or reading
+ * Show the error
+ * @param e : error
+ */
 function onRecordError(e) {
 	var msg = '';
 	switch (e.code) {
@@ -393,6 +457,11 @@ function onRecordError(e) {
 	console.log('Error: ' + msg);
 }
 
+/**
+ * Function called when the writing succeeded
+ * Add the position at the end of the file
+ * @param fileStream : Stream to write
+ */
 function writeToStream(fileStream) {
 	try {
 		var dateRecord = new Date();
@@ -405,6 +474,9 @@ function writeToStream(fileStream) {
 	}
 }
 
+/**
+ * Try to write the record into the file
+ */
 function writeRecord() {
 	try {
 		file.openStream(
@@ -419,6 +491,10 @@ function writeRecord() {
 	}
 }
 
+/**
+ * Function called when the reading succeded
+ * @param fileStream : Stream to read
+ */
 function readFromStream(fileStream) {
 	try {
 		console.log('File size: ' + file.fileSize);
@@ -430,6 +506,9 @@ function readFromStream(fileStream) {
 	}
 }
 
+/**
+ * Try to read the file
+ */
 function readRecord() {
 	try {
 		file.openStream(
@@ -444,15 +523,25 @@ function readRecord() {
 	}
 }
 
+/**
+ * Function called when getPosition got successfully the position
+ * Resolve the file, write and read the records
+ * @param position
+ */
 function recordLocation(position) {
 	if ($('#switchRecord').val() == "start") {
-		set();
+		refresh();
 		resolveFile();
 		writeRecord();
 		readRecord();
 	}
 }
 
+/**
+ * Function called when getPosition failed to get the position
+ * Show the error
+ * @param error
+ */
 function errorPosition(error) {
 	$('#switchRecord').val('stop').slider('refresh');
 	var errorInfo = document.getElementById("locationInfo");
@@ -472,11 +561,18 @@ function errorPosition(error) {
 	}
 }
 
+/**
+ * Get the recording position
+ */
 function getPosition() {
 	navigator.geolocation.getCurrentPosition(recordLocation, errorPosition,
 			{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 }
 
+/**
+ * Function called when the record of a course has been launched
+ * Record the position whith a timeout predefined in the settings
+ */
 function record() {
 	if (navigator.geolocation) {
 		if ($('#switchRecord').val() == "start") {
@@ -498,47 +594,20 @@ function record() {
 
 
 /*
- * Contact Manager
+ * Social Manager
  */
 
-function createContact() {
-	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/social/add",
-			null,
-			"vnd.tizen.item.type/vnd.tizen.contact", // null for the emulator
-			null,
-			[
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/item_type",
-					 [ "contact" ]),
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/email",
-					 [ "mapo.tizen+"+
-					   toStringWgs84(
-							   $('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/url",
-					 [ getOSMLink($("#lat").val(), $("#lon").val()) ])
-			]);
-	tizen.application.launchAppControl(appControl, null, 
-			function() {console.log("launch service succeeded");},
-			function(e) {console.log(
-					"launch service failed. Reason: " +e.name);});
-}
-
-
-/*
- * Email Manager
+/**
+ * Use the Email Application Control to share a position by Email
  */
-
 function sendEmail() {
 	if (isOnline) {
 		var message =
 			"This is the position I want to show you from Mapo:" +
 			"\nLatitute="+$("#lat").val()+
 			"\nLongitude = "+$("#lon").val()+
-			"\nIf you prefer in WGS 84, here it is: "+$('#wgs').val()+
-			"\nYou can see this position on OpenStreetMap: "+$('#OSMLink').val()+
+			"\nIf you prefer in DMS, here it is: "+$('#dms').val()+
+			"\nYou can see this position on OpenStreetMap: "+getOSMLink()+
 			"\nConnect you on Mapo for more details!";
 		var appControl = new tizen.ApplicationControl(
 				"http://tizen.org/appcontrol/operation/send", // compose or send
@@ -633,37 +702,90 @@ function sendEmail() {
 
 
 /*
+ * Contact Manager
+ */
+
+/**
+ * Use the Contact Application Control to add a contact with the corresponding position
+ */
+function createContact() {
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/social/add",
+			null,
+			"vnd.tizen.item.type/vnd.tizen.contact",
+			//TODO
+			// null for the emulator
+			// "vnd.tizen.item.type/vnd.tizen.contact" for the device
+			null,
+			[
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/item_type",
+					 [ "contact" ]),
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/email",
+					 [ "mapo.tizen+"+
+					   fromLatLonToDMS($('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/url",
+					 [ getOSMLink() ])
+			]);
+	tizen.application.launchAppControl(appControl, null, 
+			function() {console.log("launch service succeeded");},
+			function(e) {console.log(
+					"launch service failed. Reason: " +e.name);});
+}
+
+
+/*
  * Storage Manager
  */
 
+/**
+ * Store the coordinates values in the local storage
+ */
 function storeData(){
 	localStorage.setItem('lat', $('#lat').val());
 	localStorage.setItem('lon', $('#lon').val());
 	localStorage.setItem('dms', $('#dms').val());
 }
 
+/**
+ * Store the settings values in the local storage
+ */
 function storeSettings() {
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
 }
 
+
+/*
+ * Initialization Manager
+ */
+
+/**
+ * Recover in the local storage the coordinates values from the preceding use
+ */
 function initData(){
 	if (localStorage.getItem('lat') != null) {
 		$('#lat').val(localStorage.getItem('lat'));
 	}
 	if (localStorage.getItem('lon') != null) {
-		$('#lon').val(localStorage.getItem('lon'));
+		$('#lon').val(parseFloat(localStorage.getItem('lon')));
 	}
 	if (localStorage.getItem('dms') != null) {
-		$('#dms').val(localStorage.getItem('dms'));
+		$('#dms').val(parseFloat(localStorage.getItem('dms')));
 	}
 	storeData();
 }
 
+/**
+ * Recover in the local storage the setting values from the preceding use
+ */
 function initSettings() {
 	if (localStorage.getItem('connection') == 'online') {
 		$('#switchOnline').val(localStorage.getItem('connection'));
+		isOnline = true;
 	}
 	if (localStorage.getItem('energySaving') != null) {
 		$('#switchEnergy').val(localStorage.getItem('energySaving'));
@@ -674,20 +796,14 @@ function initSettings() {
 	storeSettings();
 }
 
+
+/**
+ * Initialize the data from the preceding use
+ */
 function init(){
 	initData();
 	initSettings();
 	refresh();
-}
-
-function quit() {
-	storeData();
-	storeSettings();
-	for ( var i = 0; i < localStorage.length; i++) {
-		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
-	}
-	setTimeout(
-		function() {tizen.application.getCurrentApplication().exit();}, 2000);
 }
 
 
@@ -695,6 +811,10 @@ function quit() {
  * Settings Manager
  */
 
+/**
+ * Function called when the online swith is activated or desactived
+ * Verify if the the device has a connection before connecting the application
+ */
 function switchOnline() {
 	if (!isOnline) {
 		if (navigator.onLine) {
@@ -710,6 +830,67 @@ function switchOnline() {
 	refresh();
 }
 
+
+/*
+ * General Manager
+ */
+
+/**
+ * Refresh all the application according to the coordinates and the settings
+ */
+function refresh() {
+	if (isOnline && !navigator.onLine) {
+		$('#switchOnline').val('offline').slider('refresh');
+		isOnline = false;
+		alert("Connection lost");
+	}
+	var lat = $('#lat').val();
+	var lon = $('#lon').val();
+	setLat(lat);
+	setLon(lon);
+	setDMS();
+	updateLinks();
+	$('#myMap').empty();
+	if (isOnline) {
+		setMapSize();
+		chargeMap();
+	} else {
+		$('#myMap').html(
+				"<p align='center'>" +
+				"Please connect your application online in the settings" +
+				" if you want to charge the map</p>");
+	}
+}
+
+/**
+ * Store the data before quitting the application
+ */
+function quit() {
+	storeData();
+	storeSettings();
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
+	}
+	setTimeout(
+		function() {tizen.application.getCurrentApplication().exit();}, 2000);
+}
+
+
+/*
+ * Schedule
+ */
+
+/**
+ * Show a message
+ * @param message
+ */
+function log(message) {
+	if (!false) console.log("# " + message);
+}
+
+/**
+ * Use the tactil swipe to change between every pages
+ */
 function swipePage() {
 	$('div.ui-page').live("swipeleft",
 			function() {

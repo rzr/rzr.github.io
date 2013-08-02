@@ -16,6 +16,6 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 
 ### BUG ###
 
-* BUG [#A] : Stange behavior after the first course record, 2 or 3 record in the same time 
+* BUG [#A] : Strange behavior after the first course record, 2 or 3 record in the same time 
 * BUG [#B] : No record during standby
 * BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases

@@ -203,13 +203,17 @@ function fromLatLonToDMS(lat, lon) {
 function fromDMSToLatLon(dms){
 	var re = 
 		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
-	var lat = parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60);
-	if(RegExp.$1=='S'){
-		lat=-lat;
-	}
-	var lon = parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60);
-	if(RegExp.$5=='W'){
-		lon=-lon;
+	if(re.test(dms)){
+		var lat = (parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60)).toFixed(6);
+		if(RegExp.$1=='S'){
+			lat=-lat;
+		}
+		lat = lat.toString();
+		var lon = (parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60)).toFixed(6);
+		if(RegExp.$5=='W'){
+			lon=-lon;
+		}
+		lon = lon.toString();
 	}
 	return [ lat, lon ];
 }
@@ -225,7 +229,7 @@ function fromDMSToLatLon(dms){
  */
 function setLat(lat) {
 	if (document.getElementById("lat").value != lat) {
-		lat = lat.toFixed(6);
+		//lat = lat.toFixed(6);
 		document.getElementById("lat").value = lat;
 	}
 }
@@ -236,7 +240,7 @@ function setLat(lat) {
  */
 function setLon(lon) {
 	if (document.getElementById("lon").value != lon) {
-		lon = lon.toFixed(6);
+		//lon = lon.toFixed(6);
 		document.getElementById("lon").value = lon;
 	}
 }
@@ -253,7 +257,6 @@ function setDMS() {
  */
 function setLatLon(){
 	var coordinates = fromDMSToLatLon($('#dms').val());
-	log(coordinates[0]);
 	setLat(coordinates[0]);
 	setLon(coordinates[1]);
 }
@@ -279,7 +282,7 @@ function validateDMS(dms){
  * @returns Validation
  */
 function validateLatOrLon(latOrLon){
-	if(/[0-9.-]+$/.test(latOrLon)){
+	if(/^[0-9.-]+$/.test(latOrLon)){
 		return true;
 	} else {
 		return false;
@@ -291,10 +294,9 @@ function validateLatOrLon(latOrLon){
  * Calculate the new DMS coordinate
  */
 function changeLat(){
-	var lat = parseFloat($('#lat').val()).toFixed(6);
-	var lon = parseFloat($('#lon').val()).toFixed(6);
-	$('#lat').val(lat);
+	var lat = $('#lat').val();
 	if(validateLatOrLon(lat)){
+		$('#lat').val(parseFloat($('#lat').val()).toFixed(6).toString());
 		setDMS();
 		storeData();
 	} else {
@@ -308,10 +310,9 @@ function changeLat(){
  * Calculate the new DMS coordinate
  */
 function changeLon(){
-	var lat = parseFloat($('#lat').val()).toFixed(6);
-	var lon = parseFloat($('#lon').val()).toFixed(6);
-	$('#lon').val(lon);
+	var lon = $('#lon').val();
 	if(validateLatOrLon(lon)){
+		$('#lon').val(parseFloat($('#lon').val()).toFixed(6).toString());
 		setDMS();
 		storeData();
 	} else {
@@ -327,7 +328,7 @@ function changeLon(){
 function changeDMS(){
 	var dms = $('#dms').val();
 	if(validateDMS(dms)){
-		setLatLon(dms);
+		setLatLon();
 		storeData();
 	} else {
 		alert("DMS coordinate invalid : "+dms);
@@ -712,7 +713,7 @@ function createContact() {
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/social/add",
 			null,
-			"vnd.tizen.item.type/vnd.tizen.contact",
+			null,
 			//TODO
 			// null for the emulator
 			// "vnd.tizen.item.type/vnd.tizen.contact" for the device
@@ -735,6 +736,37 @@ function createContact() {
 					"launch service failed. Reason: " +e.name);});
 }
 
+
+///*
+// * Calendar Manager
+// */
+//
+///**
+// * Use the Contact Application Control to add an event in the calendar with the corresponding date
+// */
+//function createCalendarEvent(){
+//	var appControl = new tizen.ApplicationControl(
+//			"http://tizen.org/appcontrol/operation/social/add",
+//			null,
+//			"vnd.tizen.item.type/vnd.tizen.contact",
+//			null,
+//			[
+//			 new tizen.ApplicationControlData(
+//					 "http://tizen.org/appcontrol/data/social/item_type",
+//					 [ "contact" ]),
+//			 new tizen.ApplicationControlData(
+//					 "http://tizen.org/appcontrol/data/social/email",
+//					 [ "mapo.tizen+"+
+//					   fromLatLonToDMS($('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
+//			 new tizen.ApplicationControlData(
+//					 "http://tizen.org/appcontrol/data/social/url",
+//					 [ getOSMLink() ])
+//			]);
+//	tizen.application.launchAppControl(appControl, null, 
+//			function() {console.log("launch service succeeded");},
+//			function(e) {console.log(
+//					"launch service failed. Reason: " +e.name);});
+//}
 
 /*
  * Storage Manager
@@ -771,10 +803,10 @@ function initData(){
 		$('#lat').val(localStorage.getItem('lat'));
 	}
 	if (localStorage.getItem('lon') != null) {
-		$('#lon').val(parseFloat(localStorage.getItem('lon')));
+		$('#lon').val(localStorage.getItem('lon'));
 	}
 	if (localStorage.getItem('dms') != null) {
-		$('#dms').val(parseFloat(localStorage.getItem('dms')));
+		$('#dms').val(localStorage.getItem('dms'));
 	}
 	storeData();
 }
@@ -885,7 +917,7 @@ function quit() {
  * @param message
  */
 function log(message) {
-	if (!false) console.log("# " + message);
+	if (!false) console.log("# "+message);
 }
 
 /**

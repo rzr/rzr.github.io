@@ -636,70 +636,85 @@ function sendEmail() {
 	}
 }
 
-// function sendBluetooth(){
-// var appControl = new tizen.ApplicationControl(
-// "http://tizen.org/appcontrol/operation/pick",
-// null,
-// "image/jpeg",
-// null);
+//function sendBluetooth(){
+//	var appControl = new tizen.ApplicationControl(
+//			"http://tizen.org/appcontrol/operation/pick",
+//			null,
+//			"image/jpeg",
+//			null);
 //
-// var appControlReplyCallback = {
-// // callee sent a reply
-// onsuccess: function(data) {
-// for (var i = 0; i < data.length; i++) {
-// if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
-// console.log('Selected image is ' + data[i].value[0]);
-// }
-// }
-// },
-// // callee returned failure
-// onfailure: function() {
-// console.log('The launch application control failed');
-// }
-// }
+//	tizen.application.launchAppControl(appControl, null,
+//			function() {console.log("launch service succeeded");}, 
+//			function(e) {
+//				console.log("launch service failed. Reason: " + e.name);});
+	
+//	var appControlReplyCallback = {
+//			// callee sent a reply
+//			onsuccess: function(data) {
+//				for (var i = 0; i < data.length; i++) {
+//					if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
+//						console.log('Selected image is ' + data[i].value[0]);
+//					}
+//				}
+//			},
+//			// callee returned failure
+//			onfailure: function() {
+//				console.log('The launch application control failed');
+//			}
+//	}
 //
-// tizen.application.launchAppControl(
-// appControl,
-// null,
-// function() {console.log("launch application control succeed"); },
-// function(e) {console.log("launch application control failed. reason: " +
-// e.message); },
-// appControlReplyCallback );
+//	tizen.application.launchAppControl(
+//			appControl,
+//			null,
+//			function() {console.log("launch application control succeed"); },
+//			function(e) {console.log("launch application control failed. reason: "+e.message); },
+//			appControlReplyCallback );
 
-// tizen.application.launch("tizen.bluetooth",
-// function(){console.log("launch service succeeded");},
-// function(e){console.log("launch service failed. Reason: " + e.name);});
+//	tizen.application.launch("tizen.bluetooth",
+//	function(){console.log("launch service succeeded");},
+//	function(e){console.log("launch service failed. Reason: " + e.name);});
 
-// var appControl = new
-// tizen.ApplicationControl("http://tizen.org/appcontrol/operation/bluetooth/pick",
-// "Phone/Images/image16.jpg");
-// tizen.application.launchAppControl(appControl, null,
-// function(){console.log("launch service succeeded");},
-// function(e){console.log("launch service failed. Reason: " + e.name);});
-// }
+//	var appControl = new
+//	tizen.ApplicationControl("http://tizen.org/appcontrol/operation/bluetooth/pick",
+//	"Phone/Images/image16.jpg");
+//	tizen.application.launchAppControl(appControl, null,
+//			function(){console.log("launch service succeeded");},
+//			function(e){console.log("launch service failed. Reason: " + e.name);});
 
-// function sendMessage(){
-// var message = "This is the position I want to show you from
-// Mapo:\nLatitute="+
-// $("#lat").val()+"\nLongitude = "+$("#lon").val()+
-// "\nIf you prefer in WGS 84, here it is: "+$('#wgs').val()+
-// "\nYou can see this position on OpenStreetMap: "+$('#OSMLink').val()+
-// "\nOr on Google Maps: "+$('#GMLink').val()+
-// "\nConnect you on Mapo for more details about this application!";
-// var appControl = new
-// tizen.ApplicationControl("http://tizen.org/appcontrol/operation/compose",
-// tizen.smsmessages,
-// null,
-// null,
-// [
-// new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",
-// ["lol"])
-// ]
-// );
-// tizen.application.launchAppControl(appControl, null,
-// function(){console.log("launch service succeeded");},
-// function(e){console.log("launch service failed. Reason: " + e.name);});
-// }
+//}
+
+function sendMessage(){
+	var message =
+		"This is the position I want to show you from Mapo:" +
+		"\nLatitute="+$("#lat").val()+
+		"\nLongitude = "+$("#lon").val()+
+		"\nIf you prefer in DMS, here it is: "+$('#dms').val()+
+		"\nYou can see this position on OpenStreetMap: "+getOSMLink()+
+		"\nConnect you on Mapo for more details!";
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/compose",
+			"tel:9988776655", // tizen.smsmessages
+			null,
+			null,
+			[
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/messagetype",["sms"]),
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",[message]),
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/to", ["2345678900"]),
+			 ]
+	);
+	tizen.application.launchAppControl(appControl, null,
+			function() {console.log("launch service succeeded");}, 
+			function(e) {console.log("launch service failed. Reason: "+e);});
+}
+
+function call(){
+	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/dial","tel:9988776655", null);
+
+	tizen.application.launchAppControl(appControl,null,
+			function(){console.log("launch appControl succeeded");},
+			function(e){console.log("launch appControl failed. Reason: " + e.name);},
+			null);
+}
 
 
 /*
@@ -737,36 +752,29 @@ function createContact() {
 }
 
 
-///*
-// * Calendar Manager
-// */
-//
-///**
-// * Use the Contact Application Control to add an event in the calendar with the corresponding date
-// */
-//function createCalendarEvent(){
-//	var appControl = new tizen.ApplicationControl(
-//			"http://tizen.org/appcontrol/operation/social/add",
-//			null,
-//			"vnd.tizen.item.type/vnd.tizen.contact",
-//			null,
-//			[
-//			 new tizen.ApplicationControlData(
-//					 "http://tizen.org/appcontrol/data/social/item_type",
-//					 [ "contact" ]),
-//			 new tizen.ApplicationControlData(
-//					 "http://tizen.org/appcontrol/data/social/email",
-//					 [ "mapo.tizen+"+
-//					   fromLatLonToDMS($('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
-//			 new tizen.ApplicationControlData(
-//					 "http://tizen.org/appcontrol/data/social/url",
-//					 [ getOSMLink() ])
-//			]);
-//	tizen.application.launchAppControl(appControl, null, 
-//			function() {console.log("launch service succeeded");},
-//			function(e) {console.log(
-//					"launch service failed. Reason: " +e.name);});
-//}
+/*
+ * Calendar Manager
+ */
+
+/**
+ * Use the Contact Application Control to add an event in the calendar with the corresponding date
+ */
+function createCalendarEvent(){
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/social/edit",
+			null,
+			null,
+			"tizen.calendar",
+			[
+			 new tizen.ApplicationControlData(
+					 "http://tizen.org/appcontrol/data/social/item_type",
+					 [ "event" ])
+			]);
+	tizen.application.launchAppControl(appControl, null, 
+			function() {console.log("launch service succeeded");},
+			function(e) {console.log(
+					"launch service failed. Reason: " +e.name);});
+}
 
 /*
  * Storage Manager

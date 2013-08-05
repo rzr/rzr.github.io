@@ -2,6 +2,7 @@
 ### TODO ###
 
 * TODO [#A] : Use JQuery with OpenLayers on the map
+* TODO [#A] : Offline map
 * TODO [#A] : HMS coordinates (hours, minutes, seconds) -> calculate jetlag
 * TODO [#B] : add calendar
 * TODO [#C] : share position (bluetooth, messaging, social)

@@ -38,7 +38,8 @@ var docDir;
 var doc;
 // The file where the records are placed
 var file;
-
+// Data extracted from the file composed of dates, lats and lons
+var data = new Array();
 
 /*
  * Link Manager
@@ -151,6 +152,31 @@ function chargeMap() {
 		zoom : 7
 	});
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
+	
+	
+	//TODO : clear the previous markers overlay http://dev.openlayers.org/docs/files/OpenLayers/Layer-js.html
+	
+	var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
+	map.addLayer(course);
+	
+	var size = new OpenLayers.Size(21,25);
+	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+	
+	var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+	readFile();
+	// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
+	setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
+	setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
+
+	setTimeout(function() {
+		for(var i= 0; i<data['dates'].length; i++){
+			log("(data['lons'][i]"+data['lons'][i]);
+			log("(data['lons'][i]"+data['lats'][i]);
+			course.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(data['lons'][i],data['lats'][i]),icon));
+			log("finito");
+		}
+	}, 2000);
+	//course.redraw();
 }
 
 
@@ -229,7 +255,6 @@ function fromDMSToLatLon(dms){
  */
 function setLat(lat) {
 	if (document.getElementById("lat").value != lat) {
-		//lat = lat.toFixed(6);
 		document.getElementById("lat").value = lat;
 	}
 }
@@ -240,7 +265,6 @@ function setLat(lat) {
  */
 function setLon(lon) {
 	if (document.getElementById("lon").value != lon) {
-		//lon = lon.toFixed(6);
 		document.getElementById("lon").value = lon;
 	}
 }
@@ -397,13 +421,13 @@ function getLocation() {
  */
 function onResolveSuccess(dir) {
 	docDir = dir;
-	var dateFile = new Date();
+	var date = new Date();
+	var dateFile = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
+		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
+	//log(dateFile);
 	doc = 'MAPO_' + dateFile + ".txt";
-	doc = doc.replace(/ /g, "-");
-	doc = doc.replace(/:/g, "-");
-	doc = doc.replace("-GMT+0900-(KST)", "");
 	docDir.createFile(doc);
-	$('#locationInfo').html("Course recording in the file : " + doc);
+	$('#locationInfo').html("Course recording in the file:<br/>" + doc);
 }
 
 /**
@@ -422,7 +446,7 @@ function resolveFile() {
 	try {
 		file = docDir.resolve(doc);
 	} catch (exc) {
-		console.log('Could not resolve file: ' + exc.message);
+		console.log('Could not resolve file: '+exc.message);
 		// Stop in case of any errors
 		return;
 	}
@@ -465,15 +489,25 @@ function onRecordError(e) {
  */
 function writeToStream(fileStream) {
 	try {
-		var dateRecord = new Date();
+		var date = new Date();
+		
+		var dateRecord = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
+		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
+		
+//		var dateRecord = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
+//		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
-		fileStream.write(dateRecord + ";lat:" + lat + ";lon:" + lon + "\r");
+		//fileStream.write(dateRecord + ";lat:" + lat + ";lon:" + lon + "\r");
+		
+		fileStream.write("\r"+dateRecord+";"+lat+";"+lon);
+		
 		fileStream.close();
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
 	}
 }
+
 
 /**
  * Try to write the record into the file
@@ -501,7 +535,7 @@ function readFromStream(fileStream) {
 		console.log('File size: ' + file.fileSize);
 		var contents = fileStream.read(fileStream.bytesAvailable);
 		fileStream.close();
-		console.log('file contents:' + contents);
+		console.log('file contents: ' + contents);
 	} catch (exc) {
 		console.log('Could not read from file: ' + exc.message);
 	}
@@ -580,16 +614,73 @@ function record() {
 			tizen.filesystem.resolve('documents', onResolveSuccess,
 					onResolveError, 'rw');
 			getPosition();
-			var intervalID = setInterval(getPosition, $('#selectorTimeout')
-					.val() * 1000);
-			// alert($('#selectorTimeout').val());
+			var intervalID = setInterval(getPosition, $('#selectorTimeout').val() * 1000);
 		} else {
 			clearInterval(intervalID);
-			$('#locationInfo').html("Course recorded in the file : " + doc);
+			$('#locationInfo').html("Course recorded in the file:<br/>" + doc);
 		}
 	} else {
 		document.getElementById("locationInfo").innerHTML = 
 			"Geolocation is not supported.";
+	}
+}
+
+/**
+ * Extract from a file composed by a recorded course all the dates, latitudes and lontitudes
+ * @returns [dates, lats, lons] : The latitude and the longitude for each date
+ */
+function readFile() {
+	try {
+		file = docDir.resolve(doc);
+		console.log('File size: ' + file.fileSize);
+	} catch (exc) {
+		console.log('Could not resolve file: ' + exc.message);
+		// Stop in case of any errors
+		return;
+	}
+	try {
+		file.readAsText(
+				// success callback - display the contents of the file
+				function(contents) {
+					//console.log('File contents:' + contents);
+					var lines = contents.split("\r");
+					var re = /^([0-9.:-]+);([0-9.-]+);([0-9.-]+)$/
+					
+					var dates = new Array();
+					var lats = new Array();
+					var lons = new Array();
+					var iData = 0;
+					
+					for(var iLines=0; iLines<lines.length; iLines++){
+						
+						if(re.test(lines[iLines])) {
+							log("line "+iLines+": "+lines[iLines]);
+							var parts = lines[iLines].split(";");
+							for(var iParts=0; iParts<parts.length; iParts++){
+								log("	part "+iParts+": "+parts[iParts]);
+								if((iParts%3)==0){
+									dates[iData]=parts[iParts];
+									log("		date "+iData+": "+dates[iData]);
+								} else if((iParts%3)==1) {
+									lats[iData]=parts[iParts];
+									log("		lat "+iData+": "+lats[iData]);
+								} else {
+									lons[iData]=parts[iParts];
+									log("		lon "+iData+": "+lons[iData]);
+								}
+							}
+							iData++;
+						}
+					}
+					data['dates'] = dates;
+					data['lats'] = lats;
+					data['lons'] = lons;
+				},
+				// error callback
+				onRecordError
+		);
+	} catch (exc) {
+		console.log('readAsText() exception:' + exc.message + '');
 	}
 }
 
@@ -879,6 +970,7 @@ function switchOnline() {
  * Refresh all the application according to the coordinates and the settings
  */
 function refresh() {
+	//alert("refresh");
 	if (isOnline && !navigator.onLine) {
 		$('#switchOnline').val('offline').slider('refresh');
 		isOnline = false;

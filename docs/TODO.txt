@@ -1,10 +1,18 @@
+# TODO #
+
+    Project: mapo
+
+## WORK IN PROGRESS ##
 
 ### TODO ###
 
 * TODO [#A] : Use JQuery with OpenLayers on the map
 * TODO [#A] : Offline map
-* TODO [#A] : HMS coordinates (hours, minutes, seconds) -> calculate jetlag
-* TODO [#B] : add calendar
+* TODO [#A] : Combine web API with ApplicationControl (contact, calendar...)
+* TODO [#A] : add calendar
+* TODO [#A] : Add photo linked to a position
+* TODO [#A] : Change the coordinates moving on the map
+* TODO [#B] : HMS coordinates (hours, minutes, seconds) -> calculate jetlag
 * TODO [#C] : share position (bluetooth, messaging, social)
 * TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome
 * TODO [#C] : load navicore input bookmarks
@@ -20,3 +28,9 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 * BUG [#A] : Strange behavior after the first course record, 2 or 3 record in the same time 
 * BUG [#B] : No record during standby
 * BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases
+
+
+## DONE ##
+
+* DONE [#A] : publish on tizen store
+

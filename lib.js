@@ -38,8 +38,36 @@ var docDir;
 var doc;
 // The file where the records are placed
 var file;
+// Boolean which provide the information if a file has been recorded
+var fileRecorded = false;
 // Data extracted from the file composed of dates, lats and lons
-var data = new Array(); // []
+var data = [];
+
+
+/*
+ * Set Manager
+ */
+
+/**
+ * Modify the latitude value
+ * @param lat : new latitude value
+ */
+function setLat(lat) {
+	if (document.getElementById("lat").value != lat) {
+		document.getElementById("lat").value = lat;
+	}
+}
+
+/**
+ * Modify the longitude value
+ * @param lon : new longitude value
+ */
+function setLon(lon) {
+	if (document.getElementById("lon").value != lon) {
+		document.getElementById("lon").value = lon;
+	}
+}
+
 
 /*
  * Link Manager
@@ -140,14 +168,14 @@ function chargeMap() {
 		projection : 'EPSG:3857',
 		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
 		           new OpenLayers.Layer.Google("Google Streets",
-		        		  {numZoomLevels:20}),
+                           {numZoomLevels:20}),
 		           new OpenLayers.Layer.Google("Google Physical",
-		        		   {type : google.maps.MapTypeId.TERRAIN}),
+                           {type : google.maps.MapTypeId.TERRAIN}),
 		           new OpenLayers.Layer.Google("Google Hybrid",
-		        		   {type : google.maps.MapTypeId.HYBRID,numZoomLevels : 20}),
+                           {type : google.maps.MapTypeId.HYBRID,numZoomLevels : 20}),
 		           new OpenLayers.Layer.Google("Google Satellite",
-		        		   {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22}),
-		           new OpenLayers.Layer.Markers("Latest recorded course")
+                           {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22}),
+		           new OpenLayers.Layer.Markers("latest")
 				 ],
 		center : new OpenLayers.LonLat(lon, lat).transform('EPSG:4326', 'EPSG:3857'),
 		zoom : 7
@@ -155,36 +183,42 @@ function chargeMap() {
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 	
 	
-	//TODO : clear the previous markers overlay http://dev.openlayers.org/docs/files/OpenLayers/Layer-js.html
-	//if(course){
+	if(fileRecorded){ // TODO : Data vide : data.length!=0
 		
-		//log("REMOVE COURSE");
-	//}
-
-	//var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
-	//map.removeLayer(course);
-	var course = map.getLayersByName("Latest recorded course");
-	map.addLayer(course);
-	
-	var size = new OpenLayers.Size(21,25);
-	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-	
-	var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
-	readFile();
-
-	// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
-	setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
-	setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
-	
-	setTimeout(function() {
-		for(var i= 0; i<data['dates'].length; i++){
-			log("(data['lons'][i]"+data['lons'][i]);
-			log("(data['lons'][i]"+data['lats'][i]);
-			course.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(data['lons'][i],data['lats'][i]),icon));
+		//TODO : clear the previous markers overlay http://dev.openlayers.org/docs/files/OpenLayers/Layer-js.html
+		
+		//var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
+		//map.removeLayer(course);
+		var course = map.getLayersByName("latest");
+		log("course = "+course[0].name);
+		
+		var size = new OpenLayers.Size(21,25);
+		var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+		
+		var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+		readFile();
+		
+		// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
+		setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
+		setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
+		
+		setTimeout(function() {
+			for(var i= 0; i<data['dates'].length; i++){
+				var lon = parseFloat(data['lons'][i]);
+				var lat = parseFloat(data['lats'][i]);
+				log("(data['lons'][i]"+lon);
+				log("(data['lons'][i]"+lat);
+				var typeLon = typeof lon;
+				log("type lon"+typeLon);
+				course[0].addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat),icon));
+			}
+			//map.addLayer(course[0]);
 			log("finito");
-		}
-	}, 2000);
-	//course.redraw();
+		}, 2000);
+		//course.redraw();
+	}
+	
+	
 }
 
 
@@ -209,10 +243,10 @@ function fromLatLonToDMS(lat, lon) {
 		latitude = -latitude;
 		NS += "S";
 	}
-	var d = parseInt(latitude);
-	var m = parseInt((latitude - d) * 60);
-	var s = parseInt((latitude-d)*60*60 - 60*m);
-	dms += NS+" "+d+"° "+m+"' "+s+"\"  ";
+	var dLat = parseInt(latitude, 10);
+	var mLat = parseInt((latitude - dLat) * 60, 10);
+	var sLat = parseInt((latitude-dLat)*60*60 - 60*mLat, 10);
+	dms += NS+" "+dLat+"° "+mLat+"' "+sLat+"\"  ";
 
 	var EW="";
 	if (longitude >= 0) {
@@ -221,10 +255,10 @@ function fromLatLonToDMS(lat, lon) {
 		EW += "W";
 		longitude = -longitude;
 	}
-	var d = parseInt(longitude);
-	var m = parseInt((longitude - d) * 60);
-	var s = parseInt((longitude-d)*60*60 - 60*m);
-	dms += EW+" "+d+"° "+m+"' "+s+"\"";
+	var dLon = parseInt(longitude, 10);
+	var mLon = parseInt((longitude - dLon) * 60, 10);
+	var sLon = parseInt((longitude-dLon)*60*60 - 60*mLon, 10);
+	dms += EW+" "+dLon+"° "+mLon+"' "+sLon+"\"";
 	// text = NS+" "+d+"° "+m+"' "+s+"\"  "+EW+" "+d+"° "+m+"' "+s+"\"";
 	return dms;
 }
@@ -236,46 +270,28 @@ function fromLatLonToDMS(lat, lon) {
 */
 function fromDMSToLatLon(dms){
 	var re = 
-		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
+		/^([NS])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*([EW])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*$/;
 	if(re.test(dms)){
 		var lat = (parseFloat(RegExp.$2)+parseFloat(RegExp.$3)/60+parseFloat(RegExp.$4)/(60*60)).toFixed(6);
 		if(RegExp.$1=='S'){
 			lat=-lat;
 		}
 		lat = lat.toString();
+		setLat(lat);
+
 		var lon = (parseFloat(RegExp.$6)+parseFloat(RegExp.$7)/60+parseFloat(RegExp.$8)/(60*60)).toFixed(6);
 		if(RegExp.$5=='W'){
 			lon=-lon;
 		}
 		lon = lon.toString();
+		setLon(lon);
 	}
-	return [ lat, lon ];
 }
 
 
 /*
  * Coordinates Manager
  */
-
-/**
- * Modify the latitude value
- * @param lat : new latitude value
- */
-function setLat(lat) {
-	if (document.getElementById("lat").value != lat) {
-		document.getElementById("lat").value = lat;
-	}
-}
-
-/**
- * Modify the longitude value
- * @param lon : new longitude value
- */
-function setLon(lon) {
-	if (document.getElementById("lon").value != lon) {
-		document.getElementById("lon").value = lon;
-	}
-}
 
 /**
  * Modify the DMS value using the transformation's function fromLatLonToDMS
@@ -289,8 +305,6 @@ function setDMS() {
  */
 function setLatLon(){
 	var coordinates = fromDMSToLatLon($('#dms').val());
-	setLat(coordinates[0]);
-	setLon(coordinates[1]);
 }
 
 /**
@@ -300,7 +314,7 @@ function setLatLon(){
  */
 function validateDMS(dms){
 	var re = 
-		/^([NS])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*([EW])\s*([0-9.-]+)\s*°\s*([0-9.-]+)\s*\'\s*([0-9.-]+)\s*\"\s*$/;
+		/^([NS])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*([EW])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*$/;
 	if (re.test(dms)) {
 		return true;
 	} else {
@@ -314,7 +328,7 @@ function validateDMS(dms){
  * @returns Validation
  */
 function validateLatOrLon(latOrLon){
-	if(/^[0-9.-]+$/.test(latOrLon)){
+	if(/^[0-9.\-]+$/.test(latOrLon)){
 		return true;
 	} else {
 		return false;
@@ -623,14 +637,16 @@ function getPosition() {
  */
 function record() {
 	if (navigator.geolocation) {
+		var intervalID;
 		if ($('#switchRecord').val() == "start") {
 			tizen.filesystem.resolve('documents', handleResolveSuccess,
 					handleResolveError, 'rw');
 			getPosition();
-			var intervalID = setInterval(getPosition, $('#selectorTimeout').val() * 1000);
+			intervalID = setInterval(getPosition, $('#selectorTimeout').val() * 1000);
 		} else {
 			clearInterval(intervalID);
 			$('#locationInfo').html("Course recorded in the file:<br/>" + doc);
+			fileRecorded=true;
 		}
 	} else {
 		document.getElementById("locationInfo").innerHTML = 
@@ -646,8 +662,8 @@ function readFile() {
 	try {
 		file = docDir.resolve(doc);
 		console.log('File size: ' + file.fileSize);
-	} catch (exc) {
-		console.log('Could not resolve file: ' + exc.message);
+	} catch (exceptionResolve) {
+		console.log('Could not resolve file: ' + exceptionResolve.message);
 		// Stop in case of any errors
 		return;
 	}
@@ -657,11 +673,11 @@ function readFile() {
 				function(contents) {
 					//console.log('File contents:' + contents);
 					var lines = contents.split("\r");
-					var re = /^([0-9.:-]+);([0-9.-]+);([0-9.-]+)$/
+					var re = /^([0-9.:\-]+);([0-9.\-]+);([0-9.\-]+)$/
 					
-					var dates = new Array();
-					var lats = new Array();
-					var lons = new Array();
+					var dates = [];
+					var lats = [];
+					var lons = [];
 					var iData = 0;
 					
 					for(var iLines=0; iLines<lines.length; iLines++){
@@ -692,8 +708,8 @@ function readFile() {
 				// error callback
 				handleRecordError
 		);
-	} catch (exc) {
-		console.log('readAsText() exception:' + exc.message + '');
+	} catch (exceptionRead) {
+		console.log("readAsText() exception:" + exceptionRead.message);
 	}
 }
 
@@ -996,8 +1012,8 @@ function refresh() {
 	setDMS();
 	updateLinks();
 	$('#myMap').empty();
+	log("isOnline = "+isOnline);
 	if (isOnline) {
-		log("where ?");
 		setMapSize();
 		chargeMap();
 	} else {

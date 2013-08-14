@@ -7,7 +7,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="WebContent"/>
+	<classpathentry kind="src" path="">
+		<attributes>
+			<attribute name="provider" value="org.eclipse.wst.jsdt.web.core.internal.project.ModuleSourcePathProvider"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.tizen.web.project.initializer.WebLibraryInitializer"/>
 	<classpathentry kind="con" path="org.tizen.web.project.initializer.W3CLibraryInitializer"/>
 	<classpathentry kind="con" path="org.tizen.web.project.initializer.HTML5LibraryInitializer"/>

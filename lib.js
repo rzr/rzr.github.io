@@ -39,7 +39,7 @@ var doc;
 // The file where the records are placed
 var file;
 // Data extracted from the file composed of dates, lats and lons
-var data = new Array();
+var data = new Array(); // []
 
 /*
  * Link Manager
@@ -140,13 +140,14 @@ function chargeMap() {
 		projection : 'EPSG:3857',
 		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
 		           new OpenLayers.Layer.Google("Google Streets",
-		        		   {numZoomLevels : 20}),
+		        		  {numZoomLevels:20}),
 		           new OpenLayers.Layer.Google("Google Physical",
 		        		   {type : google.maps.MapTypeId.TERRAIN}),
 		           new OpenLayers.Layer.Google("Google Hybrid",
 		        		   {type : google.maps.MapTypeId.HYBRID,numZoomLevels : 20}),
 		           new OpenLayers.Layer.Google("Google Satellite",
-		        		   {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22})
+		        		   {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22}),
+		           new OpenLayers.Layer.Markers("Latest recorded course")
 				 ],
 		center : new OpenLayers.LonLat(lon, lat).transform('EPSG:4326', 'EPSG:3857'),
 		zoom : 7
@@ -155,8 +156,14 @@ function chargeMap() {
 	
 	
 	//TODO : clear the previous markers overlay http://dev.openlayers.org/docs/files/OpenLayers/Layer-js.html
-	
-	var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
+	//if(course){
+		
+		//log("REMOVE COURSE");
+	//}
+
+	//var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
+	//map.removeLayer(course);
+	var course = map.getLayersByName("Latest recorded course");
 	map.addLayer(course);
 	
 	var size = new OpenLayers.Size(21,25);
@@ -164,10 +171,11 @@ function chargeMap() {
 	
 	var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
 	readFile();
+
 	// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
 	setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
 	setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
-
+	
 	setTimeout(function() {
 		for(var i= 0; i<data['dates'].length; i++){
 			log("(data['lons'][i]"+data['lons'][i]);
@@ -369,7 +377,12 @@ function changeDMS(){
  * Function called when the getCurrentPosition succeded
  * Refresh the application
  */
-function showLocation(position) {
+function handleShowLocation(position) {
+	var lat = position.coords.latitude.toFixed(6).toString();
+	var lon = position.coords.longitude.toFixed(6).toString();
+	log("Position - lat/lon: "+lat+", "+lon);
+	setLat(lat);
+	setLon(lon);
 	refresh();
 }
 
@@ -378,7 +391,7 @@ function showLocation(position) {
  * Show the error
  * @param error
  */
-function errorLocation(error) {
+function handleErrorLocation(error) {
 	var errorInfo = document.getElementById("locationInfo");
 	switch (error.code) {
 	case error.PERMISSION_DENIED:
@@ -400,8 +413,8 @@ function errorLocation(error) {
  * Get the current position according to the GPS' device
  */
 function getLocation() {
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(showLocation, errorLocation,
+	if (navigator.geolocation ) {
+		navigator.geolocation.getCurrentPosition(handleShowLocation, handleErrorLocation,
 				{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 	} else {
 		document.getElementById("locationInfo").innerHTML = 
@@ -419,7 +432,7 @@ function getLocation() {
  * Create the recording file in the corresponding directory
  * @param dir : directory where the file is placed
  */
-function onResolveSuccess(dir) {
+function handleResolveSuccess(dir) {
 	docDir = dir;
 	var date = new Date();
 	var dateFile = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
@@ -435,7 +448,7 @@ function onResolveSuccess(dir) {
  * Show the error
  * @param e : error
  */
-function onResolveError(e) {
+function handleResolveError(e) {
 	console.log('message: ' + e.message);
 }
 
@@ -457,7 +470,7 @@ function resolveFile() {
  * Show the error
  * @param e : error
  */
-function onRecordError(e) {
+function handleRecordError(e) {
 	var msg = '';
 	switch (e.code) {
 	case FileError.QUOTA_EXCEEDED_ERR:
@@ -520,7 +533,7 @@ function writeRecord() {
 		// success callback - add textarea's contents
 		writeToStream,
 		// error callback
-		onRecordError);
+		handleRecordError);
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
 	}
@@ -552,7 +565,7 @@ function readRecord() {
 		// success callback - add textarea's contents
 		readFromStream,
 		// error callback
-		onRecordError);
+		handleRecordError);
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
 	}
@@ -563,9 +576,9 @@ function readRecord() {
  * Resolve the file, write and read the records
  * @param position
  */
-function recordLocation(position) {
+function handleRecordLocation(position) {
 	if ($('#switchRecord').val() == "start") {
-		refresh();
+		handleShowLocation(position);
 		resolveFile();
 		writeRecord();
 		readRecord();
@@ -577,7 +590,7 @@ function recordLocation(position) {
  * Show the error
  * @param error
  */
-function errorPosition(error) {
+function handleErrorPosition(error) {
 	$('#switchRecord').val('stop').slider('refresh');
 	var errorInfo = document.getElementById("locationInfo");
 	switch (error.code) {
@@ -600,7 +613,7 @@ function errorPosition(error) {
  * Get the recording position
  */
 function getPosition() {
-	navigator.geolocation.getCurrentPosition(recordLocation, errorPosition,
+	navigator.geolocation.getCurrentPosition(handleRecordLocation, handleErrorPosition,
 			{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 }
 
@@ -611,8 +624,8 @@ function getPosition() {
 function record() {
 	if (navigator.geolocation) {
 		if ($('#switchRecord').val() == "start") {
-			tizen.filesystem.resolve('documents', onResolveSuccess,
-					onResolveError, 'rw');
+			tizen.filesystem.resolve('documents', handleResolveSuccess,
+					handleResolveError, 'rw');
 			getPosition();
 			var intervalID = setInterval(getPosition, $('#selectorTimeout').val() * 1000);
 		} else {
@@ -677,7 +690,7 @@ function readFile() {
 					data['lons'] = lons;
 				},
 				// error callback
-				onRecordError
+				handleRecordError
 		);
 	} catch (exc) {
 		console.log('readAsText() exception:' + exc.message + '');
@@ -970,20 +983,21 @@ function switchOnline() {
  * Refresh all the application according to the coordinates and the settings
  */
 function refresh() {
-	//alert("refresh");
+	log("{ refresh");
 	if (isOnline && !navigator.onLine) {
 		$('#switchOnline').val('offline').slider('refresh');
 		isOnline = false;
 		alert("Connection lost");
 	}
-	var lat = $('#lat').val();
-	var lon = $('#lon').val();
-	setLat(lat);
-	setLon(lon);
+//	var lat = $('#lat').val();
+//	var lon = $('#lon').val();
+//	setLat(lat);
+//	setLon(lon);
 	setDMS();
 	updateLinks();
 	$('#myMap').empty();
 	if (isOnline) {
+		log("where ?");
 		setMapSize();
 		chargeMap();
 	} else {
@@ -992,6 +1006,7 @@ function refresh() {
 				"Please connect your application online in the settings" +
 				" if you want to charge the map</p>");
 	}
+	log("} refresh");
 }
 
 /**

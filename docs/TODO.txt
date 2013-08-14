@@ -12,6 +12,7 @@
 * TODO [#A] : add calendar
 * TODO [#A] : Add photo linked to a position
 * TODO [#A] : Change the coordinates moving on the map
+* TODO [#A] : Calculate the average speed and the duration of a course
 * TODO [#B] : HMS coordinates (hours, minutes, seconds) -> calculate jetlag
 * TODO [#C] : share position (bluetooth, messaging, social)
 * TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome

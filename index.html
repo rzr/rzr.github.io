@@ -90,11 +90,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 				<tr>
 					<td><input type="button" onclick="getLocation()" value="Get position"/></td>
-					<td><input type="button" id="OSMLink" onclick="goToOSM()" value="OpenStreetMap"/></td>
 				</tr>
 			</table>
-			<input type="button" id="readFile" onclick="readFile()" value="Read File"/>
 			<p id="locationInfo"></p>
+						
+			<!-- <div data-role="collapsible-set">  -->
+			<div data-role="collapsible" data-collapsed="true">
+				<h3>Web Links</h3>
+				<div data-role="controlgroup">
+					<button onclick="goToURL('OSM')">OpenStreetMap</button>
+					<button onclick="goToURL('GM')">Google Maps</button>
+					<button onclick="goToURL('NOKIA')">Nokia Here</button>
+					<button onclick="goToURL('BING')">Bing Maps</button>
+				</div>
+			</div>
+
 		</div>
 		<!-- /content -->
 		
@@ -181,17 +191,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<label for="selectorTimeout">Recording timeout (seconds):</label>
 			<input type="range" name="selectorTimeout" id="selectorTimeout"
 				value="10" min="1" max="100"/>
-			<a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
+			<div data-role="collapsible" data-collapsed="true">
+				<h3>Share</h3>
+				<div data-role="controlgroup">
+					<button onclick="sendEmail()">Email</button>
+					<button onclick="call()">Call</button>
+					<button onclick="createContact()">Contact</button>
+					<button onclick="createCalendarEvent()">Calendar Event</button>
+				</div>
+			</div>
+			<!-- <a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
 			<div id="popup" data-role="popup" data-style="center_title_1btn">
 				<div class="ui-popup-title"><h3>Share With</h3></div>
 				<input type="button" class="ui-popup-content" onclick="sendEmail()" value="Email"/>
 				<input type="button" class="ui-popup-content" onclick="call()" value="Call"/>
 				<input type="button" class="ui-popup-content" onclick="sendMessage()" value="Message"/>
-				<!-- <input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/> -->
+				<input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/>
 			</div>
-			<!-- /popup -->
 			<input type="button" onclick="createContact()" value="Create a contact"/>
 			<input type="button" onclick="createCalendarEvent()" value="Create an event in the calendar"/>
+			 -->
 		</div>
 		<!-- /content -->
 		

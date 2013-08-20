@@ -77,11 +77,26 @@ function setLon(lon) {
  * Get the OpenStreetMap link with the corresponding latitude and longitude
  * @returns url
  */
-function getOSMLink() {
+function getLink(provider) {
 	var lat = $("#lat").val();
 	var lon = $("#lon").val();
-	var url = 
-		"http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+	var url;
+	switch(provider)
+	{
+	case 'OSM' :
+		url = 
+			"http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+		break;
+	case 'GM' :
+		url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
+		break;
+	case 'NOKIA' : 
+		url = "http://maps.nokia.com/${lat},${lon},16,0,0,normal.day";
+		break;
+	default :
+		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+	break;
+	}
 	url = url.replace("${lon}", lon);
 	url = url.replace("${lat}", lat);
 	return url;
@@ -90,11 +105,11 @@ function getOSMLink() {
 /**
  * Use the Internet Application Control to go to OSM link with the browser
  */
-function goToOSM() {
+function goToURL(provider) {
 	if (isOnline) {
 		var appControl = new tizen.ApplicationControl(
 				"http://tizen.org/appcontrol/operation/view", 
-				getOSMLink(), null);
+				getLink(provider), null);
 		var appControlReplyCallback = {
 			onsuccess : function(data) {
 				for ( var i = 0; i < data.length; i++) {
@@ -123,9 +138,9 @@ function goToOSM() {
 /**
  * update links
  */
-function updateLinks() {
-	$('#OSMLink').attr('href', getOSMLink());
-}
+//function updateLinks() {
+//	$('#OSMLink').attr('href', getOSMLink());
+//}
 
 
 /*
@@ -162,8 +177,8 @@ function setMapSize() {
  * Charge the OpenLayers map with different OpenStreetMap and Google maps' layers
  */
 function chargeMap() {
-	var lat = $("#lat").val();
-	var lon = $("#lon").val();
+	var latCenter = $("#lat").val();
+	var lonCenter = $("#lon").val();
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
 		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
@@ -174,23 +189,28 @@ function chargeMap() {
 		           new OpenLayers.Layer.Google("Google Hybrid",
                            {type : google.maps.MapTypeId.HYBRID,numZoomLevels : 20}),
 		           new OpenLayers.Layer.Google("Google Satellite",
-                           {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22}),
-		           new OpenLayers.Layer.Markers("latest")
+                           {type : google.maps.MapTypeId.SATELLITE,numZoomLevels : 22})
 				 ],
-		center : new OpenLayers.LonLat(lon, lat).transform('EPSG:4326', 'EPSG:3857'),
+		center : new OpenLayers.LonLat(lonCenter, latCenter).transform('EPSG:4326', 'EPSG:3857'),
 		zoom : 7
 	});
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 	
-	
-	if(fileRecorded){ // TODO : Data vide : data.length!=0
+	if(fileRecorded){ // TODO : Data vide : data([0])?.length!=0 or fileRecorded
 		
-		//TODO : clear the previous markers overlay http://dev.openlayers.org/docs/files/OpenLayers/Layer-js.html
+		
 		
 		//var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
 		//map.removeLayer(course);
-		var course = map.getLayersByName("latest");
-		log("course = "+course[0].name);
+		
+		var markers = map.getLayersByName("Last recorded course");
+		if(markers.length!=0){
+			var course = markers[0];
+			log("course = "+course.name);
+			course.destroy();
+		}
+		
+		var course = new OpenLayers.Layer.Markers("Last recorded course");
 		
 		var size = new OpenLayers.Size(21,25);
 		var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
@@ -198,27 +218,31 @@ function chargeMap() {
 		var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
 		readFile();
 		
+		
 		// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
 		setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
 		setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
+		setTimeout(function() {log("tab dates = "+data['dates']);}, 2000);
 		
 		setTimeout(function() {
 			for(var i= 0; i<data['dates'].length; i++){
 				var lon = parseFloat(data['lons'][i]);
 				var lat = parseFloat(data['lats'][i]);
-				log("(data['lons'][i]"+lon);
-				log("(data['lons'][i]"+lat);
-				var typeLon = typeof lon;
-				log("type lon"+typeLon);
-				course[0].addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat),icon));
+				var date = data['dates'][i];
+				log("data['dates']["+i+"] = "+date);
+				log("data['lons']["+i+"] = "+lon);
+				log("data['lat']["+i+"] = "+lat);
+				log("lat before : "+lat);
+				log("lon before : "+lon);
+				var lonlat = new OpenLayers.LonLat(lon,lat).transform('EPSG:4326', 'EPSG:3857');
+				var mark = new OpenLayers.Marker(lonlat,icon);
+				course.addMarker(mark);
 			}
-			//map.addLayer(course[0]);
+			map.addLayer(course);
 			log("finito");
 		}, 2000);
 		//course.redraw();
 	}
-	
-	
 }
 
 
@@ -394,7 +418,6 @@ function changeDMS(){
 function handleShowLocation(position) {
 	var lat = position.coords.latitude.toFixed(6).toString();
 	var lon = position.coords.longitude.toFixed(6).toString();
-	log("Position - lat/lon: "+lat+", "+lon);
 	setLat(lat);
 	setLon(lon);
 	refresh();
@@ -527,8 +550,7 @@ function writeToStream(fileStream) {
 		var lon = $("#lon").val();
 		//fileStream.write(dateRecord + ";lat:" + lat + ";lon:" + lon + "\r");
 		
-		fileStream.write("\r"+dateRecord+";"+lat+";"+lon);
-		
+		fileStream.write("\r"+dateRecord+";"+lat+";"+lon);		
 		fileStream.close();
 	} catch (exc) {
 		console.log('Could not write to file: ' + exc.message);
@@ -590,7 +612,7 @@ function readRecord() {
  * Resolve the file, write and read the records
  * @param position
  */
-function handleRecordLocation(position) {
+function handleRecordPosition(position) {
 	if ($('#switchRecord').val() == "start") {
 		handleShowLocation(position);
 		resolveFile();
@@ -627,7 +649,7 @@ function handleErrorPosition(error) {
  * Get the recording position
  */
 function getPosition() {
-	navigator.geolocation.getCurrentPosition(handleRecordLocation, handleErrorPosition,
+	navigator.geolocation.getCurrentPosition(handleRecordPosition, handleErrorPosition,
 			{enableHighAccuracy : $('#switchEnergy').val() == 'off'});
 }
 
@@ -639,6 +661,7 @@ function record() {
 	if (navigator.geolocation) {
 		var intervalID;
 		if ($('#switchRecord').val() == "start") {
+			
 			tizen.filesystem.resolve('documents', handleResolveSuccess,
 					handleResolveError, 'rw');
 			getPosition();
@@ -655,8 +678,8 @@ function record() {
 }
 
 /**
- * Extract from a file composed by a recorded course all the dates, latitudes and lontitudes
- * @returns [dates, lats, lons] : The latitude and the longitude for each date
+ * Extract from a file composed by the last recorded course all the dates, latitudes and lontitudes
+ * and place its in data
  */
 function readFile() {
 	try {
@@ -728,7 +751,7 @@ function sendEmail() {
 			"\nLatitute="+$("#lat").val()+
 			"\nLongitude = "+$("#lon").val()+
 			"\nIf you prefer in DMS, here it is: "+$('#dms').val()+
-			"\nYou can see this position on OpenStreetMap: "+getOSMLink()+
+			"\nYou can see this position on OpenStreetMap: "+getLink('OSM')+
 			"\nConnect you on Mapo for more details!";
 		var appControl = new tizen.ApplicationControl(
 				"http://tizen.org/appcontrol/operation/send", // compose or send
@@ -809,7 +832,7 @@ function sendMessage(){
 		"\nLatitute="+$("#lat").val()+
 		"\nLongitude = "+$("#lon").val()+
 		"\nIf you prefer in DMS, here it is: "+$('#dms').val()+
-		"\nYou can see this position on OpenStreetMap: "+getOSMLink()+
+		"\nYou can see this position on OpenStreetMap: "+getLink('OSM')+
 		"\nConnect you on Mapo for more details!";
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/compose",
@@ -852,7 +875,7 @@ function createContact() {
 			//TODO
 			// null for the emulator
 			// "vnd.tizen.item.type/vnd.tizen.contact" for the device
-			null,
+			 "vnd.tizen.item.type/vnd.tizen.contact",
 			[
 			 new tizen.ApplicationControlData(
 					 "http://tizen.org/appcontrol/data/social/item_type",
@@ -863,12 +886,12 @@ function createContact() {
 					   fromLatLonToDMS($('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
 			 new tizen.ApplicationControlData(
 					 "http://tizen.org/appcontrol/data/social/url",
-					 [ getOSMLink() ])
+					 [ getLink('OSM') ])
 			]);
 	tizen.application.launchAppControl(appControl, null, 
 			function() {console.log("launch service succeeded");},
 			function(e) {console.log(
-					"launch service failed. Reason: " +e.name);});
+					"launch service failed. Reason: " +e.name+e);});
 }
 
 
@@ -893,7 +916,7 @@ function createCalendarEvent(){
 	tizen.application.launchAppControl(appControl, null, 
 			function() {console.log("launch service succeeded");},
 			function(e) {console.log(
-					"launch service failed. Reason: " +e.name);});
+					"launch service failed. Reason: " +e.name+e);});
 }
 
 /*
@@ -916,54 +939,6 @@ function storeSettings() {
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
-}
-
-
-/*
- * Initialization Manager
- */
-
-/**
- * Recover in the local storage the coordinates values from the preceding use
- */
-function initData(){
-	if (localStorage.getItem('lat') != null) {
-		$('#lat').val(localStorage.getItem('lat'));
-	}
-	if (localStorage.getItem('lon') != null) {
-		$('#lon').val(localStorage.getItem('lon'));
-	}
-	if (localStorage.getItem('dms') != null) {
-		$('#dms').val(localStorage.getItem('dms'));
-	}
-	storeData();
-}
-
-/**
- * Recover in the local storage the setting values from the preceding use
- */
-function initSettings() {
-	if (localStorage.getItem('connection') == 'online') {
-		$('#switchOnline').val(localStorage.getItem('connection'));
-		isOnline = true;
-	}
-	if (localStorage.getItem('energySaving') != null) {
-		$('#switchEnergy').val(localStorage.getItem('energySaving'));
-	}
-	if (localStorage.getItem('timeout') != null) {
-		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
-	}
-	storeSettings();
-}
-
-
-/**
- * Initialize the data from the preceding use
- */
-function init(){
-	initData();
-	initSettings();
-	refresh();
 }
 
 
@@ -1005,12 +980,7 @@ function refresh() {
 		isOnline = false;
 		alert("Connection lost");
 	}
-//	var lat = $('#lat').val();
-//	var lon = $('#lon').val();
-//	setLat(lat);
-//	setLon(lon);
 	setDMS();
-	updateLinks();
 	$('#myMap').empty();
 	log("isOnline = "+isOnline);
 	if (isOnline) {
@@ -1036,6 +1006,53 @@ function quit() {
 	}
 	setTimeout(
 		function() {tizen.application.getCurrentApplication().exit();}, 2000);
+}
+
+
+/*
+ * Initialization Manager
+ */
+
+/**
+ * Recover in the local storage the coordinates values from the preceding use
+ */
+function initData(){
+	if (localStorage.getItem('lat') != null) {
+		$('#lat').val(localStorage.getItem('lat'));
+	}
+	if (localStorage.getItem('lon') != null) {
+		$('#lon').val(localStorage.getItem('lon'));
+	}
+	if (localStorage.getItem('dms') != null) {
+		$('#dms').val(localStorage.getItem('dms'));
+	}
+	storeData();
+}
+
+/**
+ * Recover in the local storage the setting values from the preceding use
+ */
+function initSettings() {
+	if (localStorage.getItem('connection') == 'online') {
+		$('#switchOnline').val(localStorage.getItem('connection'));
+		isOnline = true;
+	}
+	if (localStorage.getItem('energySaving') != null) {
+		$('#switchEnergy').val(localStorage.getItem('energySaving'));
+	}
+	if (localStorage.getItem('timeout') != null) {
+		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
+	}
+	storeSettings();
+}
+
+/**
+ * Initialize the data from the preceding use
+ */
+function init(){
+	initData();
+	initSettings();
+	refresh();
 }
 
 

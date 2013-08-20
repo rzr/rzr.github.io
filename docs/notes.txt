@@ -12,7 +12,8 @@ https://developer.tizen.org/forums/native-application-development/device-gps-tes
 Select maps source ie :
 
 <select>
-<option value="http://www.openstreetmap.org/?&zoom=10&layers=B00FTF&lat={lat}&lon={lon}">OpenStreetMap</option>
+<option value="http://www.openstreetmap.org/?&zoom=10&layers=B00FTF&lat={lat}&lon={lon}"
+>OpenStreetMap</option>
 <option value="http://maps.google.com/maps?&z={z}&ll=${icbm}">
 Google maps
 </option>

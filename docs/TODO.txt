@@ -14,6 +14,7 @@
 * TODO [#A] : Change the coordinates moving on the map
 * TODO [#A] : Calculate the average speed and the duration of a course
 * TODO [#A] : Web provider
+* TODO [#B] : Number in coordinates and no string -> Use a selector
 * TODO [#B] : HMS coordinates (hours, minutes, seconds) -> calculate jetlag
 * TODO [#C] : share position (bluetooth, messaging, social)
 * TODO [#C] : support more platforms : FireFoxOS, Asha, Ubuntu, bb10, gnome
@@ -22,6 +23,10 @@
 * TODO [#C] : bookmarks
 * TODO [#C] : photo wgs84
 
+Correction to do, works but not great...
+* TODO [#A] : setTimeOut -> jQuery Deferred Object  -> OK
+* TODO [#C] : Global variable "data" -> OK
+
 https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming%2Fhtml%2Fguide%2Fapp_guide%2Fapplication_service.htm
 
 
@@ -29,8 +34,6 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 
 * BUG [#A] : Strange behavior after the first course record, 2 or 3 record in the same time 
 * BUG [#B] : No record during standby
-* BUG [#C] : Only read the 12th first records, even if the write is done because the file size increases
-
 
 ## DONE ##
 

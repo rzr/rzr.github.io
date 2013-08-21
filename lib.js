@@ -40,8 +40,6 @@ var doc;
 var file;
 // Boolean which provide the information if a file has been recorded
 var fileRecorded = false;
-// Data extracted from the file composed of dates, lats and lons
-var data = [];
 
 
 /*
@@ -173,6 +171,38 @@ function setMapSize() {
 	$('#myMap').css("height", mapSize[1]);
 }
 
+function initIcon(){
+	var size = new OpenLayers.Size(21,25);
+	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+	
+	return new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+}
+
+function chargeCourse(data){
+	log("chargeCourse data : "+data['dates'][0]);
+	var icon = initIcon();
+	
+	log("tab lons = "+data['lons']);
+	log("tab lats = "+data['lats']);
+	log("tab dates = "+data['dates']);
+	
+	for(var i= 0; i<data['dates'].length; i++){
+		var lon = parseFloat(data['lons'][i]);
+		var lat = parseFloat(data['lats'][i]);
+		var date = data['dates'][i];
+		log("data['dates']["+i+"] = "+date);
+		log("data['lons']["+i+"] = "+lon);
+		log("data['lat']["+i+"] = "+lat);
+		log("lat before : "+lat);
+		log("lon before : "+lon);
+		var lonlat = new OpenLayers.LonLat(lon,lat).transform('EPSG:4326', 'EPSG:3857');
+		var mark = new OpenLayers.Marker(lonlat,icon);
+		course.addMarker(mark);
+	}
+	map.addLayer(course);
+	log("finito");
+}
+
 /**
  * Charge the OpenLayers map with different OpenStreetMap and Google maps' layers
  */
@@ -197,51 +227,25 @@ function chargeMap() {
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 	
 	if(fileRecorded){ // TODO : Data vide : data([0])?.length!=0 or fileRecorded
-		
-		
-		
+	
 		//var course = new OpenLayers.Layer.Markers( "Latest recorded course" );
 		//map.removeLayer(course);
 		
 		var markers = map.getLayersByName("Last recorded course");
 		if(markers.length!=0){
-			var course = markers[0];
-			log("course = "+course.name);
-			course.destroy();
+			var previousCourse = markers[0];
+			log("course = "+previousCourse.name);
+			previousCourse.destroy();
 		}
 		
-		var course = new OpenLayers.Layer.Markers("Last recorded course");
-		
-		var size = new OpenLayers.Size(21,25);
-		var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-		
-		var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+		course = new OpenLayers.Layer.Markers("Last recorded course");
+		//readFile().done(chargeCourse);
 		readFile();
-		
-		
-		// TODO : Deferred http://stackoverflow.com/questions/12116505/wait-till-a-function-is-finished-until-running-another-function
-		setTimeout(function() {log("tab lons = "+data['lons']);}, 2000);
-		setTimeout(function() {log("tab lats = "+data['lats']);}, 2000);
-		setTimeout(function() {log("tab dates = "+data['dates']);}, 2000);
-		
-		setTimeout(function() {
-			for(var i= 0; i<data['dates'].length; i++){
-				var lon = parseFloat(data['lons'][i]);
-				var lat = parseFloat(data['lats'][i]);
-				var date = data['dates'][i];
-				log("data['dates']["+i+"] = "+date);
-				log("data['lons']["+i+"] = "+lon);
-				log("data['lat']["+i+"] = "+lat);
-				log("lat before : "+lat);
-				log("lon before : "+lon);
-				var lonlat = new OpenLayers.LonLat(lon,lat).transform('EPSG:4326', 'EPSG:3857');
-				var mark = new OpenLayers.Marker(lonlat,icon);
-				course.addMarker(mark);
-			}
-			map.addLayer(course);
-			log("finito");
-		}, 2000);
-		//course.redraw();
+//		setTimeout(
+////			log("result 0 : "+result[0]);
+////			log("result 1 : "+result[1]);
+//			chargeCourse
+//		, 5000);
 	}
 }
 
@@ -682,6 +686,7 @@ function record() {
  * and place its in data
  */
 function readFile() {
+	//var deferred = $.Deferred();
 	try {
 		file = docDir.resolve(doc);
 		console.log('File size: ' + file.fileSize);
@@ -694,9 +699,13 @@ function readFile() {
 		file.readAsText(
 				// success callback - display the contents of the file
 				function(contents) {
+					
+
 					//console.log('File contents:' + contents);
 					var lines = contents.split("\r");
-					var re = /^([0-9.:\-]+);([0-9.\-]+);([0-9.\-]+)$/
+					var re = /^([0-9.:\-]+);([0-9.\-]+);([0-9.\-]+)$/;
+					
+					var data = [];
 					
 					var dates = [];
 					var lats = [];
@@ -727,6 +736,9 @@ function readFile() {
 					data['dates'] = dates;
 					data['lats'] = lats;
 					data['lons'] = lons;
+					
+					log("readfile data"+data['dates'][0]);
+					chargeCourse(data);
 				},
 				// error callback
 				handleRecordError
@@ -734,6 +746,8 @@ function readFile() {
 	} catch (exceptionRead) {
 		console.log("readAsText() exception:" + exceptionRead.message);
 	}
+	//deferred.resolve();
+	//return deferred; // [data, referred]
 }
 
 
@@ -941,6 +955,17 @@ function storeSettings() {
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
 }
 
+function store() {
+	var r = $.Deferred();
+	storeData();
+	storeSettings();
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
+	}
+	r.resolve();
+	return r;
+}
+
 
 /*
  * Settings Manager
@@ -974,13 +999,13 @@ function switchOnline() {
  * Refresh all the application according to the coordinates and the settings
  */
 function refresh() {
-	log("{ refresh");
+	log("{refresh");
 	if (isOnline && !navigator.onLine) {
 		$('#switchOnline').val('offline').slider('refresh');
 		isOnline = false;
 		alert("Connection lost");
 	}
-	setDMS();
+	//setDMS();
 	$('#myMap').empty();
 	log("isOnline = "+isOnline);
 	if (isOnline) {
@@ -992,20 +1017,23 @@ function refresh() {
 				"Please connect your application online in the settings" +
 				" if you want to charge the map</p>");
 	}
-	log("} refresh");
+	log("refresh}");
+}
+
+/**
+ * Quit the application
+ */
+function exit() {
+	tizen.application.getCurrentApplication().exit();
 }
 
 /**
  * Store the data before quitting the application
  */
 function quit() {
-	storeData();
-	storeSettings();
-	for ( var i = 0; i < localStorage.length; i++) {
-		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
-	}
-	setTimeout(
-		function() {tizen.application.getCurrentApplication().exit();}, 2000);
+	log("{exit")
+	store().done(exit);
+	log("exit}");
 }
 
 

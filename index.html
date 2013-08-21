@@ -49,8 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Page 1 : My position -->
 	<div data-role="page" id="position" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" 
-				id="home" class="ui-btn-left" data-icon="home">Home</a>
+			<!-- <input type="button" onclick="getLocation()" value="Position"/> -->
+			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
+				id="home" class="ui-btn-left" data-icon="home">Position</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -67,34 +68,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		
 		<div data-role="content">
 			<form>
-					<label for=lat>Latitude N+/S-:</label>
-					<input type="text" id="lat" value="26.357865"
-						onChange="changeLat(lat.value);"/>
-					<label for=lon>Longitude W+/E-:</label>
-					<input type="text" id="lon" value="127.783782"
-						onChange="changeLon();"/>
-					<label for="dms">DMS (degree,minutes,seconds):</label>
-					<input type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
+				<table>
+					<tr>
+						<td><label for=lat>Latitude N+/S-:</label></td>
+						<td><input type="text" id="lat" value="26.357865"
+								onChange="changeLat(lat.value);"/></td>
+					</tr>
+					<tr>
+						<td><label for=lon>Longitude W+/E-:</label></td>
+						<td><input type="text" id="lon" value="127.783782"
+								onChange="changeLon();"/></td>
+					</tr>
+				</table>
+				<label for="dms">DMS (degree, minutes, seconds):</label>
+				<input type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
 					onChange="changeDMS();"/>
-			</form>
-			<table>
-				<tr>
-					<td><label for="switchRecord">Record your course:</label></td>
-					<td>
-						<select name="switchRecord" id="switchRecord" 
-							data-role="slider" onchange="record()">
-							<option value="stop">Stop</option>
-							<option value="start">Start</option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td><input type="button" onclick="getLocation()" value="Get position"/></td>
-				</tr>
-			</table>
-			<p id="locationInfo"></p>
-						
-			<!-- <div data-role="collapsible-set">  -->
+				<table>
+					<tr>
+						<td><label for="switchRecord">Record your course:</label></td>
+						<td><select name="switchRecord" id="switchRecord" 
+								data-role="slider" onchange="record()">
+								<option value="stop">Stop</option>
+								<option value="start">Start</option>
+							</select></td>
+					</tr>
+				</table>
+				<p id="locationInfo"></p>
+			</form>			
 			<div data-role="collapsible" data-collapsed="true">
 				<h3>Web Links</h3>
 				<div data-role="controlgroup">
@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<button onclick="goToURL('BING')">Bing Maps</button>
 				</div>
 			</div>
-
+			
 		</div>
 		<!-- /content -->
 		
@@ -118,8 +118,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Page 2 : Search a place -->
 	<div data-role="page" id="map" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" 
-				id="home" class="ui-btn-left" data-icon="home">Home</a>
+			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
+				id="home" class="ui-btn-left" data-icon="home">Position</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -149,8 +149,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Page 3 : Settings -->
 	<div data-role="page" id="settings" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="#position" data-role="button" 
-				id="home" class="ui-btn-left" data-icon="home">Home</a>
+			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
+				id="home" class="ui-btn-left" data-icon="home">Position</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -196,21 +196,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<div data-role="controlgroup">
 					<button onclick="sendEmail()">Email</button>
 					<button onclick="call()">Call</button>
+					<!-- 
 					<button onclick="createContact()">Contact</button>
 					<button onclick="createCalendarEvent()">Calendar Event</button>
+					 -->
 				</div>
 			</div>
-			<!-- <a href="#popup" data-role="button" data-position-to="window" data-rel="popup">Share</a>
-			<div id="popup" data-role="popup" data-style="center_title_1btn">
-				<div class="ui-popup-title"><h3>Share With</h3></div>
-				<input type="button" class="ui-popup-content" onclick="sendEmail()" value="Email"/>
-				<input type="button" class="ui-popup-content" onclick="call()" value="Call"/>
-				<input type="button" class="ui-popup-content" onclick="sendMessage()" value="Message"/>
-				<input type="button" class="ui-popup-content" onclick="sendBluetooth()" value="Bluetooth"/>
-			</div>
-			<input type="button" onclick="createContact()" value="Create a contact"/>
-			<input type="button" onclick="createCalendarEvent()" value="Create an event in the calendar"/>
-			 -->
 		</div>
 		<!-- /content -->
 		

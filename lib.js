@@ -43,6 +43,40 @@ var fileRecorded = false;
 
 
 /*
+ * Storage Manager
+ */
+
+/**
+ * Store the coordinates values in the local storage
+ */
+function storeData(){
+	localStorage.setItem('lat', $('#lat').val());
+	localStorage.setItem('lon', $('#lon').val());
+	localStorage.setItem('dms', $('#dms').val());
+}
+
+/**
+ * Store the settings values in the local storage
+ */
+function storeSettings() {
+	localStorage.setItem('connection', $('#switchOnline').val());
+	localStorage.setItem('energySaving', $('#switchEnergy').val());
+	localStorage.setItem('timeout', $('#selectorTimeout').val());
+}
+
+function store() {
+	var r = $.Deferred();
+	storeData();
+	storeSettings();
+	for ( var i = 0; i < localStorage.length; i++) {
+		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
+	}
+	r.resolve();
+	return r;
+}
+
+
+/*
  * Set Manager
  */
 
@@ -200,7 +234,6 @@ function chargeCourse(data){
 		course.addMarker(mark);
 	}
 	map.addLayer(course);
-	log("finito");
 }
 
 /**
@@ -247,6 +280,83 @@ function chargeMap() {
 //			chargeCourse
 //		, 5000);
 	}
+}
+
+
+/*
+ * Refresh Manager
+ */
+
+/**
+ * Refresh all the application according to the coordinates and the settings
+ */
+function refresh() {
+	log("{refresh");
+	if (isOnline && !navigator.onLine) {
+		$('#switchOnline').val('offline').slider('refresh');
+		isOnline = false;
+		alert("Connection lost");
+	}
+	//setDMS();
+	$('#myMap').empty();
+	log("isOnline = "+isOnline);
+	if (isOnline) {
+		setMapSize();
+		chargeMap();
+	} else {
+		$('#myMap').html(
+				"<p align='center'>" +
+				"Please connect your application online in the settings" +
+				" if you want to charge the map</p>");
+	}
+	log("refresh}");
+}
+
+
+/*
+ * Initialization Manager
+ */
+
+/**
+ * Recover in the local storage the coordinates values from the preceding use
+ */
+function initData(){
+	if (localStorage.getItem('lat') != null) {
+		$('#lat').val(localStorage.getItem('lat'));
+	}
+	if (localStorage.getItem('lon') != null) {
+		$('#lon').val(localStorage.getItem('lon'));
+	}
+	if (localStorage.getItem('dms') != null) {
+		$('#dms').val(localStorage.getItem('dms'));
+	}
+	storeData();
+}
+
+/**
+ * Recover in the local storage the setting values from the preceding use
+ */
+function initSettings() {
+	if (localStorage.getItem('connection') == 'online') {
+		$('#switchOnline').val(localStorage.getItem('connection'));
+		isOnline = true;
+	}
+	if (localStorage.getItem('energySaving') != null) {
+		$('#switchEnergy').val(localStorage.getItem('energySaving'));
+	}
+	if (localStorage.getItem('timeout') != null) {
+		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
+	}
+	storeSettings();
+}
+
+/**
+ * Initialize the data from the preceding use
+ */
+function init(){
+	initData();
+	initSettings();
+	refresh();
 }
 
 
@@ -560,7 +670,6 @@ function writeToStream(fileStream) {
 		console.log('Could not write to file: ' + exc.message);
 	}
 }
-
 
 /**
  * Try to write the record into the file
@@ -933,39 +1042,6 @@ function createCalendarEvent(){
 					"launch service failed. Reason: " +e.name+e);});
 }
 
-/*
- * Storage Manager
- */
-
-/**
- * Store the coordinates values in the local storage
- */
-function storeData(){
-	localStorage.setItem('lat', $('#lat').val());
-	localStorage.setItem('lon', $('#lon').val());
-	localStorage.setItem('dms', $('#dms').val());
-}
-
-/**
- * Store the settings values in the local storage
- */
-function storeSettings() {
-	localStorage.setItem('connection', $('#switchOnline').val());
-	localStorage.setItem('energySaving', $('#switchEnergy').val());
-	localStorage.setItem('timeout', $('#selectorTimeout').val());
-}
-
-function store() {
-	var r = $.Deferred();
-	storeData();
-	storeSettings();
-	for ( var i = 0; i < localStorage.length; i++) {
-		log(i+" -- "+localStorage.key(i)+" : "+localStorage.getItem(localStorage.key(i)));
-	}
-	r.resolve();
-	return r;
-}
-
 
 /*
  * Settings Manager
@@ -996,31 +1072,6 @@ function switchOnline() {
  */
 
 /**
- * Refresh all the application according to the coordinates and the settings
- */
-function refresh() {
-	log("{refresh");
-	if (isOnline && !navigator.onLine) {
-		$('#switchOnline').val('offline').slider('refresh');
-		isOnline = false;
-		alert("Connection lost");
-	}
-	//setDMS();
-	$('#myMap').empty();
-	log("isOnline = "+isOnline);
-	if (isOnline) {
-		setMapSize();
-		chargeMap();
-	} else {
-		$('#myMap').html(
-				"<p align='center'>" +
-				"Please connect your application online in the settings" +
-				" if you want to charge the map</p>");
-	}
-	log("refresh}");
-}
-
-/**
  * Quit the application
  */
 function exit() {
@@ -1036,52 +1087,6 @@ function quit() {
 	log("exit}");
 }
 
-
-/*
- * Initialization Manager
- */
-
-/**
- * Recover in the local storage the coordinates values from the preceding use
- */
-function initData(){
-	if (localStorage.getItem('lat') != null) {
-		$('#lat').val(localStorage.getItem('lat'));
-	}
-	if (localStorage.getItem('lon') != null) {
-		$('#lon').val(localStorage.getItem('lon'));
-	}
-	if (localStorage.getItem('dms') != null) {
-		$('#dms').val(localStorage.getItem('dms'));
-	}
-	storeData();
-}
-
-/**
- * Recover in the local storage the setting values from the preceding use
- */
-function initSettings() {
-	if (localStorage.getItem('connection') == 'online') {
-		$('#switchOnline').val(localStorage.getItem('connection'));
-		isOnline = true;
-	}
-	if (localStorage.getItem('energySaving') != null) {
-		$('#switchEnergy').val(localStorage.getItem('energySaving'));
-	}
-	if (localStorage.getItem('timeout') != null) {
-		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
-	}
-	storeSettings();
-}
-
-/**
- * Initialize the data from the preceding use
- */
-function init(){
-	initData();
-	initSettings();
-	refresh();
-}
 
 
 /*

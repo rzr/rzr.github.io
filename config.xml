@@ -13,4 +13,8 @@
     <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
     <tizen:privilege name="http://tizen.org/privilege/location"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/contact.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/contact.write"/>
+    <tizen:privilege name="http://tizen.org/privilege/calendar.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/calendar.write"/>
 </widget>

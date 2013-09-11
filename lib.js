@@ -887,6 +887,7 @@ function sendEmail() {
 				 new tizen.ApplicationControlData(
 						 "http://tizen.org/appcontrol/data/to", 
 						 [ "mapo.tizen@gmail.com" ])
+				 
 				// TODO tizen.mapo@spamgourmet.com
 // new tizen.ApplicationControlData(
 //	"http://tizen.org/appcontrol/data/path",
@@ -946,7 +947,6 @@ function sendEmail() {
 //	tizen.application.launchAppControl(appControl, null,
 //			function(){console.log("launch service succeeded");},
 //			function(e){console.log("launch service failed. Reason: " + e.name);});
-
 //}
 
 function sendMessage(){
@@ -975,7 +975,6 @@ function sendMessage(){
 
 function call(){
 	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/dial","tel:9988776655", null);
-
 	tizen.application.launchAppControl(appControl,null,
 			function(){console.log("launch appControl succeeded");},
 			function(e){console.log("launch appControl failed. Reason: " + e.name);},
@@ -987,34 +986,68 @@ function call(){
  * Contact Manager
  */
 
+var appControlReplyCB = 
+{
+   /* Reply is sent if the requested operation is successfully delivered */
+   onsuccess: function(reply) 
+   {
+      for (var num = 0; num < reply.length; num++) 
+      {
+         if (reply[num].key == "http://tizen.org/appcontrol/data/selected")
+         {
+            console.log("cropped image path: " + reply[num].value[0]); 
+         }
+      }
+   }
+}
+
 /**
  * Use the Contact Application Control to add a contact with the corresponding position
  */
 function createContact() {
+	var addressbook = tizen.contact.getDefaultAddressBook();
+	
+	var groups = addressbook.getGroups();
+	var idMapo="-1";
+	for(var i=0; i<groups.length; i++){
+		log(groups[i].name);
+		if(groups[i].name=='Mapo'){
+			idMapo = groups[i].id;
+		}
+	}
+	
+	var group;
+	if(idMapo!="-1"){
+		group = addressbook.getGroup(idMapo);
+		log('Group already exists ' + group.id);
+	} else {
+		group = new tizen.ContactGroup('Mapo');
+		addressbook.addGroup(group);
+		log('Group added with id ' + group.id);
+	}
+
+	var contact = new tizen.Contact({
+		emails: [new tizen.ContactEmailAddress("mapo.tizen@gmail.com")],
+		urls: [new tizen.ContactWebSite(getLink('OSM'), 'URL')],
+		notes: ['Position: lat = '+$("#lat").val()+' lon = '+$("#lon").val()],
+		organizations: [new tizen.ContactOrganization({name: "Mapo"})],
+		groupIds: [group.id]
+	});
+	addressbook.add(contact);
+		
 	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/social/add",
+			"http://tizen.org/appcontrol/operation/social/edit",
 			null,
+			"vnd.tizen.item.type/vnd.tizen.contact",
 			null,
-			//TODO
-			// null for the emulator
-			// "vnd.tizen.item.type/vnd.tizen.contact" for the device
-			 "vnd.tizen.item.type/vnd.tizen.contact",
 			[
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/item_type",
-					 [ "contact" ]),
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/email",
-					 [ "mapo.tizen+"+
-					   fromLatLonToDMS($('#lat').val(), $('#lon').val()) + "@gmail.com" ]),
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/url",
-					 [ getLink('OSM') ])
-			]);
-	tizen.application.launchAppControl(appControl, null, 
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_type",[ "person" ]),
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_id",[ contact.personId ])
+			]
+	);
+	tizen.application.launchAppControl(appControl, null,
 			function() {console.log("launch service succeeded");},
-			function(e) {console.log(
-					"launch service failed. Reason: " +e.name+e);});
+			function(e) {console.log("launch service failed. Reason: " +e);});
 }
 
 
@@ -1026,20 +1059,32 @@ function createContact() {
  * Use the Contact Application Control to add an event in the calendar with the corresponding date
  */
 function createCalendarEvent(){
+	
+	var calendar = tizen.calendar.getDefaultCalendar("EVENT");
+	
+	var event = new tizen.CalendarEvent({
+	   description:"Mapo Event", 
+	   summary:"Mapo",
+	   startDate: new tizen.TZDate(2013, 10, 23, 10, 0), 
+	   duration: new tizen.TimeDuration(1, "HOURS")
+		//,location:'Position: lat = '+$("#lat").val()+' lon = '+$("#lon").val()
+	});
+	
+	calendar.add(event);
+	
+	log("eventid = "+event.id.uid);
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/social/edit",
 			null,
 			null,
-			"tizen.calendar",
+			null,
 			[
-			 new tizen.ApplicationControlData(
-					 "http://tizen.org/appcontrol/data/social/item_type",
-					 [ "event" ])
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_type",[ "event" ]),
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_id",[ event.id ]) //TODO : .uid
 			]);
-	tizen.application.launchAppControl(appControl, null, 
+	tizen.application.launchAppControl(appControl, "tizen.calendar", 
 			function() {console.log("launch service succeeded");},
-			function(e) {console.log(
-					"launch service failed. Reason: " +e.name+e);});
+			function(e) {console.log("launch service failed. Reason: " +e);});
 }
 
 

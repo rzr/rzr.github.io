@@ -876,44 +876,58 @@ function sendEmail() {
 			"\nIf you prefer in DMS, here it is: "+$('#dms').val()+
 			"\nYou can see this position on OpenStreetMap: "+getLink('OSM')+
 			"\nConnect you on Mapo for more details!";
+		
 		var appControl = new tizen.ApplicationControl(
-				"http://tizen.org/appcontrol/operation/send", // compose or send
-				"mailto:", null, null, 
+				"http://tizen.org/appcontrol/operation/compose",
+				null, null, null,
 				[
-				 new tizen.ApplicationControlData(
-						 "http://tizen.org/appcontrol/data/subject", [ "Mapo" ]),
-				 new tizen.ApplicationControlData(
-						 "http://tizen.org/appcontrol/data/text", [ message ]),
-				 new tizen.ApplicationControlData(
-						 "http://tizen.org/appcontrol/data/to", 
-						 [ "mapo.tizen@gmail.com" ])
-				 
-				// TODO tizen.mapo@spamgourmet.com
-// new tizen.ApplicationControlData(
-//	"http://tizen.org/appcontrol/data/path",
-// ["images/image1.jpg"])
+				 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/subject",["Mapo"]),
+				 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",["mapo.tizen@gmail.com"]),
+				 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",[message])
 				]);
-		tizen.application.launchAppControl(appControl, null,
-				function() {console.log("launch service succeeded");}, 
-				function(e) {
-					console.log("launch service failed. Reason: " + e.name);});
+		tizen.application.launchAppControl(appControl, "tizen.email",
+				function() {console.log("launch service succeeded");},
+				function(e) {console.log("launch service failed. Reason: " + e.name);})
 	} else {
 		alert("Please connect your application online in the settings"
 				+ " if you want to send an email");
 	}
 }
 
-//function sendBluetooth(){
-//	var appControl = new tizen.ApplicationControl(
-//			"http://tizen.org/appcontrol/operation/pick",
-//			null,
-//			"image/jpeg",
-//			null);
-//
-//	tizen.application.launchAppControl(appControl, null,
-//			function() {console.log("launch service succeeded");}, 
-//			function(e) {
-//				console.log("launch service failed. Reason: " + e.name);});
+//var appControl = new tizen.ApplicationControl(
+//"http://tizen.org/appcontrol/operation/send", // compose or send
+//"mailto:", null, null, 
+//[
+// new tizen.ApplicationControlData(
+//		 "http://tizen.org/appcontrol/data/subject", [ "Mapo" ]),
+// new tizen.ApplicationControlData(
+//		 "http://tizen.org/appcontrol/data/text", [ message ]),
+// new tizen.ApplicationControlData(
+//		 "http://tizen.org/appcontrol/data/to", 
+//		 [ "mapo.tizen@gmail.com" ])
+// 
+//// TODO tizen.mapo@spamgourmet.com
+// // new tizen.ApplicationControlData(
+// //	"http://tizen.org/appcontrol/data/path",
+// // ["images/image1.jpg"])
+//]);
+//tizen.application.launchAppControl(appControl, null,
+//function() {console.log("launch service succeeded");}, 
+//function(e) {
+//	console.log("launch service failed. Reason: " + e.name);});
+
+function sendBluetooth(){
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/bluetooth/pick",
+			null,
+			"image/jpeg", // "image/jpeg"
+			null,
+			[]);
+
+	tizen.application.launchAppControl(appControl, "tizen.bluetooth",
+			function() {console.log("launch service succeeded");}, 
+			function(e) {
+				console.log("launch service failed. Reason: " + e.name);});
 	
 //	var appControlReplyCallback = {
 //			// callee sent a reply
@@ -947,7 +961,7 @@ function sendEmail() {
 //	tizen.application.launchAppControl(appControl, null,
 //			function(){console.log("launch service succeeded");},
 //			function(e){console.log("launch service failed. Reason: " + e.name);});
-//}
+}
 
 function sendMessage(){
 	var message =
@@ -959,47 +973,51 @@ function sendMessage(){
 		"\nConnect you on Mapo for more details!";
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/compose",
-			"tel:9988776655", // tizen.smsmessages
+			null,
 			null,
 			null,
 			[
-			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/messagetype",["sms"]),
-			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",[message]),
-			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/to", ["2345678900"]),
-			 ]
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/messagetype",[ "sms" ]),
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/text",[ message ])
+			]
 	);
-	tizen.application.launchAppControl(appControl, null,
-			function() {console.log("launch service succeeded");}, 
-			function(e) {console.log("launch service failed. Reason: "+e);});
+	tizen.application.launchAppControl(appControl, "tizen.messages",
+			function() {console.log("launch service succeeded");},
+			function(e) {console.log("launch service failed. Reason: " +e);});
 }
 
+
+/*
+ * Caller Manager
+ */
 function call(){
-	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/dial","tel:9988776655", null);
-	tizen.application.launchAppControl(appControl,null,
+	var appControl = new tizen.ApplicationControl("http://tizen.org/appcontrol/operation/dial",null, null);
+	tizen.application.launchAppControl(appControl,"tizen.phone",
 			function(){console.log("launch appControl succeeded");},
 			function(e){console.log("launch appControl failed. Reason: " + e.name);},
 			null);
 }
 
+//function caller(){
+//	var appControl = new tizen.ApplicationControl(
+//			"http://tizen.org/appcontrol/operation/call",
+//			null,
+//			null,
+//			null,
+//			[
+//			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/call/type",[ "voice" ])
+//			]
+//	);
+//	tizen.application.launchAppControl(appControl,"tizen.call",
+//			function(){console.log("launch appControl succeeded");},
+//			function(e){console.log("launch appControl failed. Reason: " + e.name);},
+//			null);
+//}
+
 
 /*
  * Contact Manager
  */
-
-var appControlReplyCB = 
-{
-   /* Reply is sent if the requested operation is successfully delivered */
-   onsuccess: function(reply) 
-   {
-      for (var num = 0; num < reply.length; num++) 
-      {
-         if (reply[num].key == "http://tizen.org/appcontrol/data/selected")
-         {
-            console.log("cropped image path: " + reply[num].value[0]); 
-         }
-      }
-   }
-}
 
 /**
  * Use the Contact Application Control to add a contact with the corresponding position

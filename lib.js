@@ -1047,7 +1047,7 @@ function createContact() {
 	var contact = new tizen.Contact({
 		emails: [new tizen.ContactEmailAddress("mapo.tizen@gmail.com")],
 		urls: [new tizen.ContactWebSite(getLink('OSM'), 'URL')],
-		notes: ['Position: lat = '+$("#lat").val()+' lon = '+$("#lon").val()],
+		notes: ['Position: lat='+$("#lat").val()+' lon='+$("#lon").val()],
 		organizations: [new tizen.ContactOrganization({name: "Mapo"})],
 		groupIds: [group.id]
 	});
@@ -1079,26 +1079,23 @@ function createContact() {
 function createCalendarEvent(){
 	
 	var calendar = tizen.calendar.getDefaultCalendar("EVENT");
-	
+	var date = new Date();
+	var dateFile = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
+		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
 	var event = new tizen.CalendarEvent({
 	   description:"Mapo Event", 
-	   summary:"Mapo",
-	   startDate: new tizen.TZDate(2013, 10, 23, 10, 0), 
-	   duration: new tizen.TimeDuration(1, "HOURS")
-		//,location:'Position: lat = '+$("#lat").val()+' lon = '+$("#lon").val()
+	   summary: "Mapo",
+	   startDate: new tizen.TZDate(date.getFullYear().toString(), date.getMonth().toString(), date.getDate().toString(), date.getHours().toString(), date.getSeconds().toString()), 
+	   duration: new tizen.TimeDuration(1, "HOURS"),
+	   location: 'Position: lat='+$("#lat").val()+' lon='+$("#lon").val()
 	});
-	
 	calendar.add(event);
-	
-	log("eventid = "+event.id.uid);
+	log("eventid"+event.id.uid);
 	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/social/edit",
-			null,
-			null,
-			null,
+			"http://tizen.org/appcontrol/operation/social/edit", null, null, null,
 			[
 			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_type",[ "event" ]),
-			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_id",[ event.id ]) //TODO : .uid
+			 new tizen.ApplicationControlData("http://tizen.org/appcontrol/data/social/item_id",[ event.id.uid ])
 			]);
 	tizen.application.launchAppControl(appControl, "tizen.calendar", 
 			function() {console.log("launch service succeeded");},

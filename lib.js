@@ -1080,8 +1080,6 @@ function createCalendarEvent(){
 	
 	var calendar = tizen.calendar.getDefaultCalendar("EVENT");
 	var date = new Date();
-	var dateFile = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
-		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
 	var event = new tizen.CalendarEvent({
 	   description:"Mapo Event", 
 	   summary: "Mapo",
@@ -1090,7 +1088,6 @@ function createCalendarEvent(){
 	   location: 'Position: lat='+$("#lat").val()+' lon='+$("#lon").val()
 	});
 	calendar.add(event);
-	log("eventid"+event.id.uid);
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/social/edit", null, null, null,
 			[

@@ -122,7 +122,7 @@ function getLink(provider) {
 	case 'GM' :
 		url = "http://maps.google.com/maps?&z=10&ll=${lat},${lon}";
 		break;
-	case 'NOKIA' : 
+	case 'HERE' : 
 		url = "http://maps.nokia.com/${lat},${lon},16,0,0,normal.day";
 		break;
 	default :
@@ -586,12 +586,17 @@ function getLocation() {
 function handleResolveSuccess(dir) {
 	docDir = dir;
 	var date = new Date();
-	var dateFile = date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
-		+"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
+	var dateFile = ""
+	+date.getFullYear().toString()+"-"
+	+date.getMonth().toString()+"-"
+	+date.getDate().toString()+"-"
+	+date.getHours().toString()+"-"
+	+date.getMinutes().toString()+"-"
+	+date.getSeconds().toString();
 	//log(dateFile);
-	doc = 'MAPO_' + dateFile + ".txt";
+	doc = 'mapo-' + dateFile + ".txt";
 	docDir.createFile(doc);
-	$('#locationInfo').html("Course recording in the file:<br/>" + doc);
+	$('#locationInfo').html("Track recording in file:<br/>" + doc);
 }
 
 /**

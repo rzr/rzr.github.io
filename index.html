@@ -50,8 +50,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<div data-role="page" id="position" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
 			<!-- <input type="button" onclick="getLocation()" value="Position"/> -->
-			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
-				id="home" class="ui-btn-left" data-mini="true" data-icon="home">Position</a>
+			<a href="javascript:void(0);" data-role="button"
+				onclick="getLocation()" id="home" class="ui-btn-left"
+				data-mini="true" data-icon="home">Update</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right-mini"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -65,59 +66,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-		
+
 		<div data-role="content">
 			<form>
 				<table>
 					<tr>
 						<td><label for=lat>Latitude N+/S-:</label></td>
 						<td><input type="text" id="lat" value="26.357865"
-								onChange="changeLat(lat.value);"/></td>
+							onChange="changeLat(lat.value);" /></td>
 					</tr>
 					<tr>
 						<td><label for=lon>Longitude W+/E-:</label></td>
 						<td><input type="text" id="lon" value="127.783782"
-								onChange="changeLon();"/></td>
+							onChange="changeLon();" /></td>
 					</tr>
 				</table>
-				<label for="dms">DMS (degree, minutes, seconds):</label>
-				<input type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
-					onChange="changeDMS();"/>
-				<table>
-					<tr>
-						<td><label for="switchRecord">Record your course:</label></td>
-						<td><select name="switchRecord" id="switchRecord" 
-								data-role="slider" onchange="record()">
-								<option value="stop">Stop</option>
-								<option value="start">Start</option>
-							</select></td>
-					</tr>
-				</table>
-				<p id="locationInfo"></p>
-			</form>			
+				<label for="dms">DMS (degree, minutes, seconds):</label> <input
+					type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
+					onChange="changeDMS();" />
+
+			</form>
+
+
 			<div data-role="collapsible" data-collapsed="true">
-				<h3>Web Links</h3>
+				<h3>Share:</h3>
+				<div data-role="controlgroup">
+					<button onclick="sendEmail()">Email</button>
+					<button onclick="sendMessage()">Message</button>
+					<button onclick="createCalendarEvent()">Calendar</button>
+					<button onclick="createContact()">Contact</button>
+					<button onclick="call()">Call</button>
+					<!-- <button onclick="sendBluetooth()">Bluetooth</button> -->
+				</div>
+			</div>
+
+			<div data-role="collapsible" data-collapsed="true">
+				<h3>Web:</h3>
 				<div data-role="controlgroup">
 					<button onclick="goToURL('OSM')">OpenStreetMap</button>
+					<button onclick="goToURL('HERE')">Here (Nokia)</button>
 					<button onclick="goToURL('GM')">Google Maps</button>
-					<button onclick="goToURL('NOKIA')">Nokia Here</button>
 				</div>
 			</div>
 		</div>
 		<!-- /content -->
-		
+
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://gitorious.org/mapo</div>
+			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #position-->
-	
-	
+
+
 	<!-- Page 2 : Search a place -->
 	<div data-role="page" id="map" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
-				id="home" class="ui-btn-left" data-icon="home">Position</a>
+			<a href="javascript:void(0);" data-role="button"
+				onclick="getLocation()" id="home" class="ui-btn-left"
+				data-icon="home">Update</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -131,24 +137,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-		
+
 		<div data-role="content">
 			<div id="myMap"></div>
 		</div>
 		<!-- /content -->
-		
+
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://gitorious.org/mapo</div>
+			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr/</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #place-->
-	
-	
+
+
 	<!-- Page 3 : Settings -->
 	<div data-role="page" id="settings" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
-			<a href="javascript:void(0);" data-role="button" onclick="getLocation()"
-				id="home" class="ui-btn-left" data-icon="home">Position</a>
+			<a href="javascript:void(0);" data-role="button"
+				onclick="getLocation()" id="home" class="ui-btn-left"
+				data-icon="home">Update</a>
 			<h1 class="ui-title">MAPO</h1>
 			<a data-role="button" id="exit" class="ui-btn-right"
 				data-icon="delete" onclick="quit()">Exit</a>
@@ -167,45 +174,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<table>
 				<tr>
 					<td><label for="switchOnline">Connection:</label></td>
-					<td>
-						<select name="switchOnline" id="switchOnline"
-							data-role="slider" onchange="switchOnline()">
+					<td><select name="switchOnline" id="switchOnline"
+						data-role="slider" onchange="switchOnline()">
 							<option value="offline">Offline</option>
 							<option value="online">Online</option>
-						</select>
-					</td>
+					</select></td>
 				<tr>
 				<tr>
 					<td><label for="switchEnergy">Energy saving:</label></td>
-					<td>
-						<select name="switchEnergy" id="switchEnergy"
-							data-role="slider">
+					<td><select name="switchEnergy" id="switchEnergy"
+						data-role="slider">
 							<option value="off">Off</option>
 							<option value="on">On</option>
-						</select>
-					</td>
+					</select></td>
 				</tr>
 			</table>
-			<label for="selectorTimeout">Recording timeout (seconds):</label>
-			<input type="range" name="selectorTimeout" id="selectorTimeout"
-				value="10" min="1" max="100"/>
-			<div data-role="collapsible" data-collapsed="true">
-				<h3>Share</h3>
-				<div data-role="controlgroup">
-					<button onclick="sendEmail()">Email</button>
-					<button onclick="call()">Call</button>
-					<button onclick="createContact()">Contact</button>
-					<button onclick="createCalendarEvent()">Calendar</button>
-					<button onclick="sendMessage()">Message</button>
-					<!-- <button onclick="sendBluetooth()">Bluetooth</button> -->
-				</div>
-			</div>
+			<label for="selectorTimeout">Sampling rate (seconds):</label> <input
+				type="range" name="selectorTimeout" id="selectorTimeout" value="10"
+				min="1" max="100" />
+
+			<table>
+				<tr>
+					<td><label for="switchRecord">Record your track:</label></td>
+					<td><select name="switchRecord" id="switchRecord"
+						data-role="slider" onchange="record()">
+							<option value="stop">Stop</option>
+							<option value="start">Start</option>
+					</select></td>
+				</tr>
+			</table>
+							<p id="locationInfo"></p>
+
 		</div>
 		<!-- /content -->
-		
+
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://gitorious.org/mapo
-		</div>
+			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #options-->

@@ -4,6 +4,7 @@ URL: https://gitorious.org/mapo/mapo
 License: GPL-3.0-plus
 License-URL: https://spdx.org/licenses/GPL-3.0-plus
 Contact: mapo.tizen@gmail.com
+Keywords: geoloc, localisation, map, lattitude, longitude, openstreetmap, googlemaps, nokiamaps, heremaps
 
 mapo : gps recorder map displayer
 
@@ -36,8 +37,8 @@ Video: https://dockr.eurogiciel.fr/blogs/embedded/author/pcl/
 
 ::: CREDITS :::
 
-Philippe Coval : https://gitorious.org/~rzr
-Theo Gerin : https://gitorious.org/~theog
-Sebastien Bocahu : https://gitorious.org/~zecrazytux
+Philippe Coval : https://gitorious.org/ rzr
+Theo Gerin : https://gitorious.org/ theog
+Sebastien Bocahu : https://gitorious.org/ zecrazytux
 Eurogiciel Opensource Dept : https://dockr.eurogiciel.fr/blogs/embedded
 

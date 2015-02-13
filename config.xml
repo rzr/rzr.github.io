@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://gitorious.org/tizen/mapo" version="1.3.0" height="400" width="400" viewmodes="fullscreen">
     <access origin="*" subdomains="true"></access>
-    <tizen:application id="xqV5JPggpY.mapo" package="xqV5JPggpY" required_version="2.2"/>
+    <tizen:application id="mapoXtizen.mapo" package="mapoXtizen" required_version="2.2"/>
     <author href="https://gitorious.org/mapo" email="rzr@gna.org">Philippe Coval</author>
     <content src="index.html"/>
     <description>
@@ -28,3 +28,4 @@ http://gitorious.org/mapo</description>
     <tizen:privilege name="http://tizen.org/privilege/bluetooth.health"/>
     <tizen:privilege name="http://tizen.org/privilege/bluetooth.spp"/>
 </widget>
+

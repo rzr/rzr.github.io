@@ -22,6 +22,7 @@
 * TODO [#C] : 3D globe and trace curves
 * TODO [#C] : bookmarks
 * TODO [#C] : photo wgs84
+* TODO [#C] : splash screen : https://developer.tizen.org/forums/web-application-development/splash-screen
 
 Correction to do, works but not great...
 * TODO [#A] : setTimeOut -> jQuery Deferred Object  -> OK

@@ -304,6 +304,7 @@ function refresh() {
 		isOnline = false;
 		alert("Connection lost");
 	}
+	
 	// setDMS();
 	$('#myMap').empty();
 	log("isOnline = " + isOnline);
@@ -364,7 +365,7 @@ function init() {
 
 	document.addEventListener('tizenhwkey', function(e) {
 		if (e.keyName === 'back') {
-			if ($.mobile.activePage.attr('id') === 'main') {
+			if ($.mobile.activePage.attr('id') === 'position') {
 				tizen.application.getCurrentApplication().exit();
 			} else {
 				history.back();

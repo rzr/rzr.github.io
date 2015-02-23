@@ -1038,7 +1038,7 @@ function sendMessage() {
 }
 
 /*
- * Caller Manager
+ * TODO: Caller Manager
  */
 function call() {
 	var appControl = new tizen.ApplicationControl(

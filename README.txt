@@ -22,7 +22,7 @@ Development started on May 25 2013, just before showing Tizen at solutions linux
 Used target was RD210 and it was continuously upgraded until then it was tested on RDPQ
 but those 2 devices do not not support GPS.
 
-Then on 2015 back from FOSDEM with a Samsung Z1,
+Then on 2015 back from FOSDEM with a Z1 device,
 I noticed that application is not available into TizenStore
 which seems to be supported in France.
 

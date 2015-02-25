@@ -11,7 +11,7 @@ tmp/512x512.png: docs/logo.png
 	convert "$<" -resize '512x512>' -gravity center -background none -extent '512x512' "$@"
 
 clean:
-	rm -rfv tmp
+	rm -rfv tmp *~
 
 distclean: clean
 	rm -rf *.wgt

@@ -171,12 +171,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<!-- /header -->
 
 		<div data-role="content">
-			<table>
+			<table width=100%>
 				<tr>
 					<td><label for="switchOnline">Connection:</label></td>
 					<td><select name="switchOnline" id="switchOnline"
 						data-role="slider" onchange="switchOnline()">
-							<option value="offline">Offline</option>
+							<option value="offline" selected>Offline</option>
 							<option value="online">Online</option>
 					</select></td>
 				<tr>
@@ -185,17 +185,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<td><select name="switchEnergy" id="switchEnergy"
 						data-role="slider">
 							<option value="off">Off</option>
-							<option value="on">On</option>
+							<option value="on" selected>On</option>
 					</select></td>
 				</tr>
-			</table>
-			<label for="selectorTimeout">Sampling rate (seconds):</label> <input
-				type="range" name="selectorTimeout" id="selectorTimeout" value="10"
-				min="1" max="100" />
 
-			<table>
 				<tr>
-					<td><label for="switchRecord">Record your track:</label></td>
+					<td><label for="switchRecord">Record:</label></td>
 					<td><select name="switchRecord" id="switchRecord"
 						data-role="slider" onchange="record()">
 							<option value="stop">Stop</option>
@@ -203,8 +198,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</select></td>
 				</tr>
 			</table>
-							<p id="locationInfo"></p>
+			<label for="selectorTimeout">Sampling rate (seconds):</label> <input
+				type="range" name="selectorTimeout" id="selectorTimeout" value="10"
+				min="1" max="100" />
 
+			<p id="locationInfo"></p>
+			<p>Check system settings for more...</p>
 		</div>
 		<!-- /content -->
 

@@ -1,8 +1,8 @@
-icon.png: docs/screenshot.png Makefile
+icon.png: docs/logo.png Makefile
 	convert -resize 117x117! $< $@
 
 docs/screenshot.png: docs/logo.png
-	cp -av $< $@
+	echo cp $< $@
 
 tmp/512x512.png: docs/logo.png
 	mkdir -p ${@D}

@@ -367,7 +367,6 @@ function initSettings() {
 	}
 	storeSettings();
 }
-
 /**
  * Initialize the data from the preceding use
  */
@@ -390,6 +389,14 @@ function init() {
 	refresh();
 	log("} init");
 }
+
+
+/**
+ * Initialize the data from the preceding use
+ */
+function main() {
+	init();
+}	
 
 /*
  * Coordinates transformation Manager

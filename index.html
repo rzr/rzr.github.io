@@ -1,38 +1,30 @@
 <!DOCTYPE html>
-
+<html>
+<head>
 <!--
-
-Copyright (c) 2013 Mapo developpers and contributors <mapo.tizen@gmail.com>
-
+Copyright (c) 2013 Mapo developers and contributors <mapo.tizen@gmail.com>
 This file is part of Mapo.
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 
-
 <meta charset="utf-8" />
 <meta name="viewport"
-	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <meta name="description" content="An application based on geolocation" />
-
 <title>Mapo</title>
-
 <link rel="stylesheet" href="./css/jquery.mobile-1.2.0.css" />
 <link rel="stylesheet" href="./css/Mapo.css" />
 <link rel="stylesheet" href="./css/style.css" />
-
 <script type="text/javascript"
 	src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript"
@@ -42,9 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="./js/main.js"></script>
 <script type="text/javascript" src="./lib.js"></script>
 </head>
-
 <body>
-
 	<!-- Page 1 : My position -->
 	<div data-role="page" id="position" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
@@ -65,17 +55,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-
 		<div data-role="content">
 			<form>
 				<table>
 					<tr>
-						<td><label for=lat>Latitude N+/S-:</label></td>
+						<td><label for="lat">Latitude N+/S-:</label></td>
 						<td><input type="text" id="lat" value="26.357865"
 							onChange="changeLat(lat.value);" /></td>
 					</tr>
 					<tr>
-						<td><label for=lon>Longitude W+/E-:</label></td>
+						<td><label for="lon">Longitude W+/E-:</label></td>
+					
 						<td><input type="text" id="lon" value="127.783782"
 							onChange="changeLon();" /></td>
 					</tr>
@@ -83,10 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<label for="dms">DMS (degree, minutes, seconds):</label> <input
 					type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
 					onChange="changeDMS();" />
-
 			</form>
-
-
 			<div data-role="collapsible" data-collapsed="true">
 				<h3>Share:</h3>
 				<div data-role="controlgroup">
@@ -100,7 +87,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					 -->
 				</div>
 			</div>
-
 			<div data-role="collapsible" data-collapsed="true">
 				<h3>Web:</h3>
 				<div data-role="controlgroup">
@@ -111,14 +97,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</div>
 		</div>
 		<!-- /content -->
-
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #position-->
-
-
 	<!-- Page 2 : Search a place -->
 	<div data-role="page" id="map" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
@@ -138,19 +121,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-
 		<div data-role="content">
 			<div id="myMap"></div>
 		</div>
 		<!-- /content -->
-
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr/</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #place-->
-
-
 	<!-- Page 3 : Settings -->
 	<div data-role="page" id="settings" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
@@ -170,7 +149,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-
 		<div data-role="content">
 			<table>
 				<tr>
@@ -180,20 +158,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 							<option value="offline">Offline</option>
 							<option value="online">Online</option>
 					</select></td>
-				<tr>
+				</tr>
 				<tr>
 					<td><label for="switchEnergy">Energy saving:</label></td>
 					<td><select name="switchEnergy" id="switchEnergy"
 						data-role="slider">
-							<option value="off">Off</option>
-							<option value="on" selected>On</option>
+							<option value="off"  >Off</option>
+							<option value="on" >On</option>
 					</select></td>
 				</tr>
 			</table>
 			<label for="selectorTimeout">Sampling rate (seconds):</label> <input
 				type="range" name="selectorTimeout" id="selectorTimeout" value="10"
 				min="1" max="100" />
-
 			<table>
 				<tr>
 					<td><label for="switchRecord">Record your track:</label></td>
@@ -205,15 +182,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</tr>
 			</table>
 			<p id="locationInfo"></p>
-
 		</div>
 		<!-- /content -->
-
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #options-->
-
 </body>
 </html>

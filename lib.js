@@ -39,6 +39,16 @@ var file;
 // Boolean which provide the information if a file has been recorded
 var fileRecorded = false;
 
+/**
+ * Show a message
+ * 
+ * @param message
+ */
+function log(message) {
+	if (!false)
+		console.log("# log: " + message);
+}
+
 /*
  * Storage Manager
  */
@@ -144,20 +154,20 @@ function goToURL(provider) {
 		var appControlReplyCallback = {
 			onsuccess : function(data) {
 				for (var i = 0; i < data.length; i++) {
-					console.log("#" + i + " key:" + data[i].key);
+					log("#" + i + " key:" + data[i].key);
 					for (var j = 0; j < data[i].value.length; j++) {
-						console.log("   value#" + j + ":" + data[i].value[j]);
+						log("   value#" + j + ":" + data[i].value[j]);
 					}
 				}
 			},
 			onfailure : function() {
-				console.log('The launch application control failed');
+				log('The launch application control failed');
 			}
 		}
 		tizen.application.launchAppControl(appControl, null, function() {
-			console.log("launch internet application control succeed");
+			log("launch internet application control succeed");
 		}, function(e) {
-			console.log("launch internet application control failed. reason: "
+			log("launch internet application control failed. reason: "
 					+ e.message);
 		}, appControlReplyCallback);
 	} else {
@@ -362,7 +372,7 @@ function initSettings() {
  * Initialize the data from the preceding use
  */
 function init() {
-
+	log("{ init");
 	document.addEventListener('tizenhwkey', function(e) {
 		if (e.keyName === 'back') {
 			if ($.mobile.activePage.attr('id') === 'position') {
@@ -378,6 +388,7 @@ function init() {
 	initData();
 	initSettings();
 	refresh();
+	log("} init");
 }
 
 /*
@@ -633,7 +644,7 @@ function handleResolveSuccess(dir) {
  *            error
  */
 function handleResolveError(e) {
-	console.log('message: ' + e.message);
+	log('message: ' + e.message);
 }
 
 /**
@@ -643,7 +654,7 @@ function resolveFile() {
 	try {
 		file = docDir.resolve(doc);
 	} catch (exc) {
-		console.log('Could not resolve file: ' + exc.message);
+		log('Could not resolve file: ' + exc.message);
 		// Stop in case of any errors
 		return;
 	}
@@ -677,7 +688,7 @@ function handleRecordError(e) {
 		msg = 'Unknown Error';
 		break;
 	}
-	console.log('Error: ' + msg);
+	log('Error: ' + msg);
 }
 
 /**
@@ -708,7 +719,7 @@ function writeToStream(fileStream) {
 		fileStream.write("\r" + dateRecord + ";" + lat + ";" + lon);
 		fileStream.close();
 	} catch (exc) {
-		console.log('Could not write to file: ' + exc.message);
+		log('Could not write to file: ' + exc.message);
 	}
 }
 
@@ -1227,15 +1238,6 @@ function quit() {
  * Schedule
  */
 
-/**
- * Show a message
- * 
- * @param message
- */
-function log(message) {
-	if (false)
-		console.log("# " + message);
-}
 
 /**
  * Use the tactil swipe to change between every pages
@@ -1262,3 +1264,4 @@ function swipePage() {
 		}
 	});
 }
+

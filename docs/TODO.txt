@@ -4,6 +4,8 @@
 
 ## WORK IN PROGRESS ##
 
+Validation: failed:  Attached file: 000000060067_635609449956507444.zip(4.893 MB)
+
 ### TODO ###
 
 * TODO [#A] : Use JQuery with OpenLayers on the map

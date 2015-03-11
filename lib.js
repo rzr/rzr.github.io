@@ -341,6 +341,7 @@ function refresh() {
 	if (isOnline) {
 		setMapSize();
 		chargeMap();
+		
 	} else {
 		$('#myMap')
 				.html(
@@ -348,7 +349,7 @@ function refresh() {
 								+ "Please connect your application online in the settings"
 								+ " if you want to charge the map</p>");
 	}
-	log("refresh}");
+	log("}refresh");
 }
 
 /*
@@ -1057,6 +1058,23 @@ function sendMessage() {
 			});
 }
 
+
+/*
+ * Caller Manager
+ */
+function settings() {
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/configure/location", null, null);
+	tizen.application.launchAppControl(appControl, "tizen.settings", function() {
+		console.log("launch appControl succeeded");
+	}, function(e) {
+		console.log("launch appControl failed. Reason: " + e.name);
+	}, null);
+}
+
+
+
+	
 /*
  * Caller Manager
  */
@@ -1069,6 +1087,7 @@ function call() {
 		console.log("launch appControl failed. Reason: " + e.name);
 	}, null);
 }
+
 
 // function caller(){
 // var appControl = new tizen.ApplicationControl(

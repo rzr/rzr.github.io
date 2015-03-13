@@ -1,12 +1,4 @@
-tmp/*
-.build/
-.externalToolBuilders/
-.rds_delta
 .sdk_delta.info
-.settings/org.eclipse.wst.jsdt.core.prefs
-.settings/org.eclipse.wst.jsdt.ui.prefs
+.sign/
 mapo.wgt
 *~
-*.tmp
-.package/
-.sign/

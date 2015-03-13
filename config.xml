@@ -1,30 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://notabug.org/tizen/mapo" version="1.2.1" height="400" width="400" viewmodes="fullscreen">
-    <access origin="*" subdomains="true"></access>
-    <tizen:application id="mapo000000.mapo" package="mapo000000" required_version="2.2"/>
-    <author href="https://gitorious.org/mapo" email="rzr@gna.org">Philippe Coval</author>
+<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="http://yourdomain/mapo" version="1.0.0" viewmodes="maximized">
+    <tizen:application id="RWMhr5qY50.mapo" package="RWMhr5qY50" required_version="2.3"/>
     <content src="index.html"/>
-    <description>
-Mapo is a geolocation application for the Tizen OS, developed with HTML5/CSS3 an jQuery.
-
-http://gitorious.org/mapo</description>
-    <feature name="http://tizen.org/api/application.read"/>
-    <feature name="http://tizen.org/api/filesystem"/>
-    <feature name="http://tizen.org/feature/location.gps"/>
     <feature name="http://tizen.org/feature/screen.size.all"/>
-    <icon src="icon.png" height="117" width="117"/>
-    <license href="https://spdx.org/licenses/GPL-3.0+">GPL-3.0+</license>
+    <icon src="icon.png"/>
     <name>mapo</name>
-    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
-    <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
-    <tizen:privilege name="http://tizen.org/privilege/location"/>
-    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
-    <tizen:privilege name="http://tizen.org/privilege/contact.read"/>
-    <tizen:privilege name="http://tizen.org/privilege/contact.write"/>
-    <tizen:privilege name="http://tizen.org/privilege/calendar.read"/>
-    <tizen:privilege name="http://tizen.org/privilege/calendar.write"/>
-    <tizen:privilege name="http://tizen.org/privilege/bluetooth.admin"/>
-    <tizen:privilege name="http://tizen.org/privilege/bluetooth.gap"/>
-    <tizen:privilege name="http://tizen.org/privilege/bluetooth.health"/>
-    <tizen:privilege name="http://tizen.org/privilege/bluetooth.spp"/>
+    <tizen:profile name="mobile"/>
 </widget>

@@ -6,11 +6,6 @@
         </platform>
     </platforms>
     <package>
-        <blacklist>
-            <path value=".gitignore" type="file"/>
-            <path value="docs" type="dir"/>
-            <path value="docs/TODO.txt" type="file"/>
-            <path value="docs/notes.txt" type="file"/>
-        </blacklist>
+        <blacklist/>
     </package>
 </tproject>

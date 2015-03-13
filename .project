@@ -16,31 +16,18 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.tizen.web.jslint.nature.JSLintBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.tizen.web.editor.css.nature.CSSBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.wst.validation.validationbuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.tizen.web.project.builder.WebBuilder</name>
 			<arguments>
+				<dictionary>
+					<key>usedLibraryType</key>
+					<value>jQueryMobile</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.tizen.web.privilege.nature.PrivilegeNature</nature>
 		<nature>json.validation.nature</nature>
-		<nature>org.tizen.web.jslint.nature.JSLintNature</nature>
-		<nature>org.tizen.web.editor.css.nature.CSSNature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>org.tizen.web.project.builder.WebNature</nature>
 	</natures>

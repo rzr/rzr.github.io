@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Application Global variables
  */
 // The map of the application
-var map;
+var map = null;
 // The boolean which provide the connection state of the application
 var isOnline = false; // see initSettings
 
@@ -84,17 +84,17 @@ function storeSettings() {
 }
 
 function store() {
+	var i = 0;
 	var r = $.Deferred();
 	storeData();
 	storeSettings();
-	for (var i = 0; i < localStorage.length; i++) {
+	for (i = 0; i < localStorage.length; i++) {
 		log(i + " -- " + localStorage.key(i) + " : "
 				+ localStorage.getItem(localStorage.key(i)));
 	}
 	r.resolve();
 	return r;
 }
-
 
 /**
  * Store the data before quitting the application
@@ -116,7 +116,7 @@ function quit() {
  *            new latitude value
  */
 function setLat(lat) {
-	if (document.getElementById("lat").value != lat) {
+	if (document.getElementById("lat").value !== lat) {
 		document.getElementById("lat").value = lat;
 	}
 }
@@ -128,7 +128,7 @@ function setLat(lat) {
  *            new longitude value
  */
 function setLon(lon) {
-	if (document.getElementById("lon").value != lon) {
+	if (document.getElementById("lon").value !== lon) {
 		document.getElementById("lon").value = lon;
 	}
 }
@@ -169,15 +169,17 @@ function getLink(provider) {
  * Use the Internet Application Control to go to OSM link with the browser
  */
 function goToURL(provider) {
+	var i = 0;
+	var j = 0;
 	if (isOnline) {
 		var appControl = new tizen.ApplicationControl(
 				"http://tizen.org/appcontrol/operation/view",
 				getLink(provider), null);
 		var appControlReplyCallback = {
 			onsuccess : function(data) {
-				for (var i = 0; i < data.length; i++) {
+				for (i = 0; i < data.length; i++) {
 					console.log("#" + i + " key:" + data[i].key);
-					for (var j = 0; j < data[i].value.length; j++) {
+					for (j = 0; j < data[i].value.length; j++) {
 						console.log("   value#" + j + ":" + data[i].value[j]);
 					}
 				}
@@ -245,6 +247,7 @@ function initIcon() {
 }
 
 function chargeCourse(data) {
+	var i = 0;
 	log("chargeCourse data : " + data['dates'][0]);
 	var icon = initIcon();
 
@@ -252,7 +255,7 @@ function chargeCourse(data) {
 	log("tab lats = " + data['lats']);
 	log("tab dates = " + data['dates']);
 
-	for (var i = 0; i < data['dates'].length; i++) {
+	for (i = 0; i < data['dates'].length; i++) {
 		var lon = parseFloat(data['lons'][i]);
 		var lat = parseFloat(data['lats'][i]);
 		var date = data['dates'][i];
@@ -274,22 +277,35 @@ function chargeCourse(data) {
  * layers
  */
 function chargeMap() {
+
+	if (!OpenLayers) {
+		log("error: OpenLayers");
+		return;
+	}
 	var latCenter = $("#lat").val();
 	var lonCenter = $("#lon").val();
+
+	var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
+
+	if ( typeof google != 'undefined' && google.maps) {
+		var googlearray = [ new OpenLayers.Layer.Google("Google Streets", {
+			numZoomLevels : 20
+		}), new OpenLayers.Layer.Google("Google Physical", {
+			type : google.maps.MapTypeId.TERRAIN
+		}), new OpenLayers.Layer.Google("Google Hybrid", {
+			type : google.maps.MapTypeId.HYBRID,
+			numZoomLevels : 20
+		}), new OpenLayers.Layer.Google("Google Satellite", {
+			type : google.maps.MapTypeId.SATELLITE,
+			numZoomLevels : 22
+		}) ];
+
+		layers.concat(googlearray);
+
+	}
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
-		layers : [ new OpenLayers.Layer.OSM("OpenStreetMap"),
-				new OpenLayers.Layer.Google("Google Streets", {
-					numZoomLevels : 20
-				}), new OpenLayers.Layer.Google("Google Physical", {
-					type : google.maps.MapTypeId.TERRAIN
-				}), new OpenLayers.Layer.Google("Google Hybrid", {
-					type : google.maps.MapTypeId.HYBRID,
-					numZoomLevels : 20
-				}), new OpenLayers.Layer.Google("Google Satellite", {
-					type : google.maps.MapTypeId.SATELLITE,
-					numZoomLevels : 22
-				}) ],
+		layers : layers,
 		center : new OpenLayers.LonLat(lonCenter, latCenter).transform(
 				'EPSG:4326', 'EPSG:3857'),
 		zoom : 7
@@ -341,7 +357,7 @@ function refresh() {
 	if (isOnline) {
 		setMapSize();
 		chargeMap();
-		
+
 	} else {
 		$('#myMap')
 				.html(
@@ -399,6 +415,9 @@ function init() {
 	initData();
 	initSettings();
 	refresh();
+	if (false) {
+		swipePage();
+	} // TODO: buggy flash screen
 }
 
 /*
@@ -1058,23 +1077,21 @@ function sendMessage() {
 			});
 }
 
-
 /*
  * Caller Manager
  */
 function settings() {
 	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/configure/location", null, null);
-	tizen.application.launchAppControl(appControl, "tizen.settings", function() {
-		console.log("launch appControl succeeded");
-	}, function(e) {
-		console.log("launch appControl failed. Reason: " + e.name);
-	}, null);
+			"http://tizen.org/appcontrol/operation/configure/location", null,
+			null);
+	tizen.application.launchAppControl(appControl, "tizen.settings",
+			function() {
+				console.log("launch appControl succeeded");
+			}, function(e) {
+				console.log("launch appControl failed. Reason: " + e.name);
+			}, null);
 }
 
-
-
-	
 /*
  * Caller Manager
  */
@@ -1087,7 +1104,6 @@ function call() {
 		console.log("launch appControl failed. Reason: " + e.name);
 	}, null);
 }
-
 
 // function caller(){
 // var appControl = new tizen.ApplicationControl(
@@ -1220,11 +1236,22 @@ function createCalendarEvent() {
  * the the device has a connection before connecting the application
  */
 function switchOnline() {
+	log("#{ switchOnline");
 	log("status=" + $('#switchOnline').slider("option", "online"));
 	isOnline = (!isOnline && navigator.onLine);
 	$('#switchOnline').val(isOnline ? 'online' : 'offline');
 	$('#switchOnline').slider('refresh');
-	refresh();
+
+	if (isOnline && OpenLayers == null) {
+
+		$.getScript(url_openlayers, function() {
+			refresh();
+		});
+
+	} else {
+		refresh();
+	}
+	log("#} switchOnline");
 }
 
 /**

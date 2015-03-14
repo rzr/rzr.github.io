@@ -1,4 +1,5 @@
 .sdk_delta.info
 .sign/
-mapo.wgt
+*.wgt
 *~
+.rds_delta

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2013 Mapo developpers and contributors <mapo.tizen@gmail.com>
+Copyright (c) 2013 Mapo developers and contributors <mapo.tizen@gmail.com>
 
 This file is part of Mapo.
 
@@ -56,8 +56,10 @@ function exit() {
  * @param message
  */
 function log(message) {
-	if (false) {
-		console.log("# " + message);
+	if (!false) {
+	    console.log("# " + message);
+   	    var log = document.getElementById("console");
+	    log.innerHTML += "<pre>" +message + "</pre>";
 	}
 }
 
@@ -178,20 +180,20 @@ function goToURL(provider) {
 		var appControlReplyCallback = {
 			onsuccess : function(data) {
 				for (i = 0; i < data.length; i++) {
-					console.log("#" + i + " key:" + data[i].key);
+					log("#" + i + " key:" + data[i].key);
 					for (j = 0; j < data[i].value.length; j++) {
-						console.log("   value#" + j + ":" + data[i].value[j]);
+						log("   value#" + j + ":" + data[i].value[j]);
 					}
 				}
 			},
 			onfailure : function() {
-				console.log('The launch application control failed');
+				log('The launch application control failed');
 			}
 		}
 		tizen.application.launchAppControl(appControl, null, function() {
-			console.log("launch internet application control succeed");
+			log("launch internet application control succeed");
 		}, function(e) {
-			console.log("launch internet application control failed. reason: "
+			log("launch internet application control failed. reason: "
 					+ e.message);
 		}, appControlReplyCallback);
 	} else {
@@ -202,10 +204,13 @@ function goToURL(provider) {
 
 /**
  * update links
+ * TODO: check if needed ?
  */
 // function updateLinks() {
 // $('#OSMLink').attr('href', getOSMLink());
 // }
+
+
 /*
  * Map Manager
  */
@@ -246,9 +251,9 @@ function initIcon() {
 			size, offset);
 }
 
-function chargeCourse(data) {
+function loadTrace(data) {
 	var i = 0;
-	log("chargeCourse data : " + data['dates'][0]);
+	log("loadTrace data : " + data['dates'][0]);
 	var icon = initIcon();
 
 	log("tab lons = " + data['lons']);
@@ -267,16 +272,17 @@ function chargeCourse(data) {
 		var lonlat = new OpenLayers.LonLat(lon, lat).transform('EPSG:4326',
 				'EPSG:3857');
 		var mark = new OpenLayers.Marker(lonlat, icon);
-		course.addMarker(mark);
+		trace.addMarker(mark);
 	}
-	map.addLayer(course);
+	map.addLayer(trace);
 }
 
 /**
- * Charge the OpenLayers map with different OpenStreetMap and Google maps'
+ * Load the OpenLayers map with different OpenStreetMap and Google maps'
  * layers
+ * TODO: check if needed ?
  */
-function chargeMap() {
+function loadMap() {
 
 	if (!OpenLayers) {
 		log("error: OpenLayers");
@@ -284,23 +290,29 @@ function chargeMap() {
 	}
 	var latCenter = $("#lat").val();
 	var lonCenter = $("#lon").val();
+        var zoom = $("#zoom").val();
+        var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
 
-	var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
+	if ( typeof google != 'undefined') {
+		var array = [
+ new OpenLayers.Layer.Google("Google Satellite", {
+			type : google.maps.MapTypeId.SATELLITE,
+			numZoomLevels :22,
+		}) 
 
-	if ( typeof google != 'undefined' && google.maps) {
-		var googlearray = [ new OpenLayers.Layer.Google("Google Streets", {
-			numZoomLevels : 20
-		}), new OpenLayers.Layer.Google("Google Physical", {
+, new OpenLayers.Layer.Google("Google Physical", {
 			type : google.maps.MapTypeId.TERRAIN
 		}), new OpenLayers.Layer.Google("Google Hybrid", {
 			type : google.maps.MapTypeId.HYBRID,
 			numZoomLevels : 20
-		}), new OpenLayers.Layer.Google("Google Satellite", {
-			type : google.maps.MapTypeId.SATELLITE,
-			numZoomLevels : 22
-		}) ];
+		}),
 
-		layers.concat(googlearray);
+new OpenLayers.Layer.Google("Google Streets", {
+			numZoomLevels : 20
+		})
+];
+//	    layers = array.concat(layers);
+	    layers = layers.concat(array);
 
 	}
 	map = new OpenLayers.Map('myMap', {
@@ -308,31 +320,31 @@ function chargeMap() {
 		layers : layers,
 		center : new OpenLayers.LonLat(lonCenter, latCenter).transform(
 				'EPSG:4326', 'EPSG:3857'),
-		zoom : 7
+		zoom : zoom,
 	});
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 
 	if (fileRecorded) { // TODO : Data vide : data([0])?.length!=0 or
 		// fileRecorded
 
-		// var course = new OpenLayers.Layer.Markers( "Latest recorded course"
+		// var trace = new OpenLayers.Layer.Markers( "Latest recorded trace"
 		// );
-		// map.removeLayer(course);
+		// map.removeLayer(trace);
 
-		var markers = map.getLayersByName("Last recorded course");
+		var markers = map.getLayersByName("Last recorded trace");
 		if (markers.length != 0) {
-			var previousCourse = markers[0];
-			log("course = " + previousCourse.name);
-			previousCourse.destroy();
+			var previousTrace = markers[0];
+			log("trace = " + previousTrace.name);
+			previousTrace.destroy();
 		}
 
-		course = new OpenLayers.Layer.Markers("Last recorded course");
-		// readFile().done(chargeCourse);
+		trace = new OpenLayers.Layer.Markers("Last recorded trace");
+		// readFile().done(loadTrace);
 		readFile();
 		// setTimeout(
 		// // log("result 0 : "+result[0]);
 		// // log("result 1 : "+result[1]);
-		// chargeCourse
+		// loadTrace
 		// , 5000);
 	}
 }
@@ -356,14 +368,14 @@ function refresh() {
 	log("isOnline=" + isOnline);
 	if (isOnline) {
 		setMapSize();
-		chargeMap();
+		loadMap();
 
 	} else {
 		$('#myMap')
 				.html(
 						"<p align='center'>"
 								+ "Please connect your application online in the settings"
-								+ " if you want to charge the map</p>");
+								+ " if you want to load the map</p>");
 	}
 	log("}refresh");
 }
@@ -673,7 +685,7 @@ function handleResolveSuccess(dir) {
  *            error
  */
 function handleResolveError(e) {
-	console.log('message: ' + e.message);
+	log('message: ' + e.message);
 }
 
 /**
@@ -683,7 +695,7 @@ function resolveFile() {
 	try {
 		file = docDir.resolve(doc);
 	} catch (exc) {
-		console.log('Could not resolve file: ' + exc.message);
+		log('Could not resolve file: ' + exc.message);
 		// Stop in case of any errors
 		return;
 	}
@@ -717,7 +729,7 @@ function handleRecordError(e) {
 		msg = 'Unknown Error';
 		break;
 	}
-	console.log('Error: ' + msg);
+	log('Error: ' + msg);
 }
 
 /**
@@ -738,6 +750,7 @@ function writeToStream(fileStream) {
 				+ date.getMinutes().toString() + ":"
 				+ date.getSeconds().toString();
 
+	    // * TODO: check if needed ?
 		// var dateRecord =
 		// date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
 		// +"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
@@ -748,7 +761,7 @@ function writeToStream(fileStream) {
 		fileStream.write("\r" + dateRecord + ";" + lat + ";" + lon);
 		fileStream.close();
 	} catch (exc) {
-		console.log('Could not write to file: ' + exc.message);
+		log('error: could not write to file: ' + exc.message);
 	}
 }
 
@@ -765,7 +778,7 @@ function writeRecord() {
 		// error callback
 		handleRecordError);
 	} catch (exc) {
-		console.log('Could not write to file: ' + exc.message);
+		log('error: could not write to file: ' + exc.message);
 	}
 }
 
@@ -777,12 +790,12 @@ function writeRecord() {
  */
 function readFromStream(fileStream) {
 	try {
-		console.log('File size: ' + file.fileSize);
+		log('File size: ' + file.fileSize);
 		var contents = fileStream.read(fileStream.bytesAvailable);
 		fileStream.close();
-		console.log('file contents: ' + contents);
+		log('file contents: ' + contents);
 	} catch (exc) {
-		console.log('Could not read from file: ' + exc.message);
+		log('error: Could not read from file: ' + exc.message);
 	}
 }
 
@@ -799,7 +812,7 @@ function readRecord() {
 		// error callback
 		handleRecordError);
 	} catch (exc) {
-		console.log('Could not write to file: ' + exc.message);
+		log('error: Could not write to file: ' + exc.message);
 	}
 }
 
@@ -853,7 +866,7 @@ function getPosition() {
 }
 
 /**
- * Function called when the record of a course has been launched Record the
+ * Function called when the record of a trace has been launched Record the
  * position whith a timeout predefined in the settings
  */
 function record() {
@@ -868,7 +881,7 @@ function record() {
 					$('#selectorTimeout').val() * 1000);
 		} else {
 			clearInterval(intervalID);
-			$('#locationInfo').html("Course recorded in the file:<br/>" + doc);
+			$('#locationInfo').html("Trace recorded in the file:<br/>" + doc);
 			fileRecorded = true;
 		}
 	} else {
@@ -877,16 +890,16 @@ function record() {
 }
 
 /**
- * Extract from a file composed by the last recorded course all the dates,
+ * Extract from a file composed by the last recorded trace all the dates,
  * latitudes and lontitudes and place its in data
  */
 function readFile() {
 	// var deferred = $.Deferred();
 	try {
 		file = docDir.resolve(doc);
-		console.log('File size: ' + file.fileSize);
+		log('File size: ' + file.fileSize);
 	} catch (exceptionResolve) {
-		console.log('Could not resolve file: ' + exceptionResolve.message);
+		log('error: Could not resolve file: ' + exceptionResolve.message);
 		// Stop in case of any errors
 		return;
 	}
@@ -895,7 +908,7 @@ function readFile() {
 		// success callback - display the contents of the file
 		function(contents) {
 
-			// console.log('File contents:' + contents);
+			// log('File contents:' + contents);
 			var lines = contents.split("\r");
 			var re = /^([0-9.:\-]+);([0-9.\-]+);([0-9.\-]+)$/;
 
@@ -932,12 +945,12 @@ function readFile() {
 			data['lons'] = lons;
 
 			log("readfile data" + data['dates'][0]);
-			chargeCourse(data);
+			loadTrace(data);
 		},
 		// error callback
 		handleRecordError);
 	} catch (exceptionRead) {
-		console.log("readAsText() exception:" + exceptionRead.message);
+		log("error: readAsText() exception:" + exceptionRead.message);
 	}
 	// deferred.resolve();
 	// return deferred; // [data, referred]
@@ -946,6 +959,7 @@ function readFile() {
 /*
  * Social Manager
  */
+
 
 /**
  * Use the Email Application Control to share a position by Email
@@ -973,16 +987,16 @@ function sendEmail() {
 								[ message ]) ]);
 		tizen.application.launchAppControl(appControl, "tizen.email",
 				function() {
-					console.log("launch service succeeded");
+					log("launch service succeeded");
 				}, function(e) {
-					console.log("launch service failed. Reason: " + e.name);
+					log("launch service failed. Reason: " + e.name);
 				})
 	} else {
 		alert("Please connect your application online in the settings"
 				+ " if you want to send an email");
 	}
 }
-
+// TODO: check
 // var appControl = new tizen.ApplicationControl(
 // "http://tizen.org/appcontrol/operation/send", // compose or send
 // "mailto:", null, null,
@@ -1001,10 +1015,11 @@ function sendEmail() {
 // // ["images/image1.jpg"])
 // ]);
 // tizen.application.launchAppControl(appControl, null,
-// function() {console.log("launch service succeeded");},
+// function() {log("launch service succeeded");},
 // function(e) {
-// console.log("launch service failed. Reason: " + e.name);});
+// log("launch service failed. Reason: " + e.name);});
 
+// TODO: check
 function sendBluetooth() {
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/bluetooth/pick", null,
@@ -1013,9 +1028,9 @@ function sendBluetooth() {
 
 	tizen.application.launchAppControl(appControl, "tizen.bluetooth",
 			function() {
-				console.log("launch service succeeded");
+				log("launch service succeeded");
 			}, function(e) {
-				console.log("launch service failed. Reason: " + e.name);
+				log("launch service failed. Reason: " + e.name);
 			});
 
 	// var appControlReplyCallback = {
@@ -1023,34 +1038,34 @@ function sendBluetooth() {
 	// onsuccess: function(data) {
 	// for (var i = 0; i < data.length; i++) {
 	// if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
-	// console.log('Selected image is ' + data[i].value[0]);
+	// log('Selected image is ' + data[i].value[0]);
 	// }
 	// }
 	// },
 	// // callee returned failure
 	// onfailure: function() {
-	// console.log('The launch application control failed');
+	// log('The launch application control failed');
 	// }
 	// }
 	//
 	// tizen.application.launchAppControl(
 	// appControl,
 	// null,
-	// function() {console.log("launch application control succeed"); },
-	// function(e) {console.log("launch application control failed. reason:
+	// function() {log("launch application control succeed"); },
+	// function(e) {log("launch application control failed. reason:
 	// "+e.message); },
 	// appControlReplyCallback );
 
 	// tizen.application.launch("tizen.bluetooth",
-	// function(){console.log("launch service succeeded");},
-	// function(e){console.log("launch service failed. Reason: " + e.name);});
+	// function(){log("launch service succeeded");},
+	// function(e){log("launch service failed. Reason: " + e.name);});
 
 	// var appControl = new
 	// tizen.ApplicationControl("http://tizen.org/appcontrol/operation/bluetooth/pick",
 	// "Phone/Images/image16.jpg");
 	// tizen.application.launchAppControl(appControl, null,
-	// function(){console.log("launch service succeeded");},
-	// function(e){console.log("launch service failed. Reason: " + e.name);});
+	// function(){log("launch service succeeded");},
+	// function(e){log("launch service failed. Reason: " + e.name);});
 }
 
 function sendMessage() {
@@ -1071,40 +1086,42 @@ function sendMessage() {
 							[ message ]) ]);
 	tizen.application.launchAppControl(appControl, "tizen.messages",
 			function() {
-				console.log("launch service succeeded");
+				log("launch service succeeded");
 			}, function(e) {
-				console.log("launch service failed. Reason: " + e);
+				log("launch service failed. Reason: " + e);
 			});
 }
 
 /*
- * Caller Manager
+ * Settings Manager
  */
 function settings() {
+        var url="http://tizen.org/appcontrol/operation/configure/location";
 	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/configure/location", null,
+			url, null,
 			null);
 	tizen.application.launchAppControl(appControl, "tizen.settings",
 			function() {
-				console.log("launch appControl succeeded");
+				log("launch appControl succeeded");
 			}, function(e) {
-				console.log("launch appControl failed. Reason: " + e.name);
+				log("error: launch appControl failed. Reason: " + e.name);
 			}, null);
 }
 
 /*
- * Caller Manager
+ * Caller Manager : may not be needed
  */
 function call() {
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/dial", null, null);
 	tizen.application.launchAppControl(appControl, "tizen.phone", function() {
-		console.log("launch appControl succeeded");
+		log("launch appControl succeeded");
 	}, function(e) {
-		console.log("launch appControl failed. Reason: " + e.name);
+		log("error: launch appControl failed. Reason: " + e.name);
 	}, null);
 }
 
+// TODO:
 // function caller(){
 // var appControl = new tizen.ApplicationControl(
 // "http://tizen.org/appcontrol/operation/call",
@@ -1118,8 +1135,8 @@ function call() {
 // ]
 // );
 // tizen.application.launchAppControl(appControl,"tizen.call",
-// function(){console.log("launch appControl succeeded");},
-// function(e){console.log("launch appControl failed. Reason: " + e.name);},
+// function(){log("launch appControl succeeded");},
+// function(e){log("launch appControl failed. Reason: " + e.name);},
 // null);
 // }
 
@@ -1132,6 +1149,7 @@ function call() {
  * position
  */
 function createContact() {
+        log("{ createContact");
 	var addressbook = tizen.contact.getDefaultAddressBook();
 
 	var groups = addressbook.getGroups();
@@ -1152,10 +1170,11 @@ function createContact() {
 		addressbook.addGroup(group);
 		log('Group added with id ' + group.id);
 	}
+    //TODO: edit contact is present
 
 	var contact = new tizen.Contact({
 		emails : [ new tizen.ContactEmailAddress("mapo.tizen@gmail.com") ],
-		urls : [ new tizen.ContactWebSite(getLink('OSM'), 'URL') ],
+		urls : [ new tizen.ContactWebSite(getLink('OSM'), 'HOMEPAGE') ],
 		notes : [ 'Position: lat=' + $("#lat").val() + ' lon='
 				+ $("#lon").val() ],
 		organizations : [ new tizen.ContactOrganization({
@@ -1178,10 +1197,11 @@ function createContact() {
 							"http://tizen.org/appcontrol/data/social/item_id",
 							[ contact.personId ]) ]);
 	tizen.application.launchAppControl(appControl, null, function() {
-		console.log("launch service succeeded");
+		log("contact: launch service succeeded");
 	}, function(e) {
-		console.log("launch service failed. Reason: " + e);
+		log("error: contact: launch service failed. Reason: " + e);
 	});
+    log("} createContact");
 }
 
 /*
@@ -1207,8 +1227,9 @@ function createCalendarEvent() {
 				+ $("#lon").val()
 	});
 	calendar.add(event);
+    var url = "http://tizen.org/appcontrol/operation/social/edit";
 	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/social/edit",
+	    url,
 			null,
 			null,
 			null,
@@ -1221,9 +1242,9 @@ function createCalendarEvent() {
 							[ event.id.uid ]) ]);
 	tizen.application.launchAppControl(appControl, "tizen.calendar",
 			function() {
-				console.log("launch service succeeded");
+				log("success: " + url );
 			}, function(e) {
-				console.log("launch service failed. Reason: " + e);
+				log("error: launch service failed. Reason: " + e);
 			});
 }
 
@@ -1256,6 +1277,7 @@ function switchOnline() {
 
 /**
  * Use the tactil swipe to change between every pages
+* TODO : blink ?
  */
 function swipePage() {
 	$('div.ui-page').live("swipeleft", function() {

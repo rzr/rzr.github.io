@@ -3,3 +3,4 @@
 *.wgt
 *~
 .rds_delta
+tmp/*

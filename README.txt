@@ -6,7 +6,7 @@ License-URL: https://spdx.org/licenses/GPL-3.0-plus
 Contact: mapo.tizen@gmail.com
 Keywords: geoloc, localisation, map, lattitude, longitude, openstreetmap, googlemaps, nokiamaps, heremaps
 
-mapo : gps recorder map displayer
+mapo : gps recorder and map viewer
 
 Mapo is a geolocation application for the Tizen OS, developed with HTML5/CSS3 an jQuery.
 
@@ -32,9 +32,9 @@ So it was uploaded again to Tizen store.
 
 ::: MISC :::
 
-Video: https://dockr.eurogiciel.fr/blogs/embedded/author/pcl/
+Video: https://www.youtube.com/watch?v=pBCJRZAIgag
 
-https://dockr.eurogiciel.fr/blogs/embedded/samsung-tizen-z1/
+More: https://dockr.eurogiciel.fr/blogs/embedded/samsung-tizen-z1/
 
 ::: CREDITS :::
 

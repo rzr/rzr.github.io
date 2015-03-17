@@ -25,8 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // The map of the application
 var map = null;
 // The boolean which provide the connection state of the application
-var isOnline = false; // see initSettings
+var isOnline = ! navigator.onLine; // see initSettings
 
+var isLoaded = false;
+
+var isDownloaded = false;
 /*
  * Recording Global Variable
  */
@@ -39,6 +42,11 @@ var file;
 // Boolean which provide the information if a file has been recorded
 var fileRecorded = false;
 
+var url_openlayers = "http://openlayers.org/api/OpenLayers.js";
+
+var url_gmaps = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
+
+var url_gmaps = 'http://maps.googleapis.com/maps/api/js?v=3.2&signed_in=true&callback=handleLoadedGmaps';
 /*
  * General Manager
  */
@@ -57,10 +65,42 @@ function exit() {
  */
 function log(message) {
 	if (!false) {
-	    console.log("# " + message);
-   	    var log = document.getElementById("console");
-	    log.innerHTML += "<pre>" +message + "</pre>";
+		console.log("# " + message);
+		var log = document.getElementById("console");
+		log.innerHTML += "<pre>" + message + "</pre>";
 	}
+}
+
+// upstream: https://gist.github.com/kamranzafar/3136584#comment-1244934
+function toast(message) {
+	var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>'
+			+ message + '</h3></div>');
+
+	$toast.css({
+		display : 'block',
+		background : '#fff',
+		opacity : 0.90,
+		position : 'fixed',
+		padding : '7px',
+		'text-align' : 'center',
+		width : '270px',
+		left : ($(window).width() - 284) / 2,
+		top : $(window).height() / 2 - 20
+	});
+
+	var removeToast = function() {
+		$(this).remove();
+	};
+
+	$toast.click(removeToast);
+
+	$toast.appendTo($.mobile.pageContainer).delay(2000);
+	$toast.fadeOut(400, removeToast);
+}
+
+function handleError(message) {
+	log(message);
+	toast(message);
 }
 
 /*
@@ -80,9 +120,13 @@ function storeData() {
  * Store the settings values in the local storage
  */
 function storeSettings() {
+	log("#{ storeSettings: " + isOnline);
 	localStorage.setItem('connection', $('#switchOnline').val());
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
+	localStorage.setItem('downloaded', isDownloaded);
+	log("#} storeSettings: " + isOnline);
+
 }
 
 function store() {
@@ -102,9 +146,9 @@ function store() {
  * Store the data before quitting the application
  */
 function quit() {
-	log("{exit");
+	log("#{ exit");
 	store().done(exit);
-	log("exit}");
+	log("#} exit");
 }
 
 /*
@@ -197,7 +241,7 @@ function goToURL(provider) {
 					+ e.message);
 		}, appControlReplyCallback);
 	} else {
-		alert("Please connect your application online in the settings"
+		handleError("Please connect your application online in the settings"
 				+ " if you want to open a browser")
 	}
 }
@@ -237,10 +281,10 @@ function getMapSize() {
 /**
  * Modify the dimension of the map according to getMapSize()
  */
-function setMapSize() {
-	var mapSize = getMapSize();
-	$('#myMap').css("width", mapSize[0]);
-	$('#myMap').css("height", mapSize[1]);
+function setMapSize(size) {
+	size = getMapSize();
+	$('#myMap').css("width", size[0]);
+	$('#myMap').css("height", size[1]);
 }
 
 function initIcon() {
@@ -283,8 +327,8 @@ function loadTrace(data) {
  * TODO: check if needed ?
  */
 function loadMap() {
-
-	if (!OpenLayers) {
+	log("#{ loadMap: " + OpenLayers);
+	if (OpenLayers === null ) {
 		log("error: OpenLayers");
 		return;
 	}
@@ -293,9 +337,9 @@ function loadMap() {
         var zoom = $("#zoom").val();
         var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
 
-	if ( typeof google != 'undefined') {
-		var array = [
- new OpenLayers.Layer.Google("Google Satellite", {
+	log("# is gmaps available ?" + gmaps + "/" + google);
+	if (gmaps !== null ) {
+		var array = [ new OpenLayers.Layer.Google("Google Satellite", {
 			type : google.maps.MapTypeId.SATELLITE,
 			numZoomLevels :22,
 		}) 
@@ -315,6 +359,7 @@ new OpenLayers.Layer.Google("Google Streets", {
 	    layers = layers.concat(array);
 
 	}
+	log("# add ui " + layers );
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
 		layers : layers,
@@ -347,6 +392,7 @@ new OpenLayers.Layer.Google("Google Streets", {
 		// loadTrace
 		// , 5000);
 	}
+	log("#} loadMap: " + OpenLayers);
 }
 
 /*
@@ -377,7 +423,8 @@ function refresh() {
 								+ "Please connect your application online in the settings"
 								+ " if you want to load the map</p>");
 	}
-	log("}refresh");
+		// isOffline $('#switchOffline').val() // TODO
+	log("#} refresh: " + isOnline);
 }
 
 /*
@@ -388,22 +435,25 @@ function refresh() {
  * Recover in the local storage the coordinates values from the preceding use
  */
 function initData() {
-	if (localStorage.getItem('lat') != null) {
+	log("#{ initData");
+	if (localStorage.getItem('lat') !== null) {
 		$('#lat').val(localStorage.getItem('lat'));
 	}
-	if (localStorage.getItem('lon') != null) {
+	if (localStorage.getItem('lon') !== null) {
 		$('#lon').val(localStorage.getItem('lon'));
 	}
-	if (localStorage.getItem('dms') != null) {
+	if (localStorage.getItem('dms') !== null) {
 		$('#dms').val(localStorage.getItem('dms'));
 	}
 	storeData();
+	log("#} initData");
 }
 
 /**
  * Recover in the local storage the setting values from the preceding use
  */
 function initSettings() {
+	log("#{ initSettings: " + isOnline);
 	if (localStorage.getItem('connection') == 'online') {
 		$('#switchOnline').val("online");
 		isOnline = true;
@@ -411,13 +461,17 @@ function initSettings() {
 		$('#switchOnline').val("offline");
 		isOnline = false;
 	}
-	if (localStorage.getItem('energySaving') != null) {
+	if (localStorage.getItem('energySaving') !== null) {
 		$('#switchEnergy').val(localStorage.getItem('energySaving'));
 	}
-	if (localStorage.getItem('timeout') != null) {
+	if (localStorage.getItem('timeout') !== null) {
 		$('#selectorTimeout').attr('value', localStorage.getItem('timeout'));
 	}
+	if (localStorage.getItem('downloaded') !== null) {
+		isDownloaded = localStorage.getItem('downloaded');
+	}
 	storeSettings();
+	log("#} initSettings: " + isOnline);
 }
 
 /**
@@ -566,7 +620,7 @@ function changeLat() {
 		setDMS();
 		storeData();
 	} else {
-		alert("Latitude coordinate invalid : " + lat);
+		handleError("Latitude coordinate invalid : " + lat);
 		initData();
 	}
 }
@@ -582,7 +636,7 @@ function changeLon() {
 		setDMS();
 		storeData();
 	} else {
-		alert("Lontitude coordinate invalid : " + lon);
+		handleError("Lontitude coordinate invalid : " + lon);
 		initData();
 	}
 }
@@ -672,8 +726,9 @@ function handleResolveSuccess(dir) {
 			+ date.getMonth().toString() + "-" + date.getDate().toString()
 			+ "-" + date.getHours().toString() + "-"
 			+ date.getMinutes().toString() + "-" + date.getSeconds().toString();
+	dateFile = (new Date).getTime();
 	// log(dateFile);
-	doc = 'mapo-' + dateFile + ".txt";
+	doc = 'mapo-' + dateFile + ".csv.txt";
 	docDir.createFile(doc);
 	$('#locationInfo').html("Track recording in file:<br/>" + doc);
 }
@@ -685,7 +740,7 @@ function handleResolveSuccess(dir) {
  *            error
  */
 function handleResolveError(e) {
-	log('message: ' + e.message);
+	handleError('resolve: ' + e.message);
 }
 
 /**
@@ -729,7 +784,7 @@ function handleRecordError(e) {
 		msg = 'Unknown Error';
 		break;
 	}
-	log('Error: ' + msg);
+	handleError(msg);
 }
 
 /**
@@ -741,27 +796,14 @@ function handleRecordError(e) {
  */
 function writeToStream(fileStream) {
 	try {
-		var date = new Date();
-
-		var dateRecord = date.getDate().toString() + "."
-				+ date.getMonth().toString() + "."
-				+ date.getFullYear().toString() + "-"
-				+ date.getHours().toString() + ":"
-				+ date.getMinutes().toString() + ":"
-				+ date.getSeconds().toString();
-
-	    // * TODO: check if needed ?
-		// var dateRecord =
-		// date.getDate().toString()+"."+date.getMonth().toString()+"."+date.getFullYear().toString()
-		// +"-"+date.getHours().toString()+":"+date.getMinutes().toString()+":"+date.getSeconds().toString();
+		var date = (new Date).getTime();
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
-		// fileStream.write(dateRecord + ";lat:" + lat + ";lon:" + lon + "\r");
-
-		fileStream.write("\r" + dateRecord + ";" + lat + ";" + lon);
+		var line = "" + date + ";" + lat + ";" + lon + "\n";
+		fileStream.write(line);
 		fileStream.close();
 	} catch (exc) {
-		log('error: could not write to file: ' + exc.message);
+		handleError('io: could not write to file: ' + exc.message);
 	}
 }
 
@@ -778,7 +820,7 @@ function writeRecord() {
 		// error callback
 		handleRecordError);
 	} catch (exc) {
-		log('error: could not write to file: ' + exc.message);
+		handleError('io: could not write to file: ' + exc.message);
 	}
 }
 
@@ -795,7 +837,7 @@ function readFromStream(fileStream) {
 		fileStream.close();
 		log('file contents: ' + contents);
 	} catch (exc) {
-		log('error: Could not read from file: ' + exc.message);
+		handleError('io: Could not read from file: ' + exc.message);
 	}
 }
 
@@ -812,7 +854,7 @@ function readRecord() {
 		// error callback
 		handleRecordError);
 	} catch (exc) {
-		log('error: Could not write to file: ' + exc.message);
+		handleError('io: Could not write to file: ' + exc.message);
 	}
 }
 
@@ -892,6 +934,7 @@ function record() {
 /**
  * Extract from a file composed by the last recorded trace all the dates,
  * latitudes and lontitudes and place its in data
+ * TODO: test if parse CSV as "date,la,lo\n"
  */
 function readFile() {
 	// var deferred = $.Deferred();
@@ -909,8 +952,8 @@ function readFile() {
 		function(contents) {
 
 			// log('File contents:' + contents);
-			var lines = contents.split("\r");
-			var re = /^([0-9.:\-]+);([0-9.\-]+);([0-9.\-]+)$/;
+			var lines = contents.split("\n");
+			var re = /^([0-9.:\-]+),([0-9.\-]+),([0-9.\-]+)$/;
 
 			var data = [];
 
@@ -950,7 +993,7 @@ function readFile() {
 		// error callback
 		handleRecordError);
 	} catch (exceptionRead) {
-		log("error: readAsText() exception:" + exceptionRead.message);
+		handleError("io: readAsText() exception:" + exceptionRead.message);
 	}
 	// deferred.resolve();
 	// return deferred; // [data, referred]
@@ -967,7 +1010,7 @@ function readFile() {
 function sendEmail() {
 	if (isOnline) {
 		var message = "This is the position I want to show you from Mapo:"
-				+ "\nLatitute=" + $("#lat").val() + "\nLongitude = "
+				+ "\nLatitude=" + $("#lat").val() + "\nLongitude = "
 				+ $("#lon").val() + "\nIf you prefer in DMS, here it is: "
 				+ $('#dms').val()
 				+ "\nYou can see this position on OpenStreetMap: "
@@ -989,7 +1032,7 @@ function sendEmail() {
 				function() {
 					log("launch service succeeded");
 				}, function(e) {
-					log("launch service failed. Reason: " + e.name);
+					handleError("launch service failed. Reason: " + e.name);
 				})
 	} else {
 		alert("Please connect your application online in the settings"
@@ -1030,7 +1073,7 @@ function sendBluetooth() {
 			function() {
 				log("launch service succeeded");
 			}, function(e) {
-				log("launch service failed. Reason: " + e.name);
+				handleError("launch service failed. Reason: " + e.name);
 			});
 
 	// var appControlReplyCallback = {
@@ -1070,7 +1113,7 @@ function sendBluetooth() {
 
 function sendMessage() {
 	var message = "This is the position I want to show you from Mapo:"
-			+ "\nLatitute=" + $("#lat").val() + "\nLongitude = "
+			+ "\nLatitude=" + $("#lat").val() + "\nLongitude = "
 			+ $("#lon").val() + "\nIf you prefer in DMS, here it is: "
 			+ $('#dms').val()
 			+ "\nYou can see this position on OpenStreetMap: " + getLink('OSM')
@@ -1088,7 +1131,7 @@ function sendMessage() {
 			function() {
 				log("launch service succeeded");
 			}, function(e) {
-				log("launch service failed. Reason: " + e);
+				handleError("launch service failed. Reason: " + e);
 			});
 }
 
@@ -1096,15 +1139,14 @@ function sendMessage() {
  * Settings Manager
  */
 function settings() {
-        var url="http://tizen.org/appcontrol/operation/configure/location";
-	var appControl = new tizen.ApplicationControl(
-			url, null,
-			null);
+	var url="http://tizen.org/appcontrol/operation/configure/location";
+	var appControl = new tizen.ApplicationControl(url, null, null);
 	tizen.application.launchAppControl(appControl, "tizen.settings",
 			function() {
 				log("launch appControl succeeded");
 			}, function(e) {
-				log("error: launch appControl failed. Reason: " + e.name);
+				handleError("launch appControl failed. Reason: "
+						+ e.name);
 			}, null);
 }
 
@@ -1149,7 +1191,7 @@ function call() {
  * position
  */
 function createContact() {
-        log("{ createContact");
+	log("#{ createContact");
 	var addressbook = tizen.contact.getDefaultAddressBook();
 
 	var groups = addressbook.getGroups();
@@ -1170,7 +1212,7 @@ function createContact() {
 		addressbook.addGroup(group);
 		log('Group added with id ' + group.id);
 	}
-    //TODO: edit contact is present
+	//TODO: edit contact is present
 
 	var contact = new tizen.Contact({
 		emails : [ new tizen.ContactEmailAddress("mapo.tizen@gmail.com") ],
@@ -1199,9 +1241,9 @@ function createContact() {
 	tizen.application.launchAppControl(appControl, null, function() {
 		log("contact: launch service succeeded");
 	}, function(e) {
-		log("error: contact: launch service failed. Reason: " + e);
+		handleError("contact: launch service failed. Reason: " + e);
 	});
-    log("} createContact");
+	log("#} createContact");
 }
 
 /*
@@ -1227,24 +1269,19 @@ function createCalendarEvent() {
 				+ $("#lon").val()
 	});
 	calendar.add(event);
-    var url = "http://tizen.org/appcontrol/operation/social/edit";
-	var appControl = new tizen.ApplicationControl(
-	    url,
-			null,
-			null,
-			null,
-			[
-					new tizen.ApplicationControlData(
-							"http://tizen.org/appcontrol/data/social/item_type",
-							[ "event" ]),
-					new tizen.ApplicationControlData(
-							"http://tizen.org/appcontrol/data/social/item_id",
-							[ event.id.uid ]) ]);
+	var url = "http://tizen.org/appcontrol/operation/social/edit";
+	var appControl = new tizen.ApplicationControl(url, null, null, null, [
+			new tizen.ApplicationControlData(
+					"http://tizen.org/appcontrol/data/social/item_type",
+					[ "event" ]),
+			new tizen.ApplicationControlData(
+					"http://tizen.org/appcontrol/data/social/item_id",
+					[ event.id.uid ]) ]);
 	tizen.application.launchAppControl(appControl, "tizen.calendar",
 			function() {
-				log("success: " + url );
+				log("success: " + url);
 			}, function(e) {
-				log("error: launch service failed. Reason: " + e);
+				handleError("launch service failed. Reason: " + e);
 			});
 }
 
@@ -1277,7 +1314,7 @@ function switchOnline() {
 
 /**
  * Use the tactil swipe to change between every pages
-* TODO : blink ?
+ * TODO : blink ?
  */
 function swipePage() {
 	$('div.ui-page').live("swipeleft", function() {
@@ -1300,4 +1337,95 @@ function swipePage() {
 			});
 		}
 	});
+}
+
+
+function displayMap()
+{
+	if ( false ) 
+	$.mobile.changePage("#map");
+	setMapSize();
+	loadMap();
+	//refresh();
+}
+
+function handleLoadedGmaps() {
+	log("#{ handleLoadedGmaps: + " + google );
+	// gmaps = google;
+	isDownloaded = true;
+	// displayMap();
+}
+
+function handleLoaded() {
+	log("#{ handleLoaded: openlayers=" + OpenLayers);
+
+//	$.mobile.changePage("#map");
+//	displayMap();
+
+	$.getScript(url_gmaps, function() {
+		handleLoadedGmaps();
+	});
+	log("#} handleLoaded: google=" + google);
+}
+
+function downloadScripts() {
+	log("#{ download: " + OpenLayers);
+	$.getScript(url_openlayers, function() {
+		if ( false ) $.getScript(url_gmaps, function() {
+			handleLoadedGmaps();
+		});
+	});
+	isLoaded = true;
+	log("#} download: " + google);	
+}
+
+
+function download() {
+	log("#{ download: " + OpenLayers);
+	$.getScript(url_openlayers, function() {
+		if ( false ) $.getScript(url_gmaps, function() {
+			handleLoadedGmaps();
+		});
+	});
+	isLoaded = true;
+	log("#} download: " + google);	
+}
+
+
+function initScripts()
+{
+	log("#{ initScripts: " + OpenLayers );
+	log("# isDownloaded="+ isDownloaded);
+	isDownloaded = true ;
+	if (isDownloaded === true) {
+		var element = document.createElement("script");
+		element.type = 'text/javascript';
+		element.src = url_gmaps;
+		document.body.appendChild(element);
+		
+		log("# isDownloaded: true "+ isDownloaded);
+		var element = document.createElement("script");
+		element.type = 'text/javascript';
+		element.src = url_openlayers;
+		document.body.appendChild(element);
+	} else {
+		if ( false ) download();
+	}
+	log("#} initScripts: " + OpenLayers );
+}
+
+/**
+ * Initialize the data from the preceding use
+ */
+function start() {
+	log("#{ start: " + OpenLayers );
+	initData();
+	initSettings();
+	// initScripts();
+
+	if (false) { // TODO: buggy flash screen
+		swipePage();
+	}
+	// refresh();
+	log("#} start: " + OpenLayers);
 }

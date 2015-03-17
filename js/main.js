@@ -22,6 +22,7 @@ var init = function () {
         if ( e.keyName == "back" ) {
             try {
                 if ( $.mobile.urlHistory.activeIndex <= 0 ) {
+                	quit();
                     // if first page, terminate app
                     unregister();
                 } else {
@@ -33,12 +34,16 @@ var init = function () {
             } catch( ex ) {
                 unregister();
             }
+        } else if ( e.keyName == "menu") {
+        	$.mobile.changePage("#settings");
         }
     }
     
     // add eventListener for tizenhwkey (Back Button)
     document.addEventListener( 'tizenhwkey', backEvent );
     backEventListener = backEvent;
+    
+  start();
 };
 
 $(document).bind( 'pageinit', init );

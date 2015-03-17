@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // The map of the application
 var map = null;
 // The boolean which provide the connection state of the application
-var isOnline = ! navigator.onLine; // see initSettings
+var isReady = true;
+
+var isOnline = navigator.onLine;
 
 var isLoaded = false;
 
@@ -253,8 +255,6 @@ function goToURL(provider) {
 // function updateLinks() {
 // $('#OSMLink').attr('href', getOSMLink());
 // }
-
-
 /*
  * Map Manager
  */
@@ -328,38 +328,39 @@ function loadTrace(data) {
  */
 function loadMap() {
 	log("#{ loadMap: " + OpenLayers);
-	if (OpenLayers === null ) {
-		log("error: OpenLayers");
+
+	if (OpenLayers === null) {
+		log("error: OpenLayers " + isDownloaded);
 		return;
 	}
+
 	var latCenter = $("#lat").val();
 	var lonCenter = $("#lon").val();
-        var zoom = $("#zoom").val();
-        var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
+	var zoom = $("#zoom").val();
+	var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
 
-	log("# is gmaps available ?" + gmaps + "/" + google);
-	if (gmaps !== null ) {
+	log("# is gmaps available ?" + gmaps + "/" + gmaps);
+	if (gmaps !== null) {
 		var array = [ new OpenLayers.Layer.Google("Google Satellite", {
 			type : google.maps.MapTypeId.SATELLITE,
-			numZoomLevels :22,
-		}) 
+			numZoomLevels : 22,
+		})
 
-, new OpenLayers.Layer.Google("Google Physical", {
+		, new OpenLayers.Layer.Google("Google Physical", {
 			type : google.maps.MapTypeId.TERRAIN
 		}), new OpenLayers.Layer.Google("Google Hybrid", {
 			type : google.maps.MapTypeId.HYBRID,
 			numZoomLevels : 20
 		}),
 
-new OpenLayers.Layer.Google("Google Streets", {
+		new OpenLayers.Layer.Google("Google Streets", {
 			numZoomLevels : 20
-		})
-];
-//	    layers = array.concat(layers);
-	    layers = layers.concat(array);
+		}) ];
+		//	    layers = array.concat(layers);
+		layers = layers.concat(array);
 
 	}
-	log("# add ui " + layers );
+	log("# add ui " + layers);
 	map = new OpenLayers.Map('myMap', {
 		projection : 'EPSG:3857',
 		layers : layers,
@@ -403,28 +404,29 @@ new OpenLayers.Layer.Google("Google Streets", {
  * Refresh all the application according to the coordinates and the settings
  */
 function refresh() {
-	log("{refresh");
-	if (isOnline && !navigator.onLine) {
-		$('#switchOnline').val('offline').slider('refresh');
-		isOnline = false;
-		alert("Connection lost");
-	}
-	// setDMS();
-	$('#myMap').empty();
-	log("isOnline=" + isOnline);
+	log("#{ refresh: " + OpenLayers);
 	if (isOnline) {
+		isReady = (OpenLayers !== null);
+	} else {
+		isReady = false;
+	}
+	log("isReady=" + isReady);
+	if (isReady) {
+		$('#myMap').empty();
 		setMapSize();
 		loadMap();
-
 	} else {
+		// isOnline = navigator.onLine;
+		// $('#switchOnline').val(isOnline ? 'online' : 'offline');
+		$('#myMap').empty();
 		$('#myMap')
 				.html(
 						"<p align='center'>"
 								+ "Please connect your application online in the settings"
 								+ " if you want to load the map</p>");
 	}
-		// isOffline $('#switchOffline').val() // TODO
-	log("#} refresh: " + isOnline);
+	// isOffline $('#switchOffline').val() // TODO
+	log("#} refresh: " + isReady);
 }
 
 /*
@@ -454,13 +456,12 @@ function initData() {
  */
 function initSettings() {
 	log("#{ initSettings: " + isOnline);
-	if (localStorage.getItem('connection') == 'online') {
-		$('#switchOnline').val("online");
-		isOnline = true;
-	} else {
-		$('#switchOnline').val("offline");
-		isOnline = false;
+
+	if (null !== localStorage.getItem('connection')) {
+		isOnline = (localStorage.getItem('connection') == 'online');
 	}
+	$('#switchOnline').val(isOnline ? 'online' : 'offline');
+
 	if (localStorage.getItem('energySaving') !== null) {
 		$('#switchEnergy').val(localStorage.getItem('energySaving'));
 	}
@@ -471,19 +472,7 @@ function initSettings() {
 		isDownloaded = localStorage.getItem('downloaded');
 	}
 	storeSettings();
-	log("#} initSettings: " + isOnline);
-}
-
-/**
- * Initialize the data from the preceding use
- */
-function init() {
-	initData();
-	initSettings();
-	refresh();
-	if (false) {
-		swipePage();
-	} // TODO: buggy flash screen
+	log("#} initSettings: " + isReady);
 }
 
 /*
@@ -1003,7 +992,6 @@ function readFile() {
  * Social Manager
  */
 
-
 /**
  * Use the Email Application Control to share a position by Email
  */
@@ -1139,14 +1127,13 @@ function sendMessage() {
  * Settings Manager
  */
 function settings() {
-	var url="http://tizen.org/appcontrol/operation/configure/location";
+	var url = "http://tizen.org/appcontrol/operation/configure/location";
 	var appControl = new tizen.ApplicationControl(url, null, null);
 	tizen.application.launchAppControl(appControl, "tizen.settings",
 			function() {
 				log("launch appControl succeeded");
 			}, function(e) {
-				handleError("launch appControl failed. Reason: "
-						+ e.name);
+				handleError("launch appControl failed. Reason: " + e.name);
 			}, null);
 }
 
@@ -1294,22 +1281,22 @@ function createCalendarEvent() {
  * the the device has a connection before connecting the application
  */
 function switchOnline() {
-	log("#{ switchOnline");
-	log("status=" + $('#switchOnline').slider("option", "online"));
-	isOnline = (!isOnline && navigator.onLine);
-	$('#switchOnline').val(isOnline ? 'online' : 'offline');
-	$('#switchOnline').slider('refresh');
+	log("#{ switchOnline: " + isOnline);
+	log($('#switchOnline').val());
+	isOnline = ("online" === $('#switchOnline').val());
+	if (isOnline && !navigator.onLine)
+		log("connect system's wifi before");
 
-	if (isOnline && OpenLayers == null) {
-
-		$.getScript(url_openlayers, function() {
-			refresh();
-		});
-
+	if (isOnline) {
+		isReady = (null === OpenLayers);
+		if (!isReady || (null === gmaps)) {
+			download();
+		}
 	} else {
-		refresh();
+		isReady = false;
 	}
-	log("#} switchOnline");
+	refresh();
+	log("#} switchOnline: " + isOnline);
 }
 
 /**
@@ -1339,90 +1326,75 @@ function swipePage() {
 	});
 }
 
-
-function displayMap()
-{
-	if ( false ) 
-	$.mobile.changePage("#map");
-	setMapSize();
-	loadMap();
-	//refresh();
-}
-
 function handleLoadedGmaps() {
-	log("#{ handleLoadedGmaps: + " + google );
-	// gmaps = google;
+	log("#{ handleLoadedGmaps: + " + google);
+	gmaps = google;
 	isDownloaded = true;
-	// displayMap();
+	refresh();
+	log("#} handleLoadedGmaps: + " + isDownloaded);
 }
 
-function handleLoaded() {
-	log("#{ handleLoaded: openlayers=" + OpenLayers);
-
-//	$.mobile.changePage("#map");
-//	displayMap();
-
-	$.getScript(url_gmaps, function() {
-		handleLoadedGmaps();
-	});
-	log("#} handleLoaded: google=" + google);
-}
-
-function downloadScripts() {
-	log("#{ download: " + OpenLayers);
-	$.getScript(url_openlayers, function() {
-		if ( false ) $.getScript(url_gmaps, function() {
-			handleLoadedGmaps();
-		});
-	});
-	isLoaded = true;
-	log("#} download: " + google);	
-}
-
-
-function download() {
-	log("#{ download: " + OpenLayers);
-	$.getScript(url_openlayers, function() {
-		if ( false ) $.getScript(url_gmaps, function() {
-			handleLoadedGmaps();
-		});
-	});
-	isLoaded = true;
-	log("#} download: " + google);	
-}
-
-
-function initScripts()
-{
-	log("#{ initScripts: " + OpenLayers );
-	log("# isDownloaded="+ isDownloaded);
-	isDownloaded = true ;
-	if (isDownloaded === true) {
-		var element = document.createElement("script");
-		element.type = 'text/javascript';
-		element.src = url_gmaps;
-		document.body.appendChild(element);
-		
-		log("# isDownloaded: true "+ isDownloaded);
+function downloadScriptsBody() {
+	log("#{ downloadScriptsBody: " + OpenLayers);
+	{
 		var element = document.createElement("script");
 		element.type = 'text/javascript';
 		element.src = url_openlayers;
 		document.body.appendChild(element);
-	} else {
-		if ( false ) download();
 	}
-	log("#} initScripts: " + OpenLayers );
+
+	{
+		var element = document.createElement("script");
+		element.type = 'text/javascript';
+		element.src = url_gmaps;
+		document.body.appendChild(element);
+	}
+
+	log("#} downloadScriptsBody: " + OpenLayers);
+}
+
+function download() {
+	log("#{ download: " + OpenLayers);
+	if (null == OpenLayers) {
+		$.getScript(url_openlayers, function() {
+			log("download:" + OpenLayers);
+			refresh();
+			$.getScript(url_gmaps, function() {
+				handleLoadedGmaps();
+			});
+		});
+	} else if (null == google) {
+		$.getScript(url_gmaps, function() {
+			handleLoadedGmaps();
+		});
+	} else {
+		handleLoadedGmaps();
+	}
+	// isLoaded = true; // TODO?
+	log("#} download: " + OpenLayers);
+}
+
+function initScripts() {
+	log("#{ initScripts: " + OpenLayers);
+	log("# isDownloaded=" + isDownloaded);
+	if (false === isDownloaded) {
+		download();
+	} else {
+		download();
+		refresh();
+	}
+	log("#} initScripts: " + OpenLayers);
 }
 
 /**
  * Initialize the data from the preceding use
  */
 function start() {
-	log("#{ start: " + OpenLayers );
+	log("#{ start: " + OpenLayers);
 	initData();
 	initSettings();
-	// initScripts();
-
+	initScripts();
+	// 	refresh();
 	if (false) { // TODO: buggy flash screen
 		swipePage();
 	}

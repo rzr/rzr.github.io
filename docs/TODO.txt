@@ -4,10 +4,10 @@
 
 ## WORK IN PROGRESS ##
 
-Validation: failed:  Attached file: 000000060067_635609449956507444.zip(4.893 MB)
 
 ### TODO ###
 
+* TODO [#A] : upgrade to tizen-2.3 and publish in store
 * TODO [#A] : Use JQuery with OpenLayers on the map
 * TODO [#A] : Offline map
 * TODO [#A] : Combine web API with ApplicationControl (contact, calendar...)
@@ -37,7 +37,40 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 * BUG [#A] : Strange behavior after the first course record, 2 or 3 record in the same time 
 * BUG [#B] : No record during standby
 
+
 ## DONE ##
 
-* DONE [#A] : publish on tizen store
+* DONE [#A] : published on tizen store as 1.2.1
+  Validation: failed:  Attached file: 000000060067_635609449956507444.zip(4.893 MB)
 
+## TEST ##
+
+* remove app
+* system : set offline
+* start app
+* observe : no map / offline
+* exit
+* restart 
+* observe : same
+* exit
+* system : set online
+* start app
+* observe : delay to load app (in seconds?)
+* settings : set online
+* observe : map
+* exit
+* restart app
+* observe : delay to load
+* exit
+* system set offline
+* observe : map and online
+* set offline 
+* observe : mo map and offline
+* exit
+* start
+* set online
+* observe : map is online
+* uninstall
+* set online
+* start
+* observe map and online

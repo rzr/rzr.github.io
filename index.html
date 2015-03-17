@@ -146,8 +146,10 @@ var gmaps = null;
 		<!-- /header -->
 
 		<div data-role="content">
-			<div id="myMap">Wont work if not online, please connect to
-				internet and restart application</div>
+			<div id="myMap">
+				<a data-icon="delete" onclick="quit()"> Wont work if not online,
+					please connect to internet before restarting application Exit</a>
+			</div>
 		</div>
 		<!-- /content -->
 
@@ -265,13 +267,14 @@ var gmaps = null;
 
 		<div>
 			Mapo is geolocation application, licenced under GPL-3.0+
-			<h3>CREDITS</h3>
+			<h3>CREDITS / THANKS</h3>
 			<ul>
 				<li>Philippe Coval
 				<li>Theo Gerin
 				<li>Sebastien Bocahu
 				<li>Eurogiciel Opensource Dept
 				<li>OpenLayers.org
+				<li>maps.google.com
 			</ul>
 		</div>
 
@@ -280,8 +283,6 @@ var gmaps = null;
 			<div data-role="controlgroup">
 
 				<div id="console"></div>
-
-
 			</div>
 			<!-- /content -->
 
@@ -292,45 +293,9 @@ var gmaps = null;
 	</div>
 	<!-- /page #options-->
 
-
-	<script type="text/javascript"><!--
-
-function handleGmaps() {
-   console.log("log: handleGmaps: " + google );
-   isOnline = false;
-   switchOnline();
-   refresh();
-  
-}
-
-	var url_gmaps = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
-
-	var url_openlayers = "http://openlayers.org/api/OpenLayers.js";
-
- url_gmaps = 'http://maps.googleapis.com/maps/api/js?v=3.2' +
-      '&signed_in=true&callback=handleGmaps';
-	
-		function downloadJSAtOnload() {
-			var element = document.createElement("script");
-			element.type = 'text/javascript';
-			element.src = url_openlayers;
-			document.body.appendChild(element);
-			if ( !false ) {
-			var element = document.createElement("script");
-			element.type = 'text/javascript';
-			element.src = url_gmaps;
-			document.body.appendChild(element);
-			}
-		}
-		if (window.addEventListener)
-			window.addEventListener("load", downloadJSAtOnload, false);
-		else if (window.attachEvent)
-			window.attachEvent("onload", downloadJSAtOnload);
-		else
-			window.onload = downloadJSAtOnload;
-		
-	//-->
-	</script>
+	<!-- cache version -->
+	<script src="http://openlayers.org/api/OpenLayers.js"></script>
+	<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
 
 </body>
 </html>

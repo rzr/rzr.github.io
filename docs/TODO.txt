@@ -47,6 +47,7 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 
 * remove app
 * system : set offline
+* install app
 * start app
 * observe : no map / offline
 * exit
@@ -63,7 +64,8 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 * observe : delay to load
 * exit
 * system set offline
-* observe : map and online
+* start app
+* TODO: observe : map and online 
 * set offline 
 * observe : mo map and offline
 * exit
@@ -72,5 +74,6 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 * observe : map is online
 * uninstall
 * set online
-* start
+* install app
+* start app
 * observe map and online

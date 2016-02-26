@@ -1,16 +1,14 @@
 Subject: mapo
-Description: Basic HTML5 application that uses Tizen GPS API
+Description: map viewer and GPS recorder
 URL: http://notabug.org/tizen/mapo
 License: GPL-3.0-plus
 License-URL: https://spdx.org/licenses/GPL-3.0-plus
 Contact: mapo.tizen@gmail.com
 Keywords: geoloc, localisation, map, lattitude, longitude, openstreetmap, googlemaps, nokiamaps, heremaps
 
-mapo : gps recorder and map viewer
-
 Mapo is a geolocation application for the Tizen OS, developed with HTML5/CSS3 an jQuery.
 
-http://gitorious.org/mapo
+http://notabug.org/tizen/mapo
 
 This application is under GPL-3.0p license.
 

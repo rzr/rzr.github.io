@@ -1,6 +1,6 @@
 Subject: mapo
 Description: Basic HTML5 application that uses Tizen GPS API
-URL: https://gitorious.org/mapo/mapo
+URL: http://notabug.org/tizen/mapo
 License: GPL-3.0-plus
 License-URL: https://spdx.org/licenses/GPL-3.0-plus
 Contact: mapo.tizen@gmail.com
@@ -29,12 +29,12 @@ which seems to be supported in France.
 So it was uploaded again to Tizen store.
 
 
-
 ::: MISC :::
 
-Video: https://www.youtube.com/watch?v=pBCJRZAIgag
+Video: https://youtu.be/pBCJRZAIgag#mapo-tizen-z1-20150205rzr.mp4.mkv
 
 More: https://dockr.eurogiciel.fr/blogs/embedded/samsung-tizen-z1/
+
 
 ::: CREDITS :::
 
@@ -42,4 +42,3 @@ Philippe Coval : https://gitorious.org/ rzr
 Theo Gerin : https://gitorious.org/ theog
 Sebastien Bocahu : https://gitorious.org/ zecrazytux
 Eurogiciel Opensource Dept : https://dockr.eurogiciel.fr/blogs/embedded
-

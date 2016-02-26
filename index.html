@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="A geolocation application" />
@@ -36,9 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript" src="./js/jquery.mobile-1.3.2.js"></script>
 <script type="text/javascript">
 <!--
-var OpenLayers = null;
-var google = null;
-var gmaps = null;
+	var OpenLayers = null;
+	var google = null;
+	var gmaps = null;
 //-->
 </script>
 
@@ -110,15 +110,17 @@ var gmaps = null;
 				<h3>Web:</h3>
 				<div data-role="controlgroup">
 					<button onclick="goToURL('OSM')">OpenStreetMap</button>
-					<button onclick="goToURL('HERE')">Here (Nokia)</button>
+					<button onclick="goToURL('HERE')">Here Maps</button>
 					<button onclick="goToURL('GM')">Google Maps</button>
+					<button onclick="goToURL('wigle')">Wigle (WiFi)</button>
+
 				</div>
 			</div>
 		</div>
 		<!-- /content -->
 
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
+			Copyleft: GPL-3.0+ : http://notabug.org/tizen/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #position-->
@@ -154,7 +156,7 @@ var gmaps = null;
 		<!-- /content -->
 
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
+			Copyleft: GPL-3.0+ : http://notabug.org/tizen/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #place-->
@@ -184,7 +186,6 @@ var gmaps = null;
 		<div data-role="content">
 			<table width="100%">
 				<tr>
-
 					<td><label for="switchOnline">Connection:</label></td>
 					<td><select name="switchOnline" id="switchOnline"
 						data-role="slider" onchange="switchOnline()">
@@ -201,47 +202,40 @@ var gmaps = null;
 					</select></td>
 				</tr>
 				<tr>
+					<td><label for="switchDeveloper">Developer mode:</label></td>
+					<td><select name="switchDeveloper" id="switchDeveloper"
+						data-role="slider" onchange="switchDeveloper()">
+							<option value="off" selected>Off</option>
+							<option value="on">On</option>
+					</select></td>
+				</tr>
+
+				<tr>
 
 					<td colspan="2"><label for="zoom">Zoom:</label> <input
 						type="range" name="zoom" id="zoom" value="18" min="1" max="20"
 						onchange="refresh()" /></td>
+				</tr>
+
 			</table>
 
 
 			<div data-role="controlgroup">
-				<button onclick="settings()">Settings</button>
+				<button onclick="settingsLocation()">Location</button>
 			</div>
 
-			<div data-role="collapsible" data-collapsed="true">
-				<h3>Record:</h3>
-				<div data-role="controlgroup">
-					<table width="100%">
-						<tr>
-							<td><label for="switchRecord">Record:</label></td>
-							<td><select name="switchRecord" id="switchRecord"
-								data-role="slider" onchange="record()">
-									<option value="stop">Stop</option>
-									<option value="start">Start</option>
-							</select></td>
-						</tr>
-					</table>
-					<label for="selectorTimeout">Sampling rate (seconds):</label> <input
-						type="range" name="selectorTimeout" id="selectorTimeout"
-						value="10" min="1" max="100" />
-
-					<p id="locationInfo"></p>
-				</div>
+			<div data-role="controlgroup">
+				<button onclick="settings()">System</button>
 			</div>
 
 		</div>
 		<!-- /content -->
 
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
-			Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
+			Copyleft: GPL-3.0+ : http://notabug.org/tizen/mapo</div>
 		<!-- /footer -->
 	</div>
 	<!-- /page #options-->
-
 
 
 	<!-- Page 3 : about -->
@@ -264,33 +258,67 @@ var gmaps = null;
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
+		<div>
+		<h3>Mapo geoloc</h3>
+		This application is FLOSS and licenced under GPL-3.0+</div>
+
+		<div data-role="collapsible" data-collapsed="true" id="logView"
+			style="visibility: hidden;">
+			<h3>Developer Log:</h3>
+			<div data-role="controlgroup">
+				<div id="console"></div>
+			</div>
+		</div>
+
+		<div data-role="collapsible" data-collapsed="true" id="recordView"
+			style="visibility: hidden;">
+			<h3>Record:</h3>
+			<div data-role="controlgroup">
+				<table width="100%">
+					<tr>
+						<td><label for="switchRecord">Record:</label></td>
+						<td><select name="switchRecord" id="switchRecord"
+							data-role="slider" onchange="record()">
+								<option value="stop">Stop</option>
+								<option value="start">Start</option>
+						</select></td>
+					</tr>
+				</table>
+				<label for="selectorTimeout">Sampling rate (seconds):</label> <input
+					type="range" name="selectorTimeout" id="selectorTimeout" value="10"
+					min="1" max="100" />
+
+				<p id="locationInfo"></p>
+			</div>
+		</div>
+
 
 		<div>
-			Mapo is geolocation application, licenced under GPL-3.0+
 			<h3>CREDITS / THANKS</h3>
 			<ul>
 				<li>Philippe Coval
 				<li>Theo Gerin
 				<li>Sebastien Bocahu
-				<li>Eurogiciel Opensource Dept
 				<li>OpenLayers.org
 				<li>maps.google.com
+				<li>Tizen project
+				<li>TizenExperts
+				<li>BeMyApp
+				<li>LinuxFoundation
+				<li>Samsung OSG
+				<li>Intel OTC
+				<li>Eurogiciel Opensource Dept
 			</ul>
 		</div>
 
-		<div data-role="collapsible" data-collapsed="true">
-			<h3>Log:</h3>
-			<div data-role="controlgroup">
+		<!-- /content -->
 
-				<div id="console"></div>
-			</div>
-			<!-- /content -->
-
-			<div data-role="footer" data-id="myFooter" data-position="fixed">
-				Copyleft: GPL-3.0+ : http://opensource.eurogiciel.fr</div>
-			<!-- /footer -->
-		</div>
+		<div data-role="footer" data-id="myFooter" data-position="fixed">
+			Copyleft: GPL-3.0+ : http://notabug.org/tizen/mapo</div>
+		<!-- /footer -->
 	</div>
+
+
 	<!-- /page #options-->
 
 	<!-- cache version -->

@@ -22,10 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * Application Global variables
  */
+
+var web = "http://notabug.org/tizen/mapo";
+
 // The map of the application
 var map = null;
 // The boolean which provide the connection state of the application
 var isReady = true;
+
+var isLog = false;
 
 var isOnline = navigator.onLine;
 
@@ -66,10 +71,10 @@ function exit() {
  * @param message
  */
 function log(message) {
-	if (!false) {
+	if (isLog) {
 		console.log("# " + message);
-		var log = document.getElementById("console");
-		log.innerHTML += "<pre>" + message + "</pre>";
+		var element = document.getElementById("console");
+		element.innerHTML += "<pre>" + message + "</pre>";
 	}
 }
 
@@ -101,10 +106,20 @@ function toast(message) {
 }
 
 function handleError(message) {
+	message = "error: " + message;
 	log(message);
 	toast(message);
+	return message;
+
 }
 
+function handleException(e) {
+	return handleError(e.name);
+}
+
+function handleSuccess() {
+	return log("success: ");
+}
 /*
  * Storage Manager
  */
@@ -204,6 +219,12 @@ function getLink(provider) {
 	case 'HERE':
 		url = "http://maps.nokia.com/${lat},${lon},16,0,0,normal.day";
 		break;
+	case 'bing':
+		url = "http://www.bing.com/maps/?v=2&style=r&lvl=13&cp=48.11~${lat}~${lon}&style=r&lvl=4";
+		break;
+	case 'wigle':
+		url = "https://wigle.net/map?maplat=${lat}&maplon=${lon}&mapzoom=12&startTransID=20010000-00000&endTransID=20170000-00000";
+		break;
 	default:
 		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
 		break;
@@ -249,8 +270,7 @@ function goToURL(provider) {
 }
 
 /**
- * update links
- * TODO: check if needed ?
+ * update links TODO: check if needed ?
  */
 // function updateLinks() {
 // $('#OSMLink').attr('href', getOSMLink());
@@ -322,8 +342,7 @@ function loadTrace(data) {
 }
 
 /**
- * Load the OpenLayers map with different OpenStreetMap and Google maps'
- * layers
+ * Load the OpenLayers map with different OpenStreetMap and Google maps' layers
  * TODO: check if needed ?
  */
 function loadMap() {
@@ -339,7 +358,7 @@ function loadMap() {
 	var zoom = $("#zoom").val();
 	var layers = [ new OpenLayers.Layer.OSM("OpenStreetMap") ];
 
-	log("# is gmaps available ?" + gmaps + "/" + gmaps);
+	log("# is gmaps available ? " + gmaps + "/" + gmaps);
 	if (gmaps !== null) {
 		var array = [ new OpenLayers.Layer.Google("Google Satellite", {
 			type : google.maps.MapTypeId.SATELLITE,
@@ -356,7 +375,7 @@ function loadMap() {
 		new OpenLayers.Layer.Google("Google Streets", {
 			numZoomLevels : 20
 		}) ];
-		//	    layers = array.concat(layers);
+		// layers = array.concat(layers);
 		layers = layers.concat(array);
 
 	}
@@ -922,8 +941,8 @@ function record() {
 
 /**
  * Extract from a file composed by the last recorded trace all the dates,
- * latitudes and lontitudes and place its in data
- * TODO: test if parse CSV as "date,la,lo\n"
+ * latitudes and lontitudes and place its in data TODO: test if parse CSV as
+ * "date,la,lo\n"
  */
 function readFile() {
 	// var deferred = $.Deferred();
@@ -1105,7 +1124,7 @@ function sendMessage() {
 			+ $("#lon").val() + "\nIf you prefer in DMS, here it is: "
 			+ $('#dms').val()
 			+ "\nYou can see this position on OpenStreetMap: " + getLink('OSM')
-			+ "\nConnect you on Mapo for more details!";
+			+ "\n" + "\n\nURL: " + web;
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/compose", null, null, null,
 			[
@@ -1127,14 +1146,19 @@ function sendMessage() {
  * Settings Manager
  */
 function settings() {
-	var url = "http://tizen.org/appcontrol/operation/configure/location";
-	var appControl = new tizen.ApplicationControl(url, null, null);
-	tizen.application.launchAppControl(appControl, "tizen.settings",
-			function() {
-				log("launch appControl succeeded");
-			}, function(e) {
-				handleError("launch appControl failed. Reason: " + e.name);
-			}, null);
+	var url = "http://tizen.org/appcontrol/operation/setting";
+	var id = "com.samsung.setting";
+	var appControl = new tizen.ApplicationControl(url);
+	tizen.application.launchAppControl(appControl, id, handleSuccess,
+			handleException);
+}
+
+function settingsLocation() {
+	var url = "http://tizen.org/appcontrol/operation/setting/location";
+	var id = "org.tizen.setting-location";
+	var appControl = new tizen.ApplicationControl(url);
+	tizen.application.launchAppControl(appControl, id, handleSuccess,
+			handleException);
 }
 
 /*
@@ -1199,7 +1223,7 @@ function createContact() {
 		addressbook.addGroup(group);
 		log('Group added with id ' + group.id);
 	}
-	//TODO: edit contact is present
+	// TODO: edit contact is present
 
 	var contact = new tizen.Contact({
 		emails : [ new tizen.ContactEmailAddress("mapo.tizen@gmail.com") ],
@@ -1299,9 +1323,16 @@ function switchOnline() {
 	log("#} switchOnline: " + isOnline);
 }
 
+function switchDeveloper() {
+	isLog = ("on" === $('#switchDeveloper').val());
+	var attribute = (isLog) ? "visible" : "hidden";
+	$("#logView").css("visibility", attribute);
+	$("#recordView").css("visibility", attribute);
+
+}
+
 /**
- * Use the tactil swipe to change between every pages
- * TODO : blink ?
+ * Use the tactil swipe to change between every pages TODO : blink ?
  */
 function swipePage() {
 	$('div.ui-page').live("swipeleft", function() {
@@ -1394,7 +1425,7 @@ function start() {
 	initData();
 	initSettings();
 	initScripts();
-	// 	refresh();
+	// refresh();
 	if (false) { // TODO: buggy flash screen
 		swipePage();
 	}

@@ -8,6 +8,10 @@
     <package>
         <blacklist>
             <path value=".gitignore" type="file"/>
+            <path value=".gitignore.orig" type="file"/>
+            <path value=".gitignore~" type="file"/>
+            <path value=".project.orig" type="file"/>
+            <path value=".tproject.orig" type="file"/>
             <path value="Makefile" type="file"/>
             <path value="docs" type="dir"/>
             <path value="docs/TODO.txt" type="file"/>
@@ -17,6 +21,54 @@
             <path value="docs/openlayers-gmaps.png" type="file"/>
             <path value="docs/openlayers.png" type="file"/>
             <path value="docs/screenshot.png" type="file"/>
+            <path value="tmp" type="dir"/>
+            <path value="tmp/.gitignore.orig" type="file"/>
+            <path value="tmp/.gitignore~" type="file"/>
+            <path value="tmp/.project.orig" type="file"/>
+            <path value="tmp/.tproject.orig" type="file"/>
+            <path value="tmp/480x854" type="dir"/>
+            <path value="tmp/480x854/gmaps.png" type="file"/>
+            <path value="tmp/480x854/openlayers-gmaps.png" type="file"/>
+            <path value="tmp/512x512.jpg" type="file"/>
+            <path value="tmp/COPYING" type="file"/>
+            <path value="tmp/README.txt" type="file"/>
+            <path value="tmp/author-signature.xml" type="file"/>
+            <path value="tmp/config.xml" type="file"/>
+            <path value="tmp/css" type="dir"/>
+            <path value="tmp/css/Mapo.css" type="file"/>
+            <path value="tmp/css/Mapo.min.css" type="file"/>
+            <path value="tmp/css/images" type="dir"/>
+            <path value="tmp/css/images/ajax-loader.gif" type="file"/>
+            <path value="tmp/css/images/icons-18-black.png" type="file"/>
+            <path value="tmp/css/images/icons-18-white.png" type="file"/>
+            <path value="tmp/css/images/icons-36-black.png" type="file"/>
+            <path value="tmp/css/images/icons-36-white.png" type="file"/>
+            <path value="tmp/css/jqm-docs.css" type="file"/>
+            <path value="tmp/css/jquery.mobile-1.2.0.css" type="file"/>
+            <path value="tmp/css/jquery.mobile-1.3.2.css" type="file"/>
+            <path value="tmp/css/jquery.mobile.structure-1.3.2.css" type="file"/>
+            <path value="tmp/css/jquery.mobile.theme-1.3.2.css" type="file"/>
+            <path value="tmp/css/style.css" type="file"/>
+            <path value="tmp/icon.png" type="file"/>
+            <path value="tmp/index.html" type="file"/>
+            <path value="tmp/js" type="dir"/>
+            <path value="tmp/js/OpenLayers.js" type="file"/>
+            <path value="tmp/js/jqm-docs.js" type="file"/>
+            <path value="tmp/js/jquery-1.8.2.js" type="file"/>
+            <path value="tmp/js/jquery-1.9.1.js" type="file"/>
+            <path value="tmp/js/jquery.mobile-1.2.0.js" type="file"/>
+            <path value="tmp/js/jquery.mobile-1.3.2.js" type="file"/>
+            <path value="tmp/js/main.js" type="file"/>
+            <path value="tmp/js/maps.google.com.js" type="file"/>
+            <path value="tmp/lib.js" type="file"/>
+            <path value="tmp/screenshot.jpg" type="file"/>
+            <path value="tmp/signature1.xml" type="file"/>
+            <path value="tmp/tmp" type="dir"/>
+            <path value="tmp/tmp/480x854" type="dir"/>
+            <path value="tmp/tmp/480x854/gmaps.png" type="file"/>
+            <path value="tmp/tmp/480x854/openlayers-gmaps.png" type="file"/>
+            <path value="tmp/tmp/512x512.jpg" type="file"/>
+            <path value="tmp/tmp/screenshot.jpg" type="file"/>
         </blacklist>
         <resFallback autoGen="true"/>
     </package>

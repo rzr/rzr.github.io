@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://notabug.org/tizen/mapo" version="1.2.4" viewmodes="maximized">
+<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://notabug.org/tizen/mapo" version="1.2.4" viewmodes="maximized">
     <access origin="*" subdomains="true"></access>
     <tizen:application id="mapo000001.mapo" package="mapo000001" required_version="2.4"/>
     <author href="https://notabug.org/tizen/mapo" email="rzr@gna.org">
@@ -18,9 +18,8 @@
     <feature name="http://tizen.org/feature/screen.size.all"/>
     <icon src="icon.png"/>
     <license href="https://spdx.org/licenses/GPL-3.0+">GPL-3.0+</license>
-    <name>mapo</name>
+    <name>Mapo</name>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
-    <tizen:privilege name="http://tizen.org/privilege/bluetooth" />
     <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
     <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
     <tizen:privilege name="http://tizen.org/privilege/location"/>

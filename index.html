@@ -77,18 +77,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<tr>
 						<td><label for=lat>Latitude<br />N+/S-:
 						</label></td>
-						<td><input type="text" id="lat" value="26.357865"
+						<td><input type="text" id="lat" value="52.165"
 							onChange="changeLat(lat.value);" /></td>
 					</tr>
 					<tr>
 						<td><label for=lon>Longitude<br />W+/E-:
 						</label></td>
-						<td><input type="text" id="lon" value="127.783782"
+						<td><input type="text" id="lon" value="-2.21"
 							onChange="changeLon();" /></td>
 					</tr>
 				</table>
 				<label for="dms">DMS (degree, minutes, seconds):</label> <input
-					type="text" id="dms" value="N 26° 21' 28&quot;  E 127° 47' 1&quot;"
+					type="text" id="dms" value=""
 					onChange="changeDMS();" />
 
 			</form>
@@ -101,8 +101,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<button onclick="sendMessage()">Message</button>
 					<button onclick="createCalendarEvent()">Calendar</button>
 					<button onclick="createContact()">Contact</button>
-					<button onclick="call()">Call</button>
-					<!-- <button onclick="sendBluetooth()">Bluetooth</button> -->
+					<button onclick="call()" style="visibility: hidden;">Call</button>
+					<button onclick="sendBluetooth()" style="visibility: hidden;">Bluetooth</button> 
 				</div>
 			</div>
 

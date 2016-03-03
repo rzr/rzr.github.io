@@ -272,9 +272,9 @@ function goToURL(provider) {
 /**
  * update links TODO: check if needed ?
  */
-// function updateLinks() {
-// $('#OSMLink').attr('href', getOSMLink());
-// }
+function updateLinks() {
+	$('#OSMLink').attr('href', getOSMLink());
+}
 /*
  * Map Manager
  */
@@ -386,8 +386,11 @@ function loadMap() {
 		center : new OpenLayers.LonLat(lonCenter, latCenter).transform(
 				'EPSG:4326', 'EPSG:3857'),
 		zoom : zoom,
+		controls : [ new OpenLayers.Control.TouchNavigation(),
+				new OpenLayers.Control.PanZoom(),
+				new OpenLayers.Control.ArgParser() ]
 	});
-	map.addControl(new OpenLayers.Control.LayerSwitcher());
+	//map.addControl(new OpenLayers.Control.LayerSwitcher());
 
 	if (fileRecorded) { // TODO : Data vide : data([0])?.length!=0 or
 		// fileRecorded
@@ -465,7 +468,8 @@ function initData() {
 	}
 	if (localStorage.getItem('dms') !== null) {
 		$('#dms').val(localStorage.getItem('dms'));
-	}
+	} // not needed
+
 	storeData();
 	log("#} initData");
 }
@@ -1071,6 +1075,8 @@ function sendEmail() {
 
 // TODO: check
 function sendBluetooth() {
+	log("TODO");
+	exit();
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/bluetooth/pick", null,
 			"image/jpeg", // "image/jpeg"
@@ -1083,39 +1089,38 @@ function sendBluetooth() {
 				handleError("launch service failed. Reason: " + e.name);
 			});
 
-	// var appControlReplyCallback = {
-	// // callee sent a reply
-	// onsuccess: function(data) {
-	// for (var i = 0; i < data.length; i++) {
-	// if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
-	// log('Selected image is ' + data[i].value[0]);
-	// }
-	// }
-	// },
-	// // callee returned failure
-	// onfailure: function() {
-	// log('The launch application control failed');
-	// }
-	// }
-	//
-	// tizen.application.launchAppControl(
-	// appControl,
-	// null,
-	// function() {log("launch application control succeed"); },
-	// function(e) {log("launch application control failed. reason:
-	// "+e.message); },
-	// appControlReplyCallback );
+	var appControlReplyCallback = {
+		// // callee sent a reply
+		onsuccess : function(data) {
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
+					log('Selected image is ' + data[i].value[0]);
+				}
+			}
+		},
+		// callee returned failure
+		onfailure : function() {
+			log('The launch application control failed');
+		}
+	}
 
-	// tizen.application.launch("tizen.bluetooth",
-	// function(){log("launch service succeeded");},
-	// function(e){log("launch service failed. Reason: " + e.name);});
+	tizen.application.launchAppControl(appControl, null, handleSucess,
+			handleException, appControlReplyCallback);
 
-	// var appControl = new
-	// tizen.ApplicationControl("http://tizen.org/appcontrol/operation/bluetooth/pick",
-	// "Phone/Images/image16.jpg");
-	// tizen.application.launchAppControl(appControl, null,
-	// function(){log("launch service succeeded");},
-	// function(e){log("launch service failed. Reason: " + e.name);});
+	tizen.application.launch("tizen.bluetooth", function() {
+		log("launch service succeeded");
+	}, function(e) {
+		log("launch service failed. Reason: " + e.name);
+	});
+
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/bluetooth/pick",
+			"Phone/Images/image16.jpg");
+	tizen.application.launchAppControl(appControl, null, function() {
+		log("launch service succeeded");
+	}, function(e) {
+		log("launch service failed. Reason: " + e.name);
+	});
 }
 
 function sendMessage() {
@@ -1165,6 +1170,8 @@ function settingsLocation() {
  * Caller Manager : may not be needed
  */
 function call() {
+	log("TODO");
+	exit();
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/dial", null, null);
 	tizen.application.launchAppControl(appControl, "tizen.phone", function() {
@@ -1174,24 +1181,23 @@ function call() {
 	}, null);
 }
 
-// TODO:
-// function caller(){
-// var appControl = new tizen.ApplicationControl(
-// "http://tizen.org/appcontrol/operation/call",
-// null,
-// null,
-// null,
-// [
-// new
-// tizen.ApplicationControlData("http://tizen.org/appcontrol/data/call/type",[
-// "voice" ])
-// ]
-// );
-// tizen.application.launchAppControl(appControl,"tizen.call",
-// function(){log("launch appControl succeeded");},
-// function(e){log("launch appControl failed. Reason: " + e.name);},
-// null);
-// }
+ 
+ function caller() {
+	 log("TODO");
+		exit();
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/call",
+			null,
+			null,
+			null,
+			[ new tizen.ApplicationControlData(
+					"http://tizen.org/appcontrol/data/call/type", [ "voice" ]) ]);
+	tizen.application.launchAppControl(appControl, "tizen.call", function() {
+		log("launch appControl succeeded");
+	}, function(e) {
+		log("launch appControl failed. Reason: " + e.name);
+	}, null);
+}
 
 /*
  * Contact Manager
@@ -1425,6 +1431,8 @@ function start() {
 	initData();
 	initSettings();
 	initScripts();
+	changeLat();
+	changeLon();
 	// refresh();
 	if (false) { // TODO: buggy flash screen
 		swipePage();

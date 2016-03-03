@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://notabug.org/tizen/mapo" version="1.2.4" viewmodes="maximized">
     <access origin="*" subdomains="true"></access>
-    <tizen:application id="mapo000001.mapo" package="mapo000001" required_version="2.4"/>
-    <author href="https://notabug.org/tizen/mapo" email="rzr@gna.org">
-	Philippe Coval
-	</author>
+    <tizen:application id="mapo000001.mapo" package="mapo000001" required_version="2.3"/>
+    <author href="https://notabug.org/tizen/mapo" email="rzr@gna.org">Philippe Coval</author>
     <content src="index.html"/>
-    <description>
-		Mapo is a geolocation application for the Tizen OS,
-		developed with
-		HTML5/CSS3 an jQuery.
+    <description>Mapo is a geolocation application for the Tizen OS, developed with HTML5/CSS3 an jQuery.
 
-		https://notabug.org/tizen/mapo</description>
+http://notabug.org/tizen/mapo
+
+This application is under GPL-3.0p license.</description>
     <feature name="http://tizen.org/api/application.read"/>
     <feature name="http://tizen.org/api/filesystem"/>
     <feature name="http://tizen.org/feature/location.gps"/>
@@ -30,4 +27,5 @@
     <tizen:privilege name="http://tizen.org/privilege/calendar.read"/>
     <tizen:privilege name="http://tizen.org/privilege/calendar.write"/>
     <tizen:profile name="mobile"/>
+    <tizen:setting screen-orientation="portrait" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
 </widget>

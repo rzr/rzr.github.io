@@ -30,7 +30,7 @@ var map = null;
 // The boolean which provide the connection state of the application
 var isReady = true;
 
-var isLog = false;
+var isAdvanced = false;
 
 var isOnline = navigator.onLine;
 
@@ -71,7 +71,7 @@ function exit() {
  * @param message
  */
 function log(message) {
-	if (isLog) {
+	if (isAdvanced) {
 		console.log("# " + message);
 		var element = document.getElementById("console");
 		element.innerHTML += "<pre>" + message + "</pre>";
@@ -390,7 +390,8 @@ function loadMap() {
 				new OpenLayers.Control.PanZoom(),
 				new OpenLayers.Control.ArgParser() ]
 	});
-	//map.addControl(new OpenLayers.Control.LayerSwitcher());
+	if (isAdvanced)
+		p.addControl(new OpenLayers.Control.LayerSwitcher());
 
 	if (fileRecorded) { // TODO : Data vide : data([0])?.length!=0 or
 		// fileRecorded
@@ -1181,10 +1182,9 @@ function call() {
 	}, null);
 }
 
- 
- function caller() {
-	 log("TODO");
-		exit();
+function caller() {
+	log("TODO");
+	exit();
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/call",
 			null,
@@ -1330,8 +1330,8 @@ function switchOnline() {
 }
 
 function switchDeveloper() {
-	isLog = ("on" === $('#switchDeveloper').val());
-	var attribute = (isLog) ? "visible" : "hidden";
+	isAdvanced = ("on" === $('#switchDeveloper').val());
+	var attribute = (isAdvanced) ? "visible" : "hidden";
 	$("#logView").css("visibility", attribute);
 	$("#recordView").css("visibility", attribute);
 

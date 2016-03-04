@@ -1,4 +1,9 @@
-all: tmp/512x512.png tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg
+default:all
+
+package?=mapo
+all?= tmp/512x512.png tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg
+
+all: ${all}
 
 icon.png: docs/logo.png Makefile
 	convert -resize 117x117! $< $@
@@ -30,3 +35,6 @@ distclean: clean
 
 clean:
 	rm -f *~
+
+check: ${package}.wgt
+	unzip -t $<

@@ -149,3 +149,84 @@ $coord = decimalToCoord( $la , $lo );
 					<label for="flasheart">Flashearth</label>
  -->	
 -->
+
+
+Feature send image
+
+// TODO: check
+// var appControl = new tizen.ApplicationControl(
+// "http://tizen.org/appcontrol/operation/send", // compose or send
+// "mailto:", null, null,
+// [
+// new tizen.ApplicationControlData(
+// "http://tizen.org/appcontrol/data/subject", [ "Mapo" ]),
+// new tizen.ApplicationControlData(
+// "http://tizen.org/appcontrol/data/text", [ message ]),
+// new tizen.ApplicationControlData(
+// "http://tizen.org/appcontrol/data/to",
+// [ "mapo.tizen@gmail.com" ])
+// 
+// // TODO tizen.mapo@spamgourmet.com
+// // new tizen.ApplicationControlData(
+// // "http://tizen.org/appcontrol/data/path",
+// // ["images/image1.jpg"])
+// ]);
+// tizen.application.launchAppControl(appControl, null,
+// function() {log("launch service succeeded");},
+// function(e) {
+// log("launch service failed. Reason: " + e.name);});
+
+
+TODO: feature send BT
+
+
+
+// TODO: check
+function sendBluetooth() {
+	log("TODO");
+	exit();
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/bluetooth/pick", null,
+			"image/jpeg", // "image/jpeg"
+			null, []);
+
+	tizen.application.launchAppControl(appControl, "tizen.bluetooth",
+			function() {
+				log("launch service succeeded");
+			}, function(e) {
+				handleError("launch service failed. Reason: " + e.name);
+			});
+
+	var appControlReplyCallback = {
+		// // callee sent a reply
+		onsuccess : function(data) {
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
+					log('Selected image is ' + data[i].value[0]);
+				}
+			}
+		},
+		// callee returned failure
+		onfailure : function() {
+			log('The launch application control failed');
+		}
+	}
+
+	tizen.application.launchAppControl(appControl, null, handleSucess,
+			handleException, appControlReplyCallback);
+
+	tizen.application.launch("tizen.bluetooth", function() {
+		log("launch service succeeded");
+	}, function(e) {
+		log("launch service failed. Reason: " + e.name);
+	});
+
+	var appControl = new tizen.ApplicationControl(
+			"http://tizen.org/appcontrol/operation/bluetooth/pick",
+			"Phone/Images/image16.jpg");
+	tizen.application.launchAppControl(appControl, null, function() {
+		log("launch service succeeded");
+	}, function(e) {
+		log("launch service failed. Reason: " + e.name);
+	});
+}

@@ -37,6 +37,8 @@ var isOnline = navigator.onLine;
 var isLoaded = false;
 
 var isDownloaded = false;
+
+var gLocationDate = null;
 /*
  * Recording Global Variable
  */
@@ -62,7 +64,11 @@ var url_gmaps = 'http://maps.googleapis.com/maps/api/js?v=3.2&signed_in=true&cal
  * Quit the application
  */
 function exit() {
-	tizen.application.getCurrentApplication().exit();
+	if ('undefined' !== typeof (tizen)) {
+		tizen.application.getCurrentApplication().exit();
+	} else {
+		log("exit:");
+	}
 }
 
 /**
@@ -78,8 +84,21 @@ function log(message) {
 	}
 }
 
+function logMap(data) {
+	for (i = 0; i < data.length; i++) {
+		log("#" + i + " key:" + data[i].key);
+		for (j = 0; j < data[i].value.length; j++) {
+			log("   value#" + j + ":" + data[i].value[j]);
+		}
+	}
+}
+
 // upstream: https://gist.github.com/kamranzafar/3136584#comment-1244934
-function toast(message) {
+function toast(message, delay) {
+	if (typeof (b) === 'undefined') {
+		delay = 2000;
+	}
+
 	var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>'
 			+ message + '</h3></div>');
 
@@ -101,7 +120,7 @@ function toast(message) {
 
 	$toast.click(removeToast);
 
-	$toast.appendTo($.mobile.pageContainer).delay(2000);
+	$toast.appendTo($.mobile.pageContainer).delay(delay);
 	$toast.fadeOut(400, removeToast);
 }
 
@@ -225,12 +244,20 @@ function getLink(provider) {
 	case 'wigle':
 		url = "https://wigle.net/map?maplat=${lat}&maplon=${lon}&mapzoom=12&startTransID=20010000-00000&endTransID=20170000-00000";
 		break;
+	case 'twitter':
+		url = 'https://twitter.com/hashtag/${tag}?src=hash';
+		break;
 	default:
 		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
 		break;
 	}
+
 	url = url.replace("${lon}", lon);
 	url = url.replace("${lat}", lat);
+
+	var tag = fromLatLonToTag(lat, lon);
+	url = url.replace("${tag}", tag);
+
 	return url;
 }
 
@@ -240,32 +267,29 @@ function getLink(provider) {
 function goToURL(provider) {
 	var i = 0;
 	var j = 0;
-	if (isOnline) {
-		var appControl = new tizen.ApplicationControl(
-				"http://tizen.org/appcontrol/operation/view",
-				getLink(provider), null);
-		var appControlReplyCallback = {
-			onsuccess : function(data) {
-				for (i = 0; i < data.length; i++) {
-					log("#" + i + " key:" + data[i].key);
-					for (j = 0; j < data[i].value.length; j++) {
-						log("   value#" + j + ":" + data[i].value[j]);
-					}
+	var url = getLink(provider);
+	if ('undefined' !== typeof (tizen)) {
+		if (isOnline) {
+			var appControl = new tizen.ApplicationControl(
+					"http://tizen.org/appcontrol/operation/view", url, null);
+			var appControlReplyCallback = {
+				onsuccess : logMap,
+				onfailure : function() {
+					log('The launch application control failed');
 				}
-			},
-			onfailure : function() {
-				log('The launch application control failed');
 			}
+			tizen.application.launchAppControl(appControl, null, function() {
+				log("launch internet application control succeed");
+			}, function(e) {
+				log("launch internet application control failed. reason: "
+						+ e.message);
+			}, appControlReplyCallback);
+		} else {
+			handleError("Please connect your application online in the settings"
+					+ " if you want to open a browser")
 		}
-		tizen.application.launchAppControl(appControl, null, function() {
-			log("launch internet application control succeed");
-		}, function(e) {
-			log("launch internet application control failed. reason: "
-					+ e.message);
-		}, appControlReplyCallback);
 	} else {
-		handleError("Please connect your application online in the settings"
-				+ " if you want to open a browser")
+		window.open(url);
 	}
 }
 
@@ -449,6 +473,22 @@ function refresh() {
 								+ " if you want to load the map</p>");
 	}
 	// isOffline $('#switchOffline').val() // TODO
+
+	setDMS();
+	if (gLocationDate != null) {
+		var lat = $("#lat").val();
+		var lon = $("#lon").val();
+		var text = "Last update:<br/>" //
+				+ gLocationDate.toString() //
+				+ "<br/>" + "#" + fromLatLonToTag(lat, lon) //
+		;
+
+		$('#locationInfo').html(text);
+	}
+
+	// var locationInfo = document.getElementById("locationInfo");
+	// locationInfo.innerHTML = fromLatLonToDMS(lat, lon);
+
 	log("#} refresh: " + isReady);
 }
 
@@ -543,6 +583,35 @@ function fromLatLonToDMS(lat, lon) {
 	return dms;
 }
 
+function fromLatLonToTag(lat, lon) {
+	var latitude = lat;
+	var longitude = lon;
+	var dms = "";
+	var NS = "";
+	if (latitude >= 0) {
+		NS += "N";
+	} else {
+		latitude = -latitude;
+		NS += "S";
+	}
+	var dLat = parseInt(latitude, 10);
+	var mLat = parseInt((latitude - dLat) * 60, 10);
+	var sLat = parseInt((latitude - dLat) * 60 * 60 - 60 * mLat, 10);
+	dms += NS + dLat + "d" + mLat + "m" + sLat + "s";
+
+	var EW = "";
+	if (longitude >= 0) {
+		EW += "E";
+	} else {
+		EW += "W";
+		longitude = -longitude;
+	}
+	var dLon = parseInt(longitude, 10);
+	var mLon = parseInt((longitude - dLon) * 60, 10);
+	var sLon = parseInt((longitude - dLon) * 60 * 60 - 60 * mLon, 10);
+	dms += EW + dLon + "d" + mLon + "m" + sLon + "s";
+	return dms;
+}
 /**
  * Transform the DMS into latitude/longitude coordinates
  * 
@@ -579,7 +648,11 @@ function fromDMSToLatLon(dms) {
  * Modify the DMS value using the transformation's function fromLatLonToDMS
  */
 function setDMS() {
-	$('#dms').val(fromLatLonToDMS($("#lat").val(), $("#lon").val()));
+	var lat = $("#lat").val();
+	var lon = $("#lon").val();
+	var text = fromLatLonToDMS(lat, lon);
+
+	$('#dms').val(text);
 }
 
 /**
@@ -630,7 +703,7 @@ function changeLat() {
 	var lat = $('#lat').val();
 	if (validateLatOrLon(lat)) {
 		$('#lat').val(parseFloat($('#lat').val()).toFixed(6).toString());
-		setDMS();
+		refresh();
 		storeData();
 	} else {
 		handleError("Latitude coordinate invalid : " + lat);
@@ -646,7 +719,7 @@ function changeLon() {
 	var lon = $('#lon').val();
 	if (validateLatOrLon(lon)) {
 		$('#lon').val(parseFloat($('#lon').val()).toFixed(6).toString());
-		setDMS();
+		refresh();
 		storeData();
 	} else {
 		handleError("Lontitude coordinate invalid : " + lon);
@@ -679,9 +752,11 @@ function changeDMS() {
 function handleShowLocation(position) {
 	var lat = position.coords.latitude.toFixed(6).toString();
 	var lon = position.coords.longitude.toFixed(6).toString();
+	gLocationDate = new Date();
 	setLat(lat);
 	setLon(lon);
 	refresh();
+	isLocated = true;
 }
 
 /**
@@ -690,27 +765,30 @@ function handleShowLocation(position) {
  * @param error
  */
 function handleErrorLocation(error) {
-	var errorInfo = document.getElementById("locationInfo");
+	var locationInfo = document.getElementById("locationInfo");
 	switch (error.code) {
 	case error.PERMISSION_DENIED:
-		errorInfo.innerHTML = "User denied the request for Geolocation.";
+		locationInfo.innerHTML = "error: User denied the request for Geolocation.";
 		break;
 	case error.POSITION_UNAVAILABLE:
-		errorInfo.innerHTML = "Location information is unavailable.";
+		locationInfo.innerHTML = "error: Location information is unavailable.";
 		break;
 	case error.TIMEOUT:
-		errorInfo.innerHTML = "The request to get user location timed out.";
+		locationInfo.innerHTML = "error: The request to get user location timed out.";
 		break;
 	case error.UNKNOWN_ERROR:
-		errorInfo.innerHTML = "An unknown error occurred.";
+		locationInfo.innerHTML = "error: An unknown error occurred.";
 		break;
 	}
+	toast("Press update if you want track your new position", 4000);
+	isLocated = false;
 }
 
 /**
  * Get the current position according to the GPS' device
  */
 function getLocation() {
+
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(handleShowLocation,
 				handleErrorLocation, {
@@ -775,7 +853,7 @@ function resolveFile() {
  * @param e :
  *            error
  */
-function handleRecordError(e) {
+function handleErrorStream(e) {
 	var msg = '';
 	switch (e.code) {
 	case FileError.QUOTA_EXCEEDED_ERR:
@@ -807,14 +885,14 @@ function handleRecordError(e) {
  * @param fileStream :
  *            Stream to write
  */
-function writeToStream(fileStream) {
+function handleStreamWrite(stream) {
 	try {
 		var date = (new Date).getTime();
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
 		var line = "" + date + ";" + lat + ";" + lon + "\n";
-		fileStream.write(line);
-		fileStream.close();
+		stream.write(line);
+		stream.close();
 	} catch (exc) {
 		handleError('io: could not write to file: ' + exc.message);
 	}
@@ -825,13 +903,7 @@ function writeToStream(fileStream) {
  */
 function writeRecord() {
 	try {
-		file.openStream(
-		// open for appending
-		'a',
-		// success callback - add textarea's contents
-		writeToStream,
-		// error callback
-		handleRecordError);
+		file.openStream('a', handleStreamWrite, handleErrorStream);
 	} catch (exc) {
 		handleError('io: could not write to file: ' + exc.message);
 	}
@@ -843,7 +915,7 @@ function writeRecord() {
  * @param fileStream :
  *            Stream to read
  */
-function readFromStream(fileStream) {
+function handleStreamRead(fileStream) {
 	try {
 		log('File size: ' + file.fileSize);
 		var contents = fileStream.read(fileStream.bytesAvailable);
@@ -859,13 +931,7 @@ function readFromStream(fileStream) {
  */
 function readRecord() {
 	try {
-		file.openStream(
-		// open for reading
-		'r',
-		// success callback - add textarea's contents
-		readFromStream,
-		// error callback
-		handleRecordError);
+		file.openStream('r', handleStreamRead, handleRecordError);
 	} catch (exc) {
 		handleError('io: Could not write to file: ' + exc.message);
 	}
@@ -1016,27 +1082,37 @@ function readFile() {
  * Social Manager
  */
 
+function makeMessage() {
+	var message = "I am at this place:\n"
+			+ fromLatLonToTag($("#lat").val(), $("#lon").val()) + " \n" //
+			+ "Latitude=" + $("#lat").val()  + " \n" // 
+			+ "Longitude = " + $("#lon").val()  + " \n" //
+			+ "( " + $('#dms').val() + ")\n "  + " \n"  //
+			+ + getLink('OSM') + " \n" + web  + " \n" 
+
+	return message;
+}
+
 /**
  * Use the Email Application Control to share a position by Email
  */
 function sendEmail() {
+	var email = "mapo.tizen@gmail.com";
+	var message = makeMessage();
+	var subject = "Mapo current position is ...";
+
+	if ('undefined' !== typeof (tizen)) {
 	if (isOnline) {
-		var message = "This is the position I want to show you from Mapo:"
-				+ "\nLatitude=" + $("#lat").val() + "\nLongitude = "
-				+ $("#lon").val() + "\nIf you prefer in DMS, here it is: "
-				+ $('#dms').val()
-				+ "\nYou can see this position on OpenStreetMap: "
-				+ getLink('OSM') + "\nConnect you on Mapo for more details!";
 
 		var appControl = new tizen.ApplicationControl(
 				"http://tizen.org/appcontrol/operation/compose", null, null,
 				null, [
 						new tizen.ApplicationControlData(
 								"http://tizen.org/appcontrol/data/subject",
-								[ "Mapo" ]),
+								[ subject ]),
 						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/text",
-								[ "mapo.tizen@gmail.com" ]),
+								"http://tizen.org/appcontrol/data/to",
+								[ email ]),
 						new tizen.ApplicationControlData(
 								"http://tizen.org/appcontrol/data/text",
 								[ message ]) ]);
@@ -1050,87 +1126,15 @@ function sendEmail() {
 		alert("Please connect your application online in the settings"
 				+ " if you want to send an email");
 	}
-}
-// TODO: check
-// var appControl = new tizen.ApplicationControl(
-// "http://tizen.org/appcontrol/operation/send", // compose or send
-// "mailto:", null, null,
-// [
-// new tizen.ApplicationControlData(
-// "http://tizen.org/appcontrol/data/subject", [ "Mapo" ]),
-// new tizen.ApplicationControlData(
-// "http://tizen.org/appcontrol/data/text", [ message ]),
-// new tizen.ApplicationControlData(
-// "http://tizen.org/appcontrol/data/to",
-// [ "mapo.tizen@gmail.com" ])
-// 
-// // TODO tizen.mapo@spamgourmet.com
-// // new tizen.ApplicationControlData(
-// // "http://tizen.org/appcontrol/data/path",
-// // ["images/image1.jpg"])
-// ]);
-// tizen.application.launchAppControl(appControl, null,
-// function() {log("launch service succeeded");},
-// function(e) {
-// log("launch service failed. Reason: " + e.name);});
-
-// TODO: check
-function sendBluetooth() {
-	log("TODO");
-	exit();
-	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/bluetooth/pick", null,
-			"image/jpeg", // "image/jpeg"
-			null, []);
-
-	tizen.application.launchAppControl(appControl, "tizen.bluetooth",
-			function() {
-				log("launch service succeeded");
-			}, function(e) {
-				handleError("launch service failed. Reason: " + e.name);
-			});
-
-	var appControlReplyCallback = {
-		// // callee sent a reply
-		onsuccess : function(data) {
-			for (var i = 0; i < data.length; i++) {
-				if (data[i].key == "http://tizen.org/appcontrol/data/selected") {
-					log('Selected image is ' + data[i].value[0]);
-				}
-			}
-		},
-		// callee returned failure
-		onfailure : function() {
-			log('The launch application control failed');
-		}
-	}
-
-	tizen.application.launchAppControl(appControl, null, handleSucess,
-			handleException, appControlReplyCallback);
-
-	tizen.application.launch("tizen.bluetooth", function() {
-		log("launch service succeeded");
-	}, function(e) {
-		log("launch service failed. Reason: " + e.name);
-	});
-
-	var appControl = new tizen.ApplicationControl(
-			"http://tizen.org/appcontrol/operation/bluetooth/pick",
-			"Phone/Images/image16.jpg");
-	tizen.application.launchAppControl(appControl, null, function() {
-		log("launch service succeeded");
-	}, function(e) {
-		log("launch service failed. Reason: " + e.name);
-	});
+	} else {
+		var url="mailto:"+email+"?subject="+subject+"&body=" + message;
+		window.open(url);
+	}	
 }
 
 function sendMessage() {
-	var message = "This is the position I want to show you from Mapo:"
-			+ "\nLatitude=" + $("#lat").val() + "\nLongitude = "
-			+ $("#lon").val() + "\nIf you prefer in DMS, here it is: "
-			+ $('#dms').val()
-			+ "\nYou can see this position on OpenStreetMap: " + getLink('OSM')
-			+ "\n" + "\n\nURL: " + web;
+	var message = makeMessage();
+
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/compose", null, null, null,
 			[
@@ -1334,6 +1338,7 @@ function switchDeveloper() {
 	var attribute = (isAdvanced) ? "visible" : "hidden";
 	$("#logView").css("visibility", attribute);
 	$("#recordView").css("visibility", attribute);
+	log("logging...");
 
 }
 
@@ -1433,10 +1438,14 @@ function start() {
 	initScripts();
 	changeLat();
 	changeLon();
+
+	setTimeout( getLocation, 4000);
+
 	// refresh();
 	if (false) { // TODO: buggy flash screen
 		swipePage();
 	}
+
 	// refresh();
 	log("#} start: " + OpenLayers);
 }

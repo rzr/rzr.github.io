@@ -752,7 +752,7 @@ function changeDMS() {
 function handleShowLocation(position) {
 	var lat = position.coords.latitude.toFixed(6).toString();
 	var lon = position.coords.longitude.toFixed(6).toString();
-	gLocationDate = new Date();
+	gLocationDate = new Date(position.timestamp);
 	setLat(lat);
 	setLon(lon);
 	refresh();
@@ -980,6 +980,13 @@ function handleErrorPosition(error) {
  * Get the recording position
  */
 function getPosition() {
+	navigator.geolocation.getCurrentPosition(handleRecordPosition,
+			log, {
+				enableHighAccuracy : false,
+				timeout : 2000,
+				maximumAge : Ininity
+			});
+	
 	navigator.geolocation.getCurrentPosition(handleRecordPosition,
 			handleErrorPosition, {
 				enableHighAccuracy : $('#switchEnergy').val() == 'off'

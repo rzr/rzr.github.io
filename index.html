@@ -73,6 +73,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<div data-role="content">
 			<form>
+
+				<p id="locationInfo">Last saved position, press "Update" to
+					refresh</p>
+
 				<table>
 					<tr>
 						<td><label for=lat>Latitude<br />N+/S-:
@@ -96,12 +100,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<div data-role="collapsible" data-collapsed="true">
 				<h3>Share:</h3>
 				<div data-role="controlgroup">
-					<button onclick="sendEmail()">Email</button>
-					<button onclick="sendMessage()">Message</button>
-					<button onclick="createCalendarEvent()">Calendar</button>
-					<button onclick="createContact()">Contact</button>
-					<button onclick="call()" style="visibility: hidden;">Call</button>
-					<button onclick="sendBluetooth()" style="visibility: hidden;">Bluetooth</button>
+					<button id="email_button" onclick="sendEmail()">Email</button>
+					<button id="message_button" onclick="sendMessage()">Message</button>
+					<button id="calendar_button" onclick="createCalendarEvent()">Calendar</button>
+					<button id="contact_button" onclick="createContact()">Contact</button>
+					<!-- 
+					<button id="call_button" onclick="call()" style="display: none;">Call</button>
+					<button id="bluetooth_button" onclick="sendBluetooth()" style="display: none;">Bluetooth</button>
+					 -->
 				</div>
 			</div>
 
@@ -109,10 +115,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<h3>Web:</h3>
 				<div data-role="controlgroup">
 					<button onclick="goToURL('OSM')">OpenStreetMap</button>
-					<button onclick="goToURL('HERE')">Here Maps</button>
+					<button onclick="goToURL('HERE')">HERE Maps</button>
 					<button onclick="goToURL('GM')">Google Maps</button>
 					<button onclick="goToURL('wigle')">Wigle (WiFi)</button>
-
+					<button onclick="goToURL('twitter')">Twitter (hashtag)</button>
 				</div>
 			</div>
 		</div>
@@ -287,8 +293,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<label for="selectorTimeout">Sampling rate (seconds):</label> <input
 					type="range" name="selectorTimeout" id="selectorTimeout" value="10"
 					min="1" max="100" />
-
-				<p id="locationInfo"></p>
 			</div>
 		</div>
 

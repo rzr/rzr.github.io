@@ -1,9 +1,11 @@
+*#
 *.mine
 *.orig
 *.rej
 *.tmp
 *.wgt
 *.wgt
+*.zip
 *~
 .build
 .externalToolBuilders
@@ -14,4 +16,4 @@
 \.settings
 hs_err_pid*.log
 tmp
-*#
+img

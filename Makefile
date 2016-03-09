@@ -1,7 +1,11 @@
 default:all
 
 package?=mapo
-all?=tmp/512x512.png tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg
+wgt?=${package}.wgt
+all?=${wgt} \
+ tmp/512x512.png \
+ tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg \
+ #eol
 
 all: ${all} package
 
@@ -44,10 +48,14 @@ clean:
 check: ${package}.wgt
 	unzip -t $<
 
-package: ${package}.wgt
+package: ${wgt}
 
 ${package}.wgt: Makefile distclean
 	@rm -f $@.tmp
 	zip -r9 $@.tmp . -x "tmp/*" "docs/*" *.git* *.sign* ".*" $< && \
   mv $@.tmp $@
 
+
+deploy: ${wgt} check
+	sdb install $<
+	sdb shell pkgcmd -l grep -i "\"${package}\""

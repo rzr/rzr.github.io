@@ -1,0 +1,58 @@
+   Application Screening Result Report
+
+   Content Name   mapo : GPS tracker and map viewer Content ID  000000076778
+   Result         Pass (0)                          Age Rating  0+
+   Target Device  Samsung Z1, Samsung Z3            Report Date 2016-03-09
+   Summary        Dear Seller,
+                  Congratulations on your success!
+                  The registered application has passed our test.
+                  Thank you for your effort.
+                  Validation Team @ Tizen Store
+   Related Clause [1]-
+
+   ▶ Failure Issues
+
+      : Please fix following issues in your next update. It is mandatory
+   to resolve the issues to pass certification
+
+   ▶
+      Recommendation Issues
+
+      : Please refer to the following issues. You may fix the issues in
+   your next update. However, it is NOT MANDATORY to fix recommnedation
+   issues in your next udpate.
+
+     # Defect ID Test Category Title Test Result Attached Image or Video
+              1 2801236 Unused privilege is detected. [Defect]
+      There are unused privileges among the privileges declared in the
+                   config.xml of the Application package.
+                              [Expected Result]
+    Unused privileges must be deleted from the privileges declared in the
+                   config.xml of the Application package.
+                                 [Reference]
+   The application must be able to access only necessary resources to its
+                             legitimate purpose.
+     It's known as the principle of minimal privilege in the information
+                                  security.
+     If Tizen applications are not follow this principle it will cause a
+                               security issue.
+       See the attached file for further details on unused privileges.
+                            [2]1_web_pp_nouse.txt
+
+      If you have any questions on certification, please contact us at
+                  Support>[3]MY Q&A on [4]Seller Office.
+       For technical support, please post your question with below TWO
+     requirements to [5]MY Q&A on [6]Seller Office and you will have a
+                       response in 7 business days.
+      1. Please select category ”Application Certification > Technical
+                       Support for Review Defect”
+      2. Please include Content ID and Defect ID in the question detail
+
+References
+
+   1. http://developer.samsung.com/certificationGuide.do
+   2. file:///tmp/1_web_pp_nouse.txt
+   3. http://seller.samsungapps.com/qa/getQaList.as
+   4. http://seller.samsungapps.com/
+   5. http://seller.samsungapps.com/qa/getQaList.as
+   6. http://seller.samsungapps.com/

@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <link rel="stylesheet" href="./css/jquery.mobile-1.3.2.css" />
 <link rel="stylesheet" href="css/jqm-docs.css" />
 <script type="text/javascript" src="./js/jquery-1.9.1.js"></script>
-<script src="js/jqm-docs.js"></script>
+<script type="text/javascript" src="js/jqm-docs.js"></script>
 <script type="text/javascript" src="./js/jquery.mobile-1.3.2.js"></script>
 <script type="text/javascript">
 <!--
@@ -121,7 +121,7 @@ press "Update" to refresh position</p>
 					<button onclick="goToURL('http://maps.nokia.com/${lat},${lon},16,0,0,normal.day')">HERE Maps</button>
 					<button onclick="goToURL('https://wigle.net/map?maplat=${lat}&maplon=${lon}&mapzoom=12&startTransID=20010000-00000&endTransID=20170000-00000')">Wigle (WiFi)</button>
 					<button onclick="goToURL('https://twitter.com/hashtag/${tag}?src=hash')">Twitter (hashtag)</button>
-					<button onclick="goToURL('https://thingful.net/?what=sensor&&z=16&thing=17e0s0cx&lat=${lat}&lng=${lon}')">ThingFul (IoT)</button>
+					<button onclick="goToURL('https://thingful.net/?what=sensor&z=16&thing=17e0s0cx&lat=${lat}&lng=${lon}')">ThingFul (IoT)</button>
 
 				</div>
 			</div>
@@ -132,7 +132,7 @@ press "Update" to refresh position</p>
 			
 			Make picture :
 <input id="capture" type="file" accept="image/*" capture="camera" name="file" />
-<img id="picture" src="" witdth="100%" />
+<img id="picture" src="" width="100%" alt="Capture first" />
 				</div>
 			</div>
 			
@@ -212,7 +212,7 @@ press "Update" to refresh position</p>
 							<option value="offline" selected>Offline</option>
 							<option value="online">Online</option>
 					</select></td>
-				<tr>
+				</tr>
 				<tr>
 					<td><label for="switchEnergy">Energy saving:</label></td>
 					<td><select name="switchEnergy" id="switchEnergy"
@@ -345,8 +345,8 @@ press "Update" to refresh position</p>
 	<!-- /page #options-->
 
 	<!-- cache version -->
-	<script src="http://openlayers.org/api/OpenLayers.js"></script>
-	<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+	<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
 
 </body>
 </html>

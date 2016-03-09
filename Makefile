@@ -1,9 +1,9 @@
 default:all
 
 package?=mapo
-all?= tmp/512x512.png tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg
+all?=tmp/512x512.png tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg
 
-all: ${all}
+all: ${all} package
 
 icon.png: docs/logo.png Makefile
 	convert -resize 117x117! $< $@
@@ -38,7 +38,16 @@ distclean: clean
 	rm -f *.wgt
 
 clean:
-	rm -f *~
+	rm -rf .package tmp
+	rm -vf *~
 
 check: ${package}.wgt
 	unzip -t $<
+
+package: ${package}.wgt
+
+${package}.wgt: Makefile distclean
+	@rm -f $@.tmp
+	zip -r9 $@.tmp . -x "tmp/*" "docs/*" *.git* *.sign* ".*" $< && \
+  mv $@.tmp $@
+

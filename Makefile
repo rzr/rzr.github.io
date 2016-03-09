@@ -14,6 +14,10 @@ docs/screenshot.png: docs/logo.png
 tmp/screenshot.jpg: docs/screenshot.png
 	convert $< $@
 
+tmp/117x177/%: %
+	mkdir -p ${@D}
+	convert -resize '117x117!' $< $@
+
 tmp/512x512.png: docs/logo.png
 	mkdir -p ${@D}
 	convert -resize '512x512!' $< $@

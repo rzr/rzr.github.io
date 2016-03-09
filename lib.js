@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 var web = "http://notabug.org/tizen/mapo";
+var gEmail = "mapo.tizen@gmail.com";
 
 // The map of the application
 var map = null;
@@ -77,10 +78,19 @@ function exit() {
  * @param message
  */
 function log(message) {
+	var text="# ";
+	try {
+		var json = JSON.stringify(message);
+		text += json;
+	} catch (e) {
+		text += "not json: " + message;
+	}
+
+	
 	if (isAdvanced) {
-		console.log("# " + message);
+		console.log(text);
 		var element = document.getElementById("console");
-		element.innerHTML += "<pre>" + message + "</pre>";
+		element.innerHTML += "<pre>" + text + "</pre>";
 	}
 }
 
@@ -248,7 +258,7 @@ function getLink(provider) {
 		url = 'https://twitter.com/hashtag/${tag}?src=hash';
 		break;
 	default:
-		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
+		url = provider;
 		break;
 	}
 
@@ -415,7 +425,7 @@ function loadMap() {
 				new OpenLayers.Control.ArgParser() ]
 	});
 	if (isAdvanced)
-		p.addControl(new OpenLayers.Control.LayerSwitcher());
+		map.addControl(new OpenLayers.Control.LayerSwitcher());
 
 	if (fileRecorded) { // TODO : Data vide : data([0])?.length!=0 or
 		// fileRecorded
@@ -1178,6 +1188,12 @@ function settingsLocation() {
 			handleException);
 }
 
+
+function handleCapture(input)
+{
+	log($('#capture').val()); // fakepath 
+	log("TODO: save to file using tag filename");
+}
 /*
  * Caller Manager : may not be needed
  */
@@ -1186,11 +1202,8 @@ function call() {
 	exit();
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/dial", null, null);
-	tizen.application.launchAppControl(appControl, "tizen.phone", function() {
-		log("launch appControl succeeded");
-	}, function(e) {
-		log("error: launch appControl failed. Reason: " + e.name);
-	}, null);
+	tizen.application.launchAppControl(appControl, "tizen.phone", 
+			handleSuccess, handleException, null);
 }
 
 function caller() {
@@ -1203,11 +1216,10 @@ function caller() {
 			null,
 			[ new tizen.ApplicationControlData(
 					"http://tizen.org/appcontrol/data/call/type", [ "voice" ]) ]);
-	tizen.application.launchAppControl(appControl, "tizen.call", function() {
-		log("launch appControl succeeded");
-	}, function(e) {
-		log("launch appControl failed. Reason: " + e.name);
-	}, null);
+	
+	 tizen.application.launchAppControl(appControl, "tizen.call", 
+			 handleSuccess, handleException);
+	
 }
 
 /*
@@ -1243,7 +1255,7 @@ function createContact() {
 	// TODO: edit contact is present
 
 	var contact = new tizen.Contact({
-		emails : [ new tizen.ContactEmailAddress("mapo.tizen@gmail.com") ],
+		emails : [ new tizen.ContactEmailAddress(gEmail) ],
 		urls : [ new tizen.ContactWebSite(getLink('OSM'), 'HOMEPAGE') ],
 		notes : [ 'Position: lat=' + $("#lat").val() + ' lon='
 				+ $("#lon").val() ],

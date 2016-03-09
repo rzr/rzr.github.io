@@ -115,12 +115,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<h3>Web:</h3>
 				<div data-role="controlgroup">
 					<button onclick="goToURL('OSM')">OpenStreetMap</button>
-					<button onclick="goToURL('HERE')">HERE Maps</button>
 					<button onclick="goToURL('GM')">Google Maps</button>
-					<button onclick="goToURL('wigle')">Wigle (WiFi)</button>
-					<button onclick="goToURL('twitter')">Twitter (hashtag)</button>
+					<button onclick="goToURL('http://maps.nokia.com/${lat},${lon},16,0,0,normal.day')">HERE Maps</button>
+					<button onclick="goToURL('https://wigle.net/map?maplat=${lat}&maplon=${lon}&mapzoom=12&startTransID=20010000-00000&endTransID=20170000-00000')">Wigle (WiFi)</button>
+					<button onclick="goToURL('https://twitter.com/hashtag/${tag}?src=hash')">Twitter (hashtag)</button>
+					<button onclick="goToURL('https://thingful.net/?what=sensor&&z=16&thing=17e0s0cx&lat=${lat}&lng=${lon}')">ThingFul (IoT)</button>
+
 				</div>
 			</div>
+			
+				<div data-role="collapsible" data-collapsed="true">
+				<h3>Extras:</h3>
+				<div data-role="controlgroup">
+			
+			Make picture :
+<input id="capture" type="file" accept="image/*" capture="camera" name="file" />
+<img id="picture" src="" witdth="100%" />
+				</div>
+			</div>
+			
 		</div>
 		<!-- /content -->
 
@@ -210,8 +223,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<td><label for="switchDeveloper">Developer mode:</label></td>
 					<td><select name="switchDeveloper" id="switchDeveloper"
 						data-role="slider" onchange="switchDeveloper()">
-							<option value="off" selected>Off</option>
-							<option value="on">On</option>
+							<option value="off" >Off</option>
+							<option value="on" selected>On</option>
 					</select></td>
 				</tr>
 

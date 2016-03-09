@@ -7,7 +7,6 @@
 
 ### TODO ###
 
-* TODO [#A] : upgrade to tizen-2.3 and publish in store
 * TODO [#A] : Use JQuery with OpenLayers on the map
 * TODO [#A] : Offline map
 * TODO [#A] : Combine web API with ApplicationControl (contact, calendar...)
@@ -42,6 +41,7 @@ https://developer.tizen.org/help/index.jsp?topic=%2Forg.tizen.web.appprogramming
 
 * DONE [#A] : published on tizen store as 1.2.1
   Validation: failed:  Attached file: 000000060067_635609449956507444.zip(4.893 MB)
+* DONE [#A] : upgrade to tizen-2.4 and publish in store
 
 ## TEST ##
 

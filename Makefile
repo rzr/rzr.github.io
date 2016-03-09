@@ -1,13 +1,18 @@
-default:all
+#! /usr/bin/make -f
+
+default: all
 
 package?=mapo
-wgt?=${package}.wgt
+version?=0.0.0
+wgt?=${package}-${version}.wgt
+archive?=${package}-${version}.zip
+
 all?=${wgt} \
  tmp/512x512.png \
  tmp/480x854/gmaps.png tmp/480x854/openlayers-gmaps.png tmp/screenshot.jpg \
  #eol
 
-all: ${all} package
+all: ${all} package dist
 
 icon.png: docs/logo.png Makefile
 	convert -resize 117x117! $< $@
@@ -38,24 +43,56 @@ tmp/480x854/openlayers-gmaps.png: docs/openlayers-gmaps.png
 	mkdir -p ${@D}
 	convert -resize '480x854!' $< $@
 
+
 distclean: clean
-	rm -f *.wgt
+	rm -f *.wgt *.zip
 
 clean:
 	rm -rf .package tmp
 	rm -vf *~
 
-check: ${package}.wgt
-	unzip -t $<
+check: index.html wgt
+	webtidy $<
+	unzip -t ${wgt}
 
 package: ${wgt}
 
-${package}.wgt: Makefile distclean
+wgt: ${wgt}
+
+${wgt}: Makefile distclean
 	@rm -f $@.tmp
-	zip -r9 $@.tmp . -x "tmp/*" "docs/*" *.git* *.sign* ".*" $< && \
+	zip -r9 $@.tmp . -x "tmp/*" "docs/*" *.git* *.sign* ".*" "*.zip" "*.wgt" -x Makefile $< && \
   mv $@.tmp $@
 
+archive: ${archive}
+
+${archive}: img
+	@rm -f $@.tmp
+	zip -r9 $@.tmp . -x "tmp/*" "docs/*" *.git* *.sign* ".*" "*.zip" "*.wgt" -x Makefile $< && \
+  mv $@.tmp $@
+
+
+manifest.webapp:Makefile
+	sed -e "s|\"version\": \".*\"|\"version\": \"${version}\"|g" -i $@
 
 deploy: ${wgt} check
 	sdb install $<
 	sdb shell pkgcmd -l grep -i "\"${package}\""
+
+setup/debian:
+	which webtidy || sudo apt-get install make git zip libhtml-tidy-perl.
+
+
+dist: distclean wgt archive
+img: docs/logo.png Makefile
+	@mkdir -p img/icons
+	convert -resize 16x16! $< img/icons/logo-16.png
+	convert -resize 48x48! $< img/icons/logo-48.png
+	convert -resize 60x60! $< img/icons/logo-60.png
+	convert -resize 128x128! $< img/icons/logo-128.png
+
+docs/screenshot.png:
+	sleep 5 ; import $@
+
+run: index.html
+	firefox index.html

@@ -34,7 +34,7 @@ var map = null;
 // The boolean which provide the connection state of the application
 var isReady = true;
 
-var isAdvanced = !false;
+var isAdvanced = false;
 
 var isOnline = navigator.onLine;
 

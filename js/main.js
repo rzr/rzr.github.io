@@ -64,9 +64,6 @@ var init = function () {
     document.addEventListener( 'tizenhwkey', backEvent );
     backEventListener = backEvent;
     
-    $("#picture").hide()
-    $("#capture").change( handleCapture );
-    
   start();
 };
 

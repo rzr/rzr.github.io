@@ -17,6 +17,9 @@ all: ${all} package dist
 icon.png: docs/logo.png Makefile
 	convert -resize 117x117! $< $@
 
+docs/logo.png:
+	sleep 5 ; import $@
+
 docs/screenshot.png: docs/logo.png
 	echo cp $< $@
 
@@ -76,8 +79,13 @@ manifest.webapp:Makefile
 	sed -e "s|\"version\": \".*\"|\"version\": \"${version}\"|g" -i $@
 
 deploy: ${wgt} check
-	sdb install $<
+	sdb install $< 
 	sdb shell pkgcmd -l grep -i "\"${package}\""
+
+tizen-1.0/deploy: ${wgt}
+	sdb push $< /tmp/
+	sdb shell pkgcmd -i -t wgt -p /tmp/${<}
+	echo "press confirm on device"
 
 setup/debian:
 	which webtidy || sudo apt-get install make git zip libhtml-tidy-perl.
@@ -90,9 +98,6 @@ img: docs/logo.png Makefile
 	convert -resize 48x48! $< img/icons/logo-48.png
 	convert -resize 60x60! $< img/icons/logo-60.png
 	convert -resize 128x128! $< img/icons/logo-128.png
-
-docs/screenshot.png:
-	sleep 5 ; import $@
 
 run: index.html
 	firefox index.html

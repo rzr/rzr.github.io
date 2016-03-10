@@ -1,5 +1,5 @@
 Subject: mapo
-Description: map viewer and GPS recorder
+Description: GPS tracker and map viewer
 URL: http://notabug.org/tizen/mapo
 License: GPL-3.0-plus
 License-URL: https://spdx.org/licenses/GPL-3.0-plus

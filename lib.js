@@ -24,6 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 var web = "http://notabug.org/tizen/mapo";
+
+web = "http://rzr.github.io/";
+
 var gEmail = "mapo.tizen@gmail.com";
 
 // The map of the application
@@ -31,7 +34,7 @@ var map = null;
 // The boolean which provide the connection state of the application
 var isReady = true;
 
-var isAdvanced = false;
+var isAdvanced = !false;
 
 var isOnline = navigator.onLine;
 
@@ -54,7 +57,7 @@ var fileRecorded = false;
 
 var url_openlayers = "http://openlayers.org/api/OpenLayers.js";
 
-var url_gmaps = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
+// var url_gmaps = "http://maps.google.com/maps/api/js?v=3.2&sensor=false";
 
 var url_gmaps = 'http://maps.googleapis.com/maps/api/js?v=3.2&signed_in=true&callback=handleLoadedGmaps';
 /*
@@ -78,7 +81,7 @@ function exit() {
  * @param message
  */
 function log(message) {
-	var text="# ";
+	var text = "# ";
 	try {
 		var json = JSON.stringify(message);
 		text += json;
@@ -86,7 +89,6 @@ function log(message) {
 		text += "not json: " + message;
 	}
 
-	
 	if (isAdvanced) {
 		console.log(text);
 		var element = document.getElementById("console");
@@ -149,6 +151,12 @@ function handleException(e) {
 function handleSuccess() {
 	return log("success: ");
 }
+
+
+function handleFailure() {
+	return log("failure: ");
+}
+/*
 /*
  * Storage Manager
  */
@@ -225,6 +233,27 @@ function setLon(lon) {
 	}
 }
 
+
+function makeMessageShort() {
+	var tag =  fromLatLonToTag($("#lat").val(), $("#lon").val()) ;
+	var message = web + "#" +  tag + " I am at " + "#" + tag;
+	return message;
+}
+
+
+function makeTwitterUrl() {
+	
+	var tag = fromLatLonToTag($("#lat").val(), $("#lon").val()) ;
+	var url = web + "%23" +  tag ;
+	var message = " I am at " + "#" + tag;
+	var baseurl = 'https://twitter.com/intent/tweet?&via=TizenHelper&url=${web}&text=${message}';
+	url = baseurl.replace("${web}", url);
+    message = encodeURIComponent(message);
+	url = url.replace("${message}", message);
+
+	return url;
+}
+
 /*
  * Link Manager
  */
@@ -237,7 +266,10 @@ function setLon(lon) {
 function getLink(provider) {
 	var lat = $("#lat").val();
 	var lon = $("#lon").val();
-	var url;
+	var url = web;
+	var message = null;
+	var tag = null;
+	
 	switch (provider) {
 	case 'OSM':
 		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
@@ -251,22 +283,19 @@ function getLink(provider) {
 	case 'bing':
 		url = "http://www.bing.com/maps/?v=2&style=r&lvl=13&cp=48.11~${lat}~${lon}&style=r&lvl=4";
 		break;
-	case 'wigle':
-		url = "https://wigle.net/map?maplat=${lat}&maplon=${lon}&mapzoom=12&startTransID=20010000-00000&endTransID=20170000-00000";
-		break;
 	case 'twitter':
-		url = 'https://twitter.com/hashtag/${tag}?src=hash';
+		url  = makeTwitterUrl();  
 		break;
 	default:
+		tag = fromLatLonToTag(lat, lon);
 		url = provider;
 		break;
 	}
-
 	url = url.replace("${lon}", lon);
 	url = url.replace("${lat}", lat);
-
-	var tag = fromLatLonToTag(lat, lon);
 	url = url.replace("${tag}", tag);
+	url = url.replace("${url}", web);
+	url = url.replace("${web}", web);
 
 	return url;
 }
@@ -278,15 +307,14 @@ function goToURL(provider) {
 	var i = 0;
 	var j = 0;
 	var url = getLink(provider);
+	log(url);
 	if ('undefined' !== typeof (tizen)) {
 		if (isOnline) {
 			var appControl = new tizen.ApplicationControl(
 					"http://tizen.org/appcontrol/operation/view", url, null);
 			var appControlReplyCallback = {
 				onsuccess : logMap,
-				onfailure : function() {
-					log('The launch application control failed');
-				}
+				onfailure : handleFailure
 			}
 			tizen.application.launchAppControl(appControl, null, function() {
 				log("launch internet application control succeed");
@@ -484,7 +512,7 @@ function refresh() {
 	}
 	// isOffline $('#switchOffline').val() // TODO
 
-	setDMS();
+	updateDMS();
 	if (gLocationDate != null) {
 		var lat = $("#lat").val();
 		var lon = $("#lon").val();
@@ -593,10 +621,11 @@ function fromLatLonToDMS(lat, lon) {
 	return dms;
 }
 
+/** @return string in this form : N26d21m28sE127d47m1s **/
 function fromLatLonToTag(lat, lon) {
+	var result = "";
 	var latitude = lat;
 	var longitude = lon;
-	var dms = "";
 	var NS = "";
 	if (latitude >= 0) {
 		NS += "N";
@@ -607,7 +636,7 @@ function fromLatLonToTag(lat, lon) {
 	var dLat = parseInt(latitude, 10);
 	var mLat = parseInt((latitude - dLat) * 60, 10);
 	var sLat = parseInt((latitude - dLat) * 60 * 60 - 60 * mLat, 10);
-	dms += NS + dLat + "d" + mLat + "m" + sLat + "s";
+	result += NS + dLat + "d" + mLat + "m" + sLat + "s";
 
 	var EW = "";
 	if (longitude >= 0) {
@@ -619,19 +648,24 @@ function fromLatLonToTag(lat, lon) {
 	var dLon = parseInt(longitude, 10);
 	var mLon = parseInt((longitude - dLon) * 60, 10);
 	var sLon = parseInt((longitude - dLon) * 60 * 60 - 60 * mLon, 10);
-	dms += EW + dLon + "d" + mLon + "m" + sLon + "s";
-	return dms;
+	result += EW + dLon + "d" + mLon + "m" + sLon + "s";
+	return result;
 }
 /**
  * Transform the DMS into latitude/longitude coordinates
  * 
  * @param dms :
  *            DMS coordinate
- * @returns [ lat, lon ] : latitude and longitude coordinates
  */
-function fromDMSToLatLon(dms) {
-	var re = /^([NS])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*([EW])\s*([0-9.\-]+)\s*°\s*([0-9.\-]+)\s*\'\s*([0-9.\-]+)\s*\"\s*$/;
-	if (re.test(dms)) {
+function setDMS(input) {
+	input = input.replace('°','d').replace('\'','m'),replace('"',s);
+	setTag(input);
+}
+
+
+function setTag(input) {
+	var re = /^#([NS])([0-9.\-]+)d([0-9.\-]+)m([0-9.\-]+)s([EW])([0-9.\-]+)d([0-9.\-]+)m([0-9.\-]+)s$/;
+	if (re.test(input)) {
 		var lat = (parseFloat(RegExp.$2) + parseFloat(RegExp.$3) / 60 + parseFloat(RegExp.$4)
 				/ (60 * 60)).toFixed(6);
 		if (RegExp.$1 == 'S') {
@@ -647,9 +681,10 @@ function fromDMSToLatLon(dms) {
 		}
 		lon = lon.toString();
 		setLon(lon);
+		
+		refresh();
 	}
 }
-
 /*
  * Coordinates Manager
  */
@@ -657,7 +692,7 @@ function fromDMSToLatLon(dms) {
 /**
  * Modify the DMS value using the transformation's function fromLatLonToDMS
  */
-function setDMS() {
+function updateDMS() {
 	var lat = $("#lat").val();
 	var lon = $("#lon").val();
 	var text = fromLatLonToDMS(lat, lon);
@@ -665,12 +700,9 @@ function setDMS() {
 	$('#dms').val(text);
 }
 
-/**
- * Modify the latitude and longitude values using the transformation's function
- * fromDMSToLatLon
- */
+
 function setLatLon() {
-	var coordinates = fromDMSToLatLon($('#dms').val());
+	 setDMS($('#dms').val());
 }
 
 /**
@@ -787,10 +819,11 @@ function handleErrorLocation(error) {
 		locationInfo.innerHTML = "error: The request to get user location timed out.";
 		break;
 	case error.UNKNOWN_ERROR:
+	default:
 		locationInfo.innerHTML = "error: An unknown error occurred.";
 		break;
 	}
-	toast("Press update if you want track your new position", 4000);
+	toast("Check settings and press update to track position", 4000);
 	isLocated = false;
 }
 
@@ -990,13 +1023,12 @@ function handleErrorPosition(error) {
  * Get the recording position
  */
 function getPosition() {
-	navigator.geolocation.getCurrentPosition(handleRecordPosition,
-			log, {
-				enableHighAccuracy : false,
-				timeout : 2000,
-				maximumAge : Ininity
-			});
-	
+	navigator.geolocation.getCurrentPosition(handleRecordPosition, log, {
+		enableHighAccuracy : false,
+		timeout : 2000,
+		maximumAge : Ininity
+	});
+
 	navigator.geolocation.getCurrentPosition(handleRecordPosition,
 			handleErrorPosition, {
 				enableHighAccuracy : $('#switchEnergy').val() == 'off'
@@ -1100,53 +1132,53 @@ function readFile() {
  */
 
 function makeMessage() {
-	var message = "I am at this place:\n"
-			+ fromLatLonToTag($("#lat").val(), $("#lon").val()) + " \n" //
-			+ "Latitude=" + $("#lat").val()  + " \n" // 
-			+ "Longitude = " + $("#lon").val()  + " \n" //
-			+ "( " + $('#dms').val() + ")\n "  + " \n"  //
-			+ + getLink('OSM') + " \n" + web  + " \n" 
+	var message = "I am at this place:\n" //
+			+ "#" + fromLatLonToTag($("#lat").val(), $("#lon").val()) + " \n" //
+			+ "Latitude=" + $("#lat").val() + " \n" // 
+			+ "Longitude = " + $("#lon").val() + " \n" //
+			+ "( " + $('#dms').val() + ")\n " + " \n" //
+			+ getLink('OSM') + " \n" + web + " \n";
 
 	return message;
 }
+
 
 /**
  * Use the Email Application Control to share a position by Email
  */
 function sendEmail() {
-	var email = "mapo.tizen@gmail.com";
+	var email = gEmail;
 	var message = makeMessage();
 	var subject = "Mapo current position is ...";
 
 	if ('undefined' !== typeof (tizen)) {
-	if (isOnline) {
+		if (isOnline) {
 
-		var appControl = new tizen.ApplicationControl(
-				"http://tizen.org/appcontrol/operation/compose", null, null,
-				null, [
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/subject",
-								[ subject ]),
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/to",
-								[ email ]),
-						new tizen.ApplicationControlData(
-								"http://tizen.org/appcontrol/data/text",
-								[ message ]) ]);
-		tizen.application.launchAppControl(appControl, "tizen.email",
-				function() {
-					log("launch service succeeded");
-				}, function(e) {
-					handleError("launch service failed. Reason: " + e.name);
-				})
+			var appControl = new tizen.ApplicationControl(
+					"http://tizen.org/appcontrol/operation/compose", //
+ null,
+					null, null, [
+							new tizen.ApplicationControlData(
+									"http://tizen.org/appcontrol/data/subject",
+									[ subject ]),
+							new tizen.ApplicationControlData(
+									"http://tizen.org/appcontrol/data/to",
+									[ email ]),
+							new tizen.ApplicationControlData(
+									"http://tizen.org/appcontrol/data/text",
+									[ message ]) ]);
+			tizen.application
+					.launchAppControl(appControl, "tizen.email", //
+handleSuccess, handleException);
+		} else {
+			alert("Please connect your application online in the settings"
+					+ " if you want to send an email");
+		}
 	} else {
-		alert("Please connect your application online in the settings"
-				+ " if you want to send an email");
-	}
-	} else {
-		var url="mailto:"+email+"?subject="+subject+"&body=" + message;
+		var url = "mailto:" + email + "?subject=" + subject + "&body="
+				+ message;
 		window.open(url);
-	}	
+	}
 }
 
 function sendMessage() {
@@ -1161,12 +1193,8 @@ function sendMessage() {
 					new tizen.ApplicationControlData(
 							"http://tizen.org/appcontrol/data/text",
 							[ message ]) ]);
-	tizen.application.launchAppControl(appControl, "tizen.messages",
-			function() {
-				log("launch service succeeded");
-			}, function(e) {
-				handleError("launch service failed. Reason: " + e);
-			});
+	tizen.application.launchAppControl(appControl, "tizen.messages", //
+handleSuccess, handleException);
 }
 
 /*
@@ -1188,10 +1216,8 @@ function settingsLocation() {
 			handleException);
 }
 
-
-function handleCapture(input)
-{
-	log($('#capture').val()); // fakepath 
+function handleCapture(input) {
+	log($('#capture').val()); // fakepath
 	log("TODO: save to file using tag filename");
 }
 /*
@@ -1202,7 +1228,7 @@ function call() {
 	exit();
 	var appControl = new tizen.ApplicationControl(
 			"http://tizen.org/appcontrol/operation/dial", null, null);
-	tizen.application.launchAppControl(appControl, "tizen.phone", 
+	tizen.application.launchAppControl(appControl, "tizen.phone",
 			handleSuccess, handleException, null);
 }
 
@@ -1216,10 +1242,10 @@ function caller() {
 			null,
 			[ new tizen.ApplicationControlData(
 					"http://tizen.org/appcontrol/data/call/type", [ "voice" ]) ]);
-	
-	 tizen.application.launchAppControl(appControl, "tizen.call", 
-			 handleSuccess, handleException);
-	
+
+	tizen.application.launchAppControl(appControl, "tizen.call", //
+handleSuccess, handleException);
+
 }
 
 /*
@@ -1452,13 +1478,21 @@ function initScripts() {
  */
 function start() {
 	log("#{ start: " + OpenLayers);
+
+	$("#picture").hide()
+	$("#capture").change(handleCapture);
+
 	initData();
 	initSettings();
 	initScripts();
 	changeLat();
 	changeLon();
-
-	setTimeout( getLocation, 4000);
+log(window.location.hash);
+	if(window.location.hash) {
+		setTag(window.location.hash);
+	} else {
+			setTimeout(getLocation, 4000);
+	}
 
 	// refresh();
 	if (false) { // TODO: buggy flash screen

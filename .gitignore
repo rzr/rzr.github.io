@@ -15,5 +15,6 @@
 \.sdk_delta.info
 \.settings
 hs_err_pid*.log
-tmp
 img
+tmp
+tmp.*

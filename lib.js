@@ -830,17 +830,36 @@ function handleErrorLocation(error) {
 /**
  * Get the current position according to the GPS' device
  */
-function getLocation() {
-
+function getLocation(isUpdate) {
+	
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(handleShowLocation,
-				handleErrorLocation, {
-					enableHighAccuracy : $('#switchEnergy').val() == 'off'
-				});
+		
+		if(isUpdate){
+			navigator.geolocation.getCurrentPosition(handleShowLocation,
+					handleErrorLocation, {
+						enableHighAccuracy : $('#switchEnergy').val() == 'off'
+					});
+		}else{
+			navigator.geolocation.watchPosition(updateMapCenter,
+					handleErrorLocation, {
+						enableHighAccuracy : $('#switchEnergy').val() == 'off'
+					});
+		}
+
 	} else {
 		document.getElementById("locationInfo").innerHTML = "Geolocation is not supported by this browser.";
 	}
 }
+
+function updateMapCenter(position){
+
+	var latCenter = position.coords.latitude.toFixed(6).toString();
+	var lonCenter = position.coords.longitude.toFixed(6).toString();
+	
+	map.setCenter(new OpenLayers.LonLat(lonCenter, latCenter).transform('EPSG:4326', 'EPSG:3857'));
+	
+}
+
 
 /*
  * Recording manager

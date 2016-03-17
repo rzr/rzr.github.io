@@ -17,3 +17,5 @@
 hs_err_pid*.log
 tmp
 img
+/.settings
+/.sdk_delta.info

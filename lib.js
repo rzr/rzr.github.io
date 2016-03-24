@@ -34,7 +34,7 @@ var map = null;
 // The boolean which provide the connection state of the application
 var isReady = true;
 
-var isAdvanced = !false;
+var isAdvanced = false;
 
 var isOnline = navigator.onLine;
 
@@ -179,6 +179,7 @@ function storeSettings() {
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
 	localStorage.setItem('downloaded', isDownloaded);
+	localStorage.setItem('develmode', isAdvanced);
 	log("#} storeSettings: " + isOnline);
 
 }
@@ -572,6 +573,12 @@ function initSettings() {
 	}
 	if (localStorage.getItem('downloaded') !== null) {
 		isDownloaded = localStorage.getItem('downloaded');
+	}
+	if (localStorage.getItem('develmode') !== null) {
+		isAdvanced = localStorage.getItem('develmode');
+	}
+	else { // Placeholder for settings consolidation strategy
+		isAdvanced = ('on' === $('#switchDeveloper').val());
 	}
 	storeSettings();
 	log("#} initSettings: " + isReady);

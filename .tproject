@@ -69,6 +69,7 @@
             <path value="tmp/tmp/480x854/openlayers-gmaps.png" type="file"/>
             <path value="tmp/tmp/512x512.jpg" type="file"/>
             <path value="tmp/tmp/screenshot.jpg" type="file"/>
+            <path value="manifest.webapp" type="file"/>
         </blacklist>
         <resFallback autoGen="true"/>
     </package>

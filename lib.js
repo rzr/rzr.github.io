@@ -152,11 +152,9 @@ function handleSuccess() {
 	return log("success: ");
 }
 
-
 function handleFailure() {
 	return log("failure: ");
 }
-/*
 /*
  * Storage Manager
  */
@@ -179,7 +177,8 @@ function storeSettings() {
 	localStorage.setItem('energySaving', $('#switchEnergy').val());
 	localStorage.setItem('timeout', $('#selectorTimeout').val());
 	localStorage.setItem('downloaded', isDownloaded);
-	localStorage.setItem('develmode', isAdvanced);
+	isAdvanced = $('#switchDeveloper').val();
+	localStorage.setItem('develmode', isAdvanced );
 	log("#} storeSettings: " + isOnline);
 
 }
@@ -234,22 +233,20 @@ function setLon(lon) {
 	}
 }
 
-
 function makeMessageShort() {
-	var tag =  fromLatLonToTag($("#lat").val(), $("#lon").val()) ;
-	var message = web + "#" +  tag + " I am at " + "#" + tag;
+	var tag = fromLatLonToTag($("#lat").val(), $("#lon").val());
+	var message = web + "#" + tag + " I am at " + "#" + tag;
 	return message;
 }
 
-
 function makeTwitterUrl() {
-	
-	var tag = fromLatLonToTag($("#lat").val(), $("#lon").val()) ;
-	var url = web + "%23" +  tag ;
+
+	var tag = fromLatLonToTag($("#lat").val(), $("#lon").val());
+	var url = web + "%23" + tag;
 	var message = " I am at " + "#" + tag;
 	var baseurl = 'https://twitter.com/intent/tweet?&via=TizenHelper&url=${web}&text=${message}';
 	url = baseurl.replace("${web}", url);
-    message = encodeURIComponent(message);
+	message = encodeURIComponent(message);
 	url = url.replace("${message}", message);
 
 	return url;
@@ -270,7 +267,7 @@ function getLink(provider) {
 	var url = web;
 	var message = null;
 	var tag = null;
-	
+
 	switch (provider) {
 	case 'OSM':
 		url = "http://www.openstreetmap.org/?&zoom=10&layers=mapnik&lat=${lat}&lon=${lon}";
@@ -285,7 +282,7 @@ function getLink(provider) {
 		url = "http://www.bing.com/maps/?v=2&style=r&lvl=13&cp=48.11~${lat}~${lon}&style=r&lvl=4";
 		break;
 	case 'twitter':
-		url  = makeTwitterUrl();  
+		url = makeTwitterUrl();
 		break;
 	default:
 		tag = fromLatLonToTag(lat, lon);
@@ -574,12 +571,12 @@ function initSettings() {
 	if (localStorage.getItem('downloaded') !== null) {
 		isDownloaded = localStorage.getItem('downloaded');
 	}
+	
 	if (localStorage.getItem('develmode') !== null) {
 		isAdvanced = localStorage.getItem('develmode');
-	}
-	else { // Placeholder for settings consolidation strategy
-		isAdvanced = ('on' === $('#switchDeveloper').val());
-	}
+	}	
+	$('#switchDeveloper').val(isAdvanced ? 'on' : 'off');
+
 	storeSettings();
 	log("#} initSettings: " + isReady);
 }
@@ -665,10 +662,9 @@ function fromLatLonToTag(lat, lon) {
  *            DMS coordinate
  */
 function setDMS(input) {
-	input = input.replace('°','d').replace('\'','m'),replace('"',s);
+	input = input.replace('°', 'd').replace('\'', 'm'), replace('"', s);
 	setTag(input);
 }
-
 
 function setTag(input) {
 	var re = /^#([NS])([0-9.\-]+)d([0-9.\-]+)m([0-9.\-]+)s([EW])([0-9.\-]+)d([0-9.\-]+)m([0-9.\-]+)s$/;
@@ -688,7 +684,7 @@ function setTag(input) {
 		}
 		lon = lon.toString();
 		setLon(lon);
-		
+
 		refresh();
 	}
 }
@@ -707,9 +703,8 @@ function updateDMS() {
 	$('#dms').val(text);
 }
 
-
 function setLatLon() {
-	 setDMS($('#dms').val());
+	setDMS($('#dms').val());
 }
 
 /**
@@ -838,15 +833,15 @@ function handleErrorLocation(error) {
  * Get the current position according to the GPS' device
  */
 function getLocation(isUpdate) {
-	
+
 	if (navigator.geolocation) {
-		
-		if(isUpdate){
+
+		if (isUpdate) {
 			navigator.geolocation.getCurrentPosition(handleShowLocation,
 					handleErrorLocation, {
 						enableHighAccuracy : $('#switchEnergy').val() == 'off'
 					});
-		}else{
+		} else {
 			navigator.geolocation.watchPosition(updateMapCenter,
 					handleErrorLocation, {
 						enableHighAccuracy : $('#switchEnergy').val() == 'off'
@@ -858,15 +853,14 @@ function getLocation(isUpdate) {
 	}
 }
 
-function updateMapCenter(position){
+function updateMapCenter(position) {
 
 	var latCenter = position.coords.latitude.toFixed(6).toString();
 	var lonCenter = position.coords.longitude.toFixed(6).toString();
-	
-	map.setCenter(new OpenLayers.LonLat(lonCenter, latCenter).transform('EPSG:4326', 'EPSG:3857'));
-	
-}
 
+	map.setCenter(new OpenLayers.LonLat(lonCenter, latCenter).transform('EPSG:4326', 'EPSG:3857'));
+
+}
 
 /*
  * Recording manager
@@ -1168,7 +1162,6 @@ function makeMessage() {
 	return message;
 }
 
-
 /**
  * Use the Email Application Control to share a position by Email
  */
@@ -1182,8 +1175,7 @@ function sendEmail() {
 
 			var appControl = new tizen.ApplicationControl(
 					"http://tizen.org/appcontrol/operation/compose", //
- null,
-					null, null, [
+					null, null, null, [
 							new tizen.ApplicationControlData(
 									"http://tizen.org/appcontrol/data/subject",
 									[ subject ]),
@@ -1193,9 +1185,8 @@ function sendEmail() {
 							new tizen.ApplicationControlData(
 									"http://tizen.org/appcontrol/data/text",
 									[ message ]) ]);
-			tizen.application
-					.launchAppControl(appControl, "tizen.email", //
-handleSuccess, handleException);
+			tizen.application.launchAppControl(appControl, "tizen.email", //
+			handleSuccess, handleException);
 		} else {
 			alert("Please connect your application online in the settings"
 					+ " if you want to send an email");
@@ -1220,7 +1211,7 @@ function sendMessage() {
 							"http://tizen.org/appcontrol/data/text",
 							[ message ]) ]);
 	tizen.application.launchAppControl(appControl, "tizen.messages", //
-handleSuccess, handleException);
+	handleSuccess, handleException);
 }
 
 /*
@@ -1270,7 +1261,7 @@ function caller() {
 					"http://tizen.org/appcontrol/data/call/type", [ "voice" ]) ]);
 
 	tizen.application.launchAppControl(appControl, "tizen.call", //
-handleSuccess, handleException);
+	handleSuccess, handleException);
 
 }
 
@@ -1410,7 +1401,6 @@ function switchDeveloper() {
 	$("#logView").css("visibility", attribute);
 	$("#recordView").css("visibility", attribute);
 	log("logging...");
-
 }
 
 /**
@@ -1511,13 +1501,14 @@ function start() {
 	initData();
 	initSettings();
 	initScripts();
+	switchDeveloper();
 	changeLat();
 	changeLon();
-log(window.location.hash);
-	if(window.location.hash) {
+	log(window.location.hash);
+	if (window.location.hash) {
 		setTag(window.location.hash);
 	} else {
-			setTimeout(getLocation, 4000);
+		setTimeout(getLocation, 4000);
 	}
 
 	// refresh();

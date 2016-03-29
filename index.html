@@ -73,10 +73,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<div data-role="content">
 			<form>
+				<center>
+				<p id="locationInfo">
+					Last saved position: <br />(Press "Update" to refresh position)
+				</p>
 
-				<p id="locationInfo">Last saved position, <br/>
-press "Update" to refresh position</p>
-<center>
 				<table>
 					<tr>
 						<td><label for=lat>Latitude (N+/S-):
@@ -125,17 +126,7 @@ press "Update" to refresh position</p>
 
 				</div>
 			</div>
-			
-				<div data-role="collapsible" data-collapsed="true">
-				<h3>Extras:</h3>
-				<div data-role="controlgroup">
-			
-			Make picture :
-<input id="capture" type="file" accept="image/*" capture="camera" name="file" />
-<img id="picture" src="" width="100%" alt="Capture first" />
-				</div>
-			</div>
-			
+
 		</div>
 		<!-- /content -->
 
@@ -225,8 +216,8 @@ press "Update" to refresh position</p>
 					<td><label for="switchDeveloper">Developer mode:</label></td>
 					<td><select name="switchDeveloper" id="switchDeveloper"
 						data-role="slider" onchange="switchDeveloper()">
-							<option value="off" >Off</option>
-							<option value="on" selected>On</option>
+							<option value="off" selected>Off</option>
+							<option value="on">On</option>
 					</select></td>
 				</tr>
 
@@ -258,7 +249,7 @@ press "Update" to refresh position</p>
 	<!-- /page #options-->
 
 
-	<!-- Page 3 : about -->
+	<!-- Page 4 : about -->
 	<div data-role="page" id="about" class="ui-page">
 		<div data-role="header" data-id="myHeader" data-position="fixed">
 			<a href="javascript:void(0);" data-role="button"
@@ -278,45 +269,63 @@ press "Update" to refresh position</p>
 			<!-- /navbar -->
 		</div>
 		<!-- /header -->
-		<div>
-			<h3>Mapo geoloc</h3>
-			This application is Free Libre and Open Source Software (licenced under GPL-3.0+)</br>
-			You're welcome to contribute and make it a community managed project.</br>
-			Support can be provided, join tizen devolopers channels.
-		</div>
 
-		<div data-role="collapsible" data-collapsed="true" id="logView"
-			style="visibility: hidden;">
-			<h3>Developer Log:</h3>
-			<div data-role="controlgroup">
-				<div id="console"></div>
+		<div data-role="content">
+			<div>
+				<h3>Mapo geoloc</h3>
+				This application is Free Libre and Open Source Software (licenced
+				under GPL-3.0+)<br />
 			</div>
-		</div>
-		
-		<div data-role="collapsible" data-collapsed="true" id="recordView"
-			style="visibility: hidden;">
-			<h3>Record:</h3>
-			<div data-role="controlgroup">
-				<table width="100%">
-					<tr>
-						<td><label for="switchRecord">Record:</label></td>
-						<td><select name="switchRecord" id="switchRecord"
-							data-role="slider" onchange="record()">
-								<option value="stop">Stop</option>
-								<option value="start">Start</option>
-						</select></td>
-					</tr>
-				</table>
-				<label for="selectorTimeout">Sampling rate (seconds):</label> <input
-					type="range" name="selectorTimeout" id="selectorTimeout" value="10"
-					min="1" max="100" />
+
+			<div data-role="collapsible" data-collapsed="true" id="logView"
+				style="visibility: hidden;">
+				<h3>Developer Log:</h3>
+				<div data-role="controlgroup">
+					<div id="console"></div>
+				</div>
 			</div>
-		</div>
-		
-<center><img src="icon.png" /></center>
 
+			<div data-role="collapsible" data-collapsed="true" id="recordView"
+				style="visibility: hidden;">
+				<h3>Extras:</h3>
+				<h4>Record :</h4>
+				<div data-role="controlgroup">
+					<table width="100%">
+						<tr>
+							<td><label for="switchRecord">Record:</label></td>
+							<td><select name="switchRecord" id="switchRecord"
+								data-role="slider" onchange="record()">
+									<option value="stop">Stop</option>
+									<option value="start">Start</option>
+							</select></td>
+						</tr>
+					</table>
+					<label for="selectorTimeout">Sampling rate (seconds):</label> <input
+						type="range" name="selectorTimeout" id="selectorTimeout"
+						value="10" min="1" max="100" />
+				</div>
 
-		<div>
+				<h4>Picture:</h4>
+				<div data-role="controlgroup">
+					Make picture : <input id="capture" type="file" accept="image/*"
+						capture="camera" name="file" /> <img id="picture" src=""
+						width="100%" alt="Capture first" />
+				</div>
+
+			</div>
+
+			<div>
+
+				<center>
+					<img src="icon.png" />
+				</center>
+
+				<p>
+					You're welcome to contribute and be part of the project.<br />
+					Support can be provided, join tizen devolopers channels.
+
+				</p>
+			</div>
 			<h3>CREDITS / THANKS</h3>
 			<ul>
 				<li>Philippe Coval
@@ -333,16 +342,13 @@ press "Update" to refresh position</p>
 				<li>Eurogiciel Opensource Dept
 			</ul>
 		</div>
-
 		<!-- /content -->
 
 		<div data-role="footer" data-id="myFooter" data-position="fixed">
 			Copyleft: GPL-3.0+ : http://notabug.org/tizen/mapo</div>
 		<!-- /footer -->
 	</div>
-
-
-	<!-- /page #options-->
+	<!-- /page #about-->
 
 	<!-- cache version -->
 	<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>

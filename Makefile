@@ -52,7 +52,7 @@ distclean: clean
 
 clean:
 	rm -rf .package tmp
-	rm -vf *~
+	rm -vf *~ .*~ .*.orig .*.mine
 
 check: index.html wgt
 	webtidy $<
